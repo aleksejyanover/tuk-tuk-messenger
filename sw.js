@@ -1,4 +1,4 @@
-const CACHE = 'brum-brum-v3';
+const CACHE = 'brum-brum-v4';
 const ASSETS = [
   './',
   './manifest.webmanifest',
@@ -13,15 +13,39 @@ self.addEventListener('install', (e) => {
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())
+    caches.keys().then((keys) => Promise.all(
+      keys
+        .filter((k) => k !== CACHE)
+        .map((k) => caches.delete(k))
+    )).then(() => {
+      // на всякий случай вычищаем старые рекламные ролики из всех кэшей
+      return caches.keys().then((keys) => Promise.all(
+        keys.map((k) => caches.open(k).then((c) => c.keys().then((reqs) => Promise.all(
+          reqs.filter((r) => /ad.*\.mp4$/i.test(new URL(r.url).pathname)).map((r) => c.delete(r))
+        ))))
+      ));
+    }).then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
-  // не кэшируем сторонние ресурсы (видео рекламы и т.п.)
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;
+  const isDoc = e.request.mode === 'navigate' || url.pathname === '/' || /\.html?$/.test(url.pathname);
+  if (isDoc) {
+    // документ всегда тянем из сети (со свежим приложением), кэш — только запасной
+    e.respondWith(
+      fetch(e.request).then((resp) => {
+        if (resp && resp.status === 200 && resp.type === 'basic') {
+          const clone = resp.clone();
+          caches.open(CACHE).then((c) => c.put(e.request, clone));
+        }
+        return resp;
+      }).catch(() => caches.match(e.request))
+    );
+    return;
+  }
   e.respondWith(
     caches.match(e.request).then((cached) => {
       const fetchP = fetch(e.request).then((resp) => {
