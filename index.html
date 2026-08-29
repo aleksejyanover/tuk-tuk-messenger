@@ -6552,5 +6552,144 @@ function unmuteAd(video) {
         });
     })();
     </script>
+    <script>
+    (function(){
+        var cssId = 'tukFeatCss';
+        if (!document.getElementById(cssId)) {
+            var s = document.createElement('style'); s.id = cssId; s.textContent = [
+            '#tukFab{position:fixed;left:16px;bottom:16px;z-index:9995;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#00f0ff,#22d3ee);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 22px rgba(0,240,255,.45);font-size:24px;border:none}',
+            '#tukPanel{position:fixed;left:16px;bottom:84px;z-index:9995;width:min(330px,90vw);background:rgba(10,14,26,.97);border:1px solid rgba(0,240,255,.3);border-radius:16px;padding:14px;display:none;color:#e2e8f0}',
+            '#tukPanel h3{margin:0 0 10px;font-size:15px;color:#00f0ff}',
+            '.tk-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;padding:10px;background:rgba(255,255,255,.05);border-radius:10px}',
+            '.tk-row .lbl{font-size:13px;flex:1}',
+            '.tk-btn{border:none;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:12px}',
+            '.tk-on{background:linear-gradient(135deg,#22c55e,#16a34a);color:#000}',
+            '.tk-off{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}',
+            '.tk-a{background:linear-gradient(135deg,#00f0ff,#22d3ee);color:#000}',
+            '.tk-soft{background:rgba(255,255,255,.1);color:#cbd5e1;border-radius:8px;padding:8px 12px;font-size:12px;border:1px solid rgba(255,255,255,.15);margin-top:6px;width:100%;cursor:pointer}',
+            '#soberBadge{display:none;position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9999;background:linear-gradient(135deg,#22c55e,#16a34a);color:#000;font-weight:800;padding:8px 18px;border-radius:30px;box-shadow:0 8px 25px rgba(34,197,94,.5);font-size:14px}',
+            '.tk-status{font-size:12px;color:#94a3b8;margin-top:4px}',
+            '.tk-note{font-size:11px;color:#64748b;margin-top:8px;line-height:1.4}'
+            ].join('\n');
+            document.head.appendChild(s);
+        }
+        if (!document.getElementById('soberBadge')) {
+            var sb = document.createElement('div'); sb.id = 'soberBadge'; sb.textContent = '✅ Трезвый водитель'; document.body.appendChild(sb);
+        }
+        if (!document.getElementById('tukFab')) {
+            var fab = document.createElement('div'); fab.id = 'tukFab'; fab.textContent = '🧰'; fab.title = 'Функции водителя';
+            fab.onclick = function(){ var p = document.getElementById('tukPanel'); p.style.display = p.style.display === 'block' ? 'none' : 'block'; };
+            document.body.appendChild(fab);
+        }
+        if (document.getElementById('tukPanel')) return;
+        var panel = document.createElement('div'); panel.id = 'tukPanel';
+        panel.innerHTML =
+          '<h3>🧰 Функции водителя</h3>' +
+          '<div class="tk-row"><span class="lbl">🚸 Трезвый водитель</span><button class="tk-btn tk-off" id="soberBtn">Выключено</button></div>' +
+          '<div class="tk-status" id="soberStatus">Статус виден в профиле. Ты сам подтверждаешь трезвость.</div>' +
+          '<div class="tk-row"><span class="lbl">📍 Моя геопозиция</span><button class="tk-btn tk-a" id="geoBtn">Запросить</button></div>' +
+          '<div class="tk-status" id="geoStatus">Мы спросим разрешение на доступ к геопозиции.</div>' +
+          '<div class="tk-row"><span class="lbl">🎙 Аудиосообщение</span><button class="tk-btn tk-a" id="audioBtn">Записать</button></div>' +
+          '<audio id="tukAudio" controls style="width:100%;margin-top:6px;display:none"></audio>' +
+          '<div class="tk-row"><span class="lbl">🎥 Видеосообщение</span><button class="tk-btn tk-a" id="videoBtn">Снять</button></div>' +
+          '<video id="tukVideo" controls playsinline style="width:100%;margin-top:6px;display:none;border-radius:10px"></video>' +
+          '<div class="tk-note">Каждый доступ (гео, микрофон, камера) запрашивается отдельно перед использованием. Можно отключить в любой момент.</div>';
+        document.body.appendChild(panel);
+
+        var soberOn = false;
+        var soberBtn = document.getElementById('soberBtn');
+        var soberBadge = document.getElementById('soberBadge');
+        var soberStatus = document.getElementById('soberStatus');
+        soberBtn.onclick = function(){
+            soberOn = !soberOn;
+            if (soberOn) {
+                soberBtn.textContent = 'Включено'; soberBtn.className = 'tk-btn tk-on';
+                soberBadge.style.display = 'flex';
+                soberStatus.textContent = '✅ Подтверждено: ты трезв за рулём. Друзья видят зелёный статус.';
+            } else {
+                soberBtn.textContent = 'Выключено'; soberBtn.className = 'tk-btn tk-off';
+                soberBadge.style.display = 'none';
+                soberStatus.textContent = 'Статус трезвости выключен.';
+            }
+        };
+        if (window.tukSoberState && window.tukSoberState.get) {
+            try { if (window.tukSoberState.get()) { soberOn = true; soberBtn.textContent='Включено'; soberBtn.className='tk-btn tk-on'; soberBadge.style.display='flex'; } } catch(e){}
+        }
+
+        var geoBtn = document.getElementById('geoBtn');
+        var geoStatus = document.getElementById('geoStatus');
+        geoBtn.onclick = function(){
+            if (!navigator.geolocation) { geoStatus.textContent = '❌ Геолокация не поддерживается.'; return; }
+            var ok = confirm('📍 Тук-Тук хочет получить вашу геопозицию, чтобы показать её в чате.\n\nРазрешить доступ к геопозиции?');
+            if (!ok) { geoStatus.textContent = '🚫 Вы отказали в доступе к геопозиции.'; return; }
+            geoStatus.textContent = '📍 Запрашиваем координаты...';
+            navigator.geolocation.getCurrentPosition(function(pos){
+                var lat = pos.coords.latitude.toFixed(5), lon = pos.coords.longitude.toFixed(5);
+                geoStatus.textContent = '📍 Ваша позиция: ' + lat + ', ' + lon;
+                geoBtn.textContent = 'Ещё раз';
+                var mapLink = 'https://www.openstreetmap.org/?mlat=' + lat + '&mlon=' + lon + '#map=16/' + lat + '/' + lon;
+                window.open(mapLink, '_blank');
+            }, function(err){
+                geoStatus.textContent = '🚫 Отказано или ошибка доступа к геопозиции (' + err.code + ').';
+            }, { enableHighAccuracy: true, timeout: 8000 });
+        };
+
+        var audioBtn = document.getElementById('audioBtn');
+        var audioEl = document.getElementById('tukAudio');
+        var mediaRec = null, audioChunks = [];
+        audioBtn.onclick = function(){
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { alert('Запись аудио не поддерживается в этом браузере.'); return; }
+            var ok = confirm('🎙 Тук-Тук хочет использовать микрофон для записи аудиосообщения.\n\nРазрешить доступ к микрофону?');
+            if (!ok) { alert('Вы отказали в доступе к микрофону.'); return; }
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream){
+                mediaRec = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRec.ondataavailable = function(e){ if (e.data.size) audioChunks.push(e.data); };
+                mediaRec.onstop = function(){
+                    var blob = new Blob(audioChunks, { type: 'audio/webm' });
+                    audioEl.src = URL.createObjectURL(blob);
+                    audioEl.style.display = 'block';
+                    stream.getTracks().forEach(function(t){ t.stop(); });
+                };
+                mediaRec.start();
+                audioBtn.textContent = '⏹ Остановить';
+                audioBtn.onclick = function(){
+                    mediaRec.stop();
+                    audioBtn.textContent = '🎙 Записать';
+                    audioBtn.onclick = arguments.callee;
+                };
+            }).catch(function(){ alert('🚫 Доступ к микрофону отклонён или недоступен.'); });
+        };
+
+        var videoBtn = document.getElementById('videoBtn');
+        var videoEl = document.getElementById('tukVideo');
+        videoBtn.onclick = function(){
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { alert('Запись видео не поддерживается.'); return; }
+            var ok = confirm('🎥 Тук-Тук хочет использовать камеру для видеосообщения.\n\nРазрешить доступ к камере?');
+            if (!ok) { alert('Вы отказали в доступе к камере.'); return; }
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function(stream){
+                var rec = null, chunks = [];
+                videoEl.srcObject = stream;
+                videoEl.style.display = 'block';
+                videoEl.play();
+                rec = new MediaRecorder(stream);
+                rec.ondataavailable = function(e){ if (e.data.size) chunks.push(e.data); };
+                rec.onstop = function(){
+                    var blob = new Blob(chunks, { type: 'video/webm' });
+                    videoEl.srcObject = null;
+                    videoEl.src = URL.createObjectURL(blob);
+                    stream.getTracks().forEach(function(t){ t.stop(); });
+                };
+                rec.start();
+                videoBtn.textContent = '⏹ Стоп';
+                videoBtn.onclick = function(){
+                    rec.stop();
+                    videoBtn.textContent = '🎥 Снять';
+                    videoBtn.onclick = arguments.callee;
+                };
+            }).catch(function(){ alert('🚫 Доступ к камере отклонён или недоступен.'); });
+        };
+    })();
+    </script>
 </body>
 </html>
