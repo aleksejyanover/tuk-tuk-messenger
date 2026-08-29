@@ -2257,6 +2257,77 @@ function setTheme(mode) {
             { t: 23.2, text: 'Такси: зарплата на дороге 🚕.' },
             { t: 25.5, text: 'Сканируй QR и скачивай Брум-Брум!' }
         ];
+        var _trailerTimer = null;
+        var _trailerParticlesInt = null;
+        function _stopTrailer() {
+            if (_trailerTimer) { clearTimeout(_trailerTimer); _trailerTimer = null; }
+            if (_trailerParticlesInt) { clearInterval(_trailerParticlesInt); _trailerParticlesInt = null; }
+            var t = document.getElementById('adTrailer');
+            var scenes = t ? t.querySelectorAll('.trailer-scene') : [];
+            for (var i = 0; i < scenes.length; i++) scenes[i].classList.remove('active');
+            var cap = document.getElementById('trailerCaption');
+            if (cap) cap.textContent = '';
+            var load = document.getElementById('adTrailerLoading');
+            if (load) load.style.display = 'none';
+            var pb = document.getElementById('trailerParticles');
+            if (pb) pb.innerHTML = '';
+        }
+        function startTrailer(cbDone) {
+            var ov = document.getElementById('adOverlay');
+            if (!ov) return;
+            var load = document.getElementById('adLoading');
+            var vid = document.getElementById('adVideo');
+            var place = document.getElementById('adPlaceholder');
+            var skip = document.getElementById('adSkipBtn');
+            var tr = document.getElementById('adTrailer');
+            _stopTrailer();
+            load.style.display = 'none';
+            place.style.display = 'none';
+            vid.style.display = 'none';
+            skip.style.display = 'block';
+            tr.style.display = 'block';
+            tr.classList.add('active');
+            ov.classList.add('active');
+            var cap = document.getElementById('trailerCaption');
+            if (cap) cap.textContent = '';
+            var scenes = tr.querySelectorAll('.trailer-scene');
+            var t = 0;
+            var partsBox = document.getElementById('trailerParticles');
+            var partInt = null;
+            if (partsBox) {
+                partsBox.innerHTML = '';
+                partInt = setInterval(function() {
+                    if (partsBox.childElementCount > 24) return;
+                    var p = document.createElement('div');
+                    p.className = 'trailer-particle';
+                    p.style.left = (Math.random() * 100) + '%';
+                    p.style.animationDuration = (4 + Math.random() * 4) + 's';
+                    p.style.animationDelay = (Math.random() * 3) + 's';
+                    if (Math.random() < 0.3) p.style.background = '#a855f7';
+                    partsBox.appendChild(p);
+                    setTimeout(function() { try { p.remove(); } catch(e){} }, 9000);
+                }, 260);
+            }
+            if (partInt) _trailerParticlesInt = partInt;
+            function showScene(i) {
+                if (i >= scenes.length) {
+                    if (_trailerParticlesInt) clearInterval(_trailerParticlesInt);
+                    if (cbDone) cbDone(); else closeStartupAd();
+                    return;
+                }
+                var sc = scenes[i];
+                var delay = parseInt(sc.getAttribute('data-t') + '000', 10);
+                var dur = 5800;
+                var nextT = (i + 1 < scenes.length) ? parseInt(scenes[i + 1].getAttribute('data-t') + '000', 10) : delay + dur;
+                _trailerTimer = setTimeout(function() {
+                    for (var k = 0; k < scenes.length; k++) scenes[k].classList.remove('active');
+                    sc.classList.add('active');
+                    if (cap) cap.textContent = (sc.querySelector('.t-text') || {}).textContent || '';
+                    _trailerTimer = setTimeout(function() { showScene(i + 1); }, nextT - delay);
+                }, (i === 0) ? 300 : 0);
+            }
+            showScene(0);
+        }
         function _startAdSubtitles(vid, capEl) {
             if (!vid || !capEl || !AD_SUBTITLES.length) return;
             function tick() {
@@ -2272,7 +2343,7 @@ function setTheme(mode) {
             requestAnimationFrame(tick);
         }
         function _tryAdSources(vid, index, callbacks) {
-            var sources = ['ad_novoice.mp4'];
+            var sources = [];
             if (AD_VIDEO_URL) sources.push(AD_VIDEO_URL);
             if (index >= sources.length) { if (callbacks.onError) callbacks.onError(); return; }
             var settled = false;
@@ -2301,7 +2372,9 @@ function setTheme(mode) {
         }
         function showStartupAd() {
             var ov = document.getElementById('adOverlay');
+            var tr = document.getElementById('adTrailer');
             if (!ov) return;
+            if (tr) { startTrailer(closeStartupAd); return; }
             var vid = document.getElementById('adVideo');
             var place = document.getElementById('adPlaceholder');
             var load = document.getElementById('adLoading');
@@ -2338,6 +2411,10 @@ function unmuteAd(video) {
         }
 
         function openPromoVideo() {
+            var ov = document.getElementById('adOverlay');
+            var tr = document.getElementById('adTrailer');
+            if (!ov) return;
+            if (tr) { startTrailer(closeStartupAd); return; }
             var vid = document.getElementById('adVideo');
             var place = document.getElementById('adPlaceholder');
             var load = document.getElementById('adLoading');
@@ -2362,6 +2439,7 @@ function unmuteAd(video) {
         }
 
         function closeStartupAd() {
+            _stopTrailer();
             var ov = document.getElementById('adOverlay');
             var vid = document.getElementById('adVideo');
             if (!ov) return;
@@ -4048,81 +4126,81 @@ function unmuteAd(video) {
         const LESH_PRICE = { user:0, vip:10, premium:15, veteran:20, gold:30, mentor:40, platinum:55, moderator:75, dev:90, legend:100, admin:130, titan:165, ultra:200, nova:240, quant:285, cyber:330, cosmos:380, immortal:430, avatar:480, prime:530, shadow:580, phoenix:620, galaxy:660, dragon:700, pharaoh:740, virus:775, emperor:815, colossus:850, myth:880, infinity:905, void:930, omega:950, chaos:968, divine:984, apex:996, god:1000, owner:1000 };
 
         const ROLE_ABILITIES = {
-            vip:       ['⭐ Золотой гудок — гудок даёт вдвое больше XP', '💰 Гудок-навар — каждый гудок даёт +2 монеты', '🎙️ Скорописец — каждое сообщение даёт +1 монету'],
-            premium:   ['💎 Бонус дня — раз в день бесплатные +30 XP', '💰 Премиум-кубыш — раз в день бесплатные +25 монет', '🎁 Стикер-плюс — каждый стикер даёт +2 монеты'],
-            veteran:   ['🎖️ Опыт ветерана — мини-игры дают +20% XP', '💰 Ветеранский паёк — каждая игра даёт +5 монет', '📜 Длинная речь — сообщения от 20 символов дают +2 XP'],
-            gold:      ['🥇 Золотая удача — шанс +5 XP за каждое сообщение', '💰 Золотая жила — каждое сообщение даёт +1 монету', '🚕 Такси-золото — каждая доставка пассажира +5 монет'],
-            mentor:    ['🎓 Мудрость — секретные слова дают +50% XP', '💡 Наставник — каждое 3-е сообщение даёт +1 Лешинкс (шанс)', '💰 Пенсия мастера — каждый день +15 монет'],
-            platinum:  ['💎 Двойной гудок — гудок засчитывается дважды', '💰 Платиновый гудок — каждый гудок +3 монеты', '👥 Статус — каждая игра даёт +8 монет'],
-            moderator: ['🛡️ Патруль — раз в день бесплатные +30 XP', '💰 Штрафной сбор — каждый гудок +2 монеты', '🚔 Охрана — каждый день +20 монет'],
-            dev:       ['🛠️ Мастерская — выпускай игры, клипы и версии Брум-Брум, минус 60% комиссии с продаж', '💻 Код-мастер — каждая игра даёт +10 монет', '🔓 Взлом бонуса — каждое сообщение длиной от 20 символов даёт +3 XP'],
-            legend:    ['🏆 Легендарный гудок — гудок даёт конфетти и +3 XP', '💰 Наследие легенды — каждый гудок +4 монеты', '🏅 Слава — каждый день +25 монет'],
-            admin:     ['👑 Админ-крит — 5% шанс на удвоенный XP', '💰 Админский налог — каждый гудок +3 монеты', '👑 Власть монет — каждое сообщение +1 монета'],
-            titan:     ['🔮 Титан-крит — 25% шанс на x2 XP', '💰 Титан-кубок — каждая игра +12 монет', '🪙 Титан-руда — каждое сообщение +1 монета'],
-            ultra:     ['☄️ Ультра-спид — мини-игры дают +50% XP', '💰 Ультра-приз — каждая игра +10 монет', '📨 Ультра-поток — каждый стикер +3 монеты'],
-            nova:      ['🪐 Нова-серия — каждая 3-я игра +30 XP', '💰 Нова-монета — каждый гудок +3 монеты', '🌠 Нова-свет — каждое сообщение +1 монета'],
-            quant:     ['🌀 Квант-реактор — 35% шанс на x3 XP', '💰 Квант-кванта — каждая игра +15 монет', '🔁 Квант-петля — длинные сообщения (20+) дают +3 XP'],
-            cyber:     ['🤖 Кибер-хак — раз в час бесплатные +50 XP', '💰 Кибер-крипта — каждое сообщение +2 монеты', '💾 Кибер-скелет — каждый гудок +3 монеты'],
-            cosmos:    ['🌌 Невесомость — каждое сообщение даёт +1 XP', '💰 Космо-пыль — каждый стикер +4 монеты', '🪐 Астероид — каждый день +30 монет'],
-            immortal:  ['🔥 Бессмертный — мини-игры дают +60% XP', '💰 Бессмертный кошелёк — каждая игра +18 монет', '🔥 Пламя мира — каждое сообщение +1 монета'],
-            avatar:    ['⚡ Стихии — все гудки дают x2 XP', '💰 Стихийный клад — каждый гудок +4 монеты', '🌪️ Стихийный вихрь — каждый день +30 монет'],
-            prime:     ['✨ Прайм-разум — все бонусы и 50% шанс на x3 XP', '💰 Прайм-банк — каждое сообщение +2 монеты', '✨ Прайм-заговор — каждая игра +20 монет'],
-            shadow:    ['🌑 Тень-удар — гудок даёт конфетти и +3 XP, как у Легенды', '💰 Теневой куш — каждый гудок +4 монеты', '🕶️ Теневая сеть — каждое сообщение +1 монета'],
-            phoenix:   ['🐦‍🔥 Возрождение — раз в день бесплатные +40 XP, мини-игры +25%', '💰 Пепел в золото — каждая игра +16 монет', '🔥 Птица удачи — каждый день +35 монет'],
-            galaxy:    ['🌠 Звёздный поток — каждое 2-е сообщение даёт +2 XP', '💰 Звёздный дождь — каждый стикер +5 монет', '🌌 Галактический банк — каждый день +35 монет'],
-            dragon:    ['🐉 Огненный крит — 40% шанс на x3 XP', '💰 Сокровищница дракона — каждая игра +22 монеты', '🐲 Чешуя золота — каждое сообщение +2 монеты'],
-            pharaoh:   ['⚱️ Наследие — мини-игры дают +70% XP', '💰 Сокровища фараона — каждый день +40 монет', '⚱️ Песок монет — каждое сообщение +2 монеты'],
-            virus:     ['🦠 Зараза — 50% шанс на x3 XP, каждый 5-й гудок +10 XP', '💰 Вирусный вирус — каждый гудок +4 монеты', '🦠 Штамм богатства — каждый стикер +5 монет'],
-            emperor:   ['🏛️ Власть — ежедневно бесплатные +50 XP, все бонусы', '💰 Казна империи — каждый день +50 монет', '👑 Имперский налог — каждое сообщение +3 монеты'],
-            colossus:  ['🗿 Колосс — мини-игры дают вдвое больше XP', '💰 Колосс-комиссия — каждая игра +30 монет', '🗿 Гранит — каждое сообщение +2 монеты'],
-            myth:      ['🐐 Миф-удача — 60% шанс на x4 XP', '💰 Миф-золото — каждый гудок +6 монет', '🐐 Легенда монет — каждый день +45 монет'],
-            infinity:  ['♾️ Бесконечность — ВСЁ XP удваивается', '💰 Бесконечный банк — каждое сообщение +3 монеты', '♾️ Бесконечный поток — каждый стикер +6 монет'],
-            void:      ['⚫️ Из ниоткуда — каждое сообщение даёт +2 XP', '💰 Пустота-кошелёк — каждый гудок +6 монет', '⚫️ Чёрная дыра — каждая игра +35 монет'],
-            omega:     ['🔱 Финальный — 70% шанс на x5 крит', '💰 Финальный банк — каждый день +60 монет', '🔱 Омега-казна — каждое сообщение +3 монеты'],
-            chaos:     ['🌪️ Удача хаоса — мини-игры дают тройной XP', '💰 Хаос-монета — каждая игра +40 монет', '🌪️ Хаос-дождь — каждый стикер +7 монет'],
-            divine:    ['😇 Благословение — раз в день бесплатные +100 XP', '💰 Небесная казна — каждый день +80 монет', '😇 Божественная пыль — каждое сообщение +4 монеты'],
-            apex:      ['🎯 Снайпер — 80% шанс на x5 крит', '💰 Снайперский выстрел — каждый гудок +8 монет', '🎯 Точный банк — каждый день +70 монет'],
-            god:       ['🧿 Всемогущество — все способности ролей сразу', '💰 Божественный банк — каждый день +200 монет', '🧿 Божественный поток — каждое сообщение +5 монет'],
-            owner:     ['👑👑 ВЕРХОВНЫЙ ВЛАДЕЛЕЦ — всё открыто, максимальный множитель, доступ ко всему без исключений', '💰 Безлимитная казна — все монетные бонусы x5', '👑 Корона вечности — каждый день +500 монет']
+            vip:       ['⭐ Золотой гудок — гудок даёт вдвое больше XP', '💰 Гудок-навар — каждый гудок даёт +2 монеты', '🎙️ Скорописец — каждое сообщение даёт +1 монету', '📈 Голос гудка — каждый гудок даёт +1 XP', '🎰 Шанс фортуны — 25% шанс на +3 монеты за гудок'],
+            premium:   ['💎 Бонус дня — раз в день бесплатные +30 XP', '💰 Премиум-кубыш — раз в день бесплатные +25 монет', '🎁 Стикер-плюс — каждый стикер даёт +2 монеты', '🎈 Праздник — каждый стикер даёт +2 XP', '💎 Дар драгоценности — раз в день +1 Лешинкс'],
+            veteran:   ['🎖️ Опыт ветерана — мини-игры дают +20% XP', '💰 Ветеранский паёк — каждая игра даёт +5 монет', '📜 Длинная речь — сообщения от 20 символов дают +2 XP', '🏁 Игровой стаж — каждая игра даёт +3 XP', '🎰 Удача бывалого — 30% шанс на +3 монеты за гудок'],
+            gold:      ['🥇 Золотая удача — шанс +5 XP за каждое сообщение', '💰 Золотая жила — каждое сообщение даёт +1 монету', '🚕 Такси-золото — каждая доставка пассажира +5 монет', '📈 Золотое перо — каждое сообщение даёт +1 XP', '📈 Такси-опыт — каждая доставка даёт +3 XP'],
+            mentor:    ['🎓 Мудрость — секретные слова дают +50% XP', '💡 Наставник — каждое 3-е сообщение даёт +1 Лешинкс (шанс)', '💰 Пенсия мастера — каждый день +15 монет', '📈 Просветлённый — каждое сообщение даёт +1 XP', '💎 Ученик успеха — шанс +1 Лешинкс за игру'],
+            platinum:  ['💎 Двойной гудок — гудок засчитывается дважды', '💰 Платиновый гудок — каждый гудок +3 монеты', '👥 Статус — каждая игра даёт +8 монет', '📈 Платина гудка — каждый гудок даёт +2 XP', '🎰 Бросок платины — 15% шанс на +5 монет за любое действие'],
+            moderator: ['🛡️ Патруль — раз в день бесплатные +30 XP', '💰 Штрафной сбор — каждый гудок +2 монеты', '🚔 Охрана — каждый день +20 монет', '📈 Порядок — каждое сообщение даёт +1 XP', '🎰 Бдительность — 30% шанс на +3 монеты за гудок'],
+            dev:       ['🛠️ Мастерская — выпускай игры, клипы и версии Брум-Брум, минус 60% комиссии с продаж', '💻 Код-мастер — каждая игра даёт +10 монет', '🔓 Взлом бонуса — каждое сообщение длиной от 20 символов даёт +3 XP', '📈 Игровой код — каждая игра даёт +4 XP', '💎 Файлы удачи — шанс +1 Лешинкс за игру'],
+            legend:    ['🏆 Легендарный гудок — гудок даёт конфетти и +3 XP', '💰 Наследие легенды — каждый гудок +4 монеты', '🏅 Слава — каждый день +25 монет', '📈 Гудок легенды — каждый гудок даёт +3 XP', '🎰 Бросок легенды — 20% шанс на +6 монет за любое действие'],
+            admin:     ['👑 Админ-крит — 5% шанс на удвоенный XP', '💰 Админский налог — каждый гудок +3 монеты', '👑 Власть монет — каждое сообщение +1 монета', '📈 Админ-слово — каждое сообщение даёт +2 XP', '💎 Админский указ — шанс +1 Лешинкс за гудок'],
+            titan:     ['🔮 Титан-крит — 25% шанс на x2 XP', '💰 Титан-кубок — каждая игра +12 монет', '🪙 Титан-руда — каждое сообщение +1 монета', '📈 Титан-достижение — каждая игра даёт +5 XP', '🎰 Титан-бросок — 20% шанс на +7 монет за любое действие'],
+            ultra:     ['☄️ Ультра-спид — мини-игры дают +50% XP', '💰 Ультра-приз — каждая игра +10 монет', '📨 Ультра-поток — каждый стикер +3 монеты', '🎈 Ультра-стиль — каждый стикер даёт +3 XP', '💎 Ультра-добыча — шанс +1 Лешинкс за игру'],
+            nova:      ['🪐 Нова-серия — каждая 3-я игра +30 XP', '💰 Нова-монета — каждый гудок +3 монеты', '🌠 Нова-свет — каждое сообщение +1 монета', '📈 Нова-заезд — каждый гудок даёт +3 XP', '🎰 Нова-шанс — 25% шанс на +7 монет за любое действие'],
+            quant:     ['🌀 Квант-реактор — 35% шанс на x3 XP', '💰 Квант-кванта — каждая игра +15 монет', '🔁 Квант-петля — длинные сообщения (20+) дают +3 XP', '📈 Квант-логика — каждая игра даёт +6 XP', '💎 Квант-сплетение — шанс +1 Лешинкс за гудок'],
+            cyber:     ['🤖 Кибер-хак — раз в час бесплатные +50 XP', '💰 Кибер-крипта — каждое сообщение +2 монеты', '💾 Кибер-скелет — каждый гудок +3 монеты', '📈 Кибер-поток — каждое сообщение даёт +2 XP', '🎰 Кибер-джекпот — 35% шанс на +5 монет за гудок'],
+            cosmos:    ['🌌 Невесомость — каждое сообщение даёт +1 XP', '💰 Космо-пыль — каждый стикер +4 монеты', '🪐 Астероид — каждый день +30 монет', '🎈 Космо-сияние — каждый стикер даёт +5 XP', '💎 Космический дар — раз в день +1 Лешинкс'],
+            immortal:  ['🔥 Бессмертный — мини-игры дают +60% XP', '💰 Бессмертный кошелёк — каждая игра +18 монет', '🔥 Пламя мира — каждое сообщение +1 монета', '📈 Игровой бег — каждая игра даёт +8 XP', '🎰 Пепел удачи — 25% шанс на +8 монет за любое действие'],
+            avatar:    ['⚡ Стихии — все гудки дают x2 XP', '💰 Стихийный клад — каждый гудок +4 монеты', '🌪️ Стихийный вихрь — каждый день +30 монет', '📈 Гудок стихий — каждый гудок даёт +4 XP', '💎 Настроение стихий — шанс +1 Лешинкс за гудок'],
+            prime:     ['✨ Прайм-разум — все бонусы и 50% шанс на x3 XP', '💰 Прайм-банк — каждое сообщение +2 монеты', '✨ Прайм-заговор — каждая игра +20 монет', '📈 Прайм-слово — каждое сообщение даёт +3 XP', '💎 Прайм-дар — шанс +1 Лешинкс за игру'],
+            shadow:    ['🌑 Тень-удар — гудок даёт конфетти и +3 XP, как у Легенды', '💰 Теневой куш — каждый гудок +4 монеты', '🕶️ Теневая сеть — каждое сообщение +1 монета', '📈 Гудок тени — каждый гудок даёт +4 XP', '🎰 Удача из мрака — 30% шанс на +9 монет за любое действие'],
+            phoenix:   ['🐦‍🔥 Возрождение — раз в день бесплатные +40 XP, мини-игры +25%', '💰 Пепел в золото — каждая игра +16 монет', '🔥 Птица удачи — каждый день +35 монет', '📈 Игровой полёт — каждая игра даёт +7 XP', '💎 Перо удачи — раз в день +1 Лешинкс'],
+            galaxy:    ['🌠 Звёздный поток — каждое 2-е сообщение даёт +2 XP', '💰 Звёздный дождь — каждый стикер +5 монет', '🌌 Галактический банк — каждый день +35 монет', '🎈 Звёздное сияние — каждый стикер даёт +6 XP', '💎 Галактический дар — шанс +1 Лешинкс за игру'],
+            dragon:    ['🐉 Огненный крит — 40% шанс на x3 XP', '💰 Сокровищница дракона — каждая игра +22 монеты', '🐲 Чешуя золота — каждое сообщение +2 монеты', '📈 Огненный бег — каждая игра даёт +10 XP', '💎 Коготь удачи — шанс +1 Лешинкс за гудок'],
+            pharaoh:   ['⚱️ Наследие — мини-игры дают +70% XP', '💰 Сокровища фараона — каждый день +40 монет', '⚱️ Песок монет — каждое сообщение +2 монеты', '📈 Слово фараона — каждое сообщение даёт +3 XP', '💎 Дар фараона — раз в день +1 Лешинкс'],
+            virus:     ['🦠 Зараза — 50% шанс на x3 XP, каждый 5-й гудок +10 XP', '💰 Вирусный вирус — каждый гудок +4 монеты', '🦠 Штамм богатства — каждый стикер +5 монет', '📈 Гудок вируса — каждый гудок даёт +5 XP', '💎 Зараза-добыча — шанс +1 Лешинкс за игру'],
+            emperor:   ['🏛️ Власть — ежедневно бесплатные +50 XP, все бонусы', '💰 Казна империи — каждый день +50 монет', '👑 Имперский налог — каждое сообщение +3 монеты', '📈 Слово императора — каждое сообщение даёт +4 XP', '💎 Имперский дар — раз в день +2 Лешинкса'],
+            colossus:  ['🗿 Колосс — мини-игры дают вдвое больше XP', '💰 Колосс-комиссия — каждая игра +30 монет', '🗿 Гранит — каждое сообщение +2 монеты', '📈 Колосс-игра — каждая игра даёт +12 XP', '🎰 Колосс-шанс — 35% шанс на +10 монет за любое действие'],
+            myth:      ['🐐 Миф-удача — 60% шанс на x4 XP', '💰 Миф-золото — каждый гудок +6 монет', '🐐 Легенда монет — каждый день +45 монет', '📈 Гудок мифа — каждый гудок даёт +6 XP', '💎 Миф-дар — шанс +1 Лешинкс за гудок'],
+            infinity:  ['♾️ Бесконечность — ВСЁ XP удваивается', '💰 Бесконечный банк — каждое сообщение +3 монеты', '♾️ Бесконечный поток — каждый стикер +6 монет', '📈 Слово вечности — каждое сообщение даёт +5 XP', '💎 Дар бесконечности — раз в день +2 Лешинкса'],
+            void:      ['⚫️ Из ниоткуда — каждое сообщение даёт +2 XP', '💰 Пустота-кошелёк — каждый гудок +6 монет', '⚫️ Чёрная дыра — каждая игра +35 монет', '📈 Гудок пустоты — каждый гудок даёт +6 XP', '💎 Пустота-дар — шанс +1 Лешинкс за игру'],
+            omega:     ['🔱 Финальный — 70% шанс на x5 крит', '💰 Финальный банк — каждый день +60 монет', '🔱 Омега-казна — каждое сообщение +3 монеты', '📈 Слово омеги — каждое сообщение даёт +5 XP', '💎 Финальный дар — раз в день +2 Лешинкса'],
+            chaos:     ['🌪️ Удача хаоса — мини-игры дают тройной XP', '💰 Хаос-монета — каждая игра +40 монет', '🌪️ Хаос-дождь — каждый стикер +7 монет', '📈 Игровой хаос — каждая игра даёт +15 XP', '💎 Хаос-дар — шанс +1 Лешинкс за игру'],
+            divine:    ['😇 Благословение — раз в день бесплатные +100 XP', '💰 Небесная казна — каждый день +80 монет', '😇 Божественная пыль — каждое сообщение +4 монеты', '📈 Слово свыше — каждое сообщение даёт +6 XP', '💎 Божественный дар — раз в день +3 Лешинкса'],
+            apex:      ['🎯 Снайпер — 80% шанс на x5 крит', '💰 Снайперский выстрел — каждый гудок +8 монет', '🎯 Точный банк — каждый день +70 монет', '📈 Гудок снайпера — каждый гудок даёт +8 XP', '💎 Точный дар — шанс +1 Лешинкс за гудок'],
+            god:       ['🧿 Всемогущество — все способности ролей сразу', '💰 Божественный банк — каждый день +200 монет', '🧿 Божественный поток — каждое сообщение +5 монет', '📈 Слово бога — каждое сообщение даёт +10 XP', '💎 Божественный дар — раз в день +5 Лешинксов'],
+            owner:     ['👑👑 ВЕРХОВНЫЙ ВЛАДЕЛЕЦ — всё открыто, максимальный множитель, доступ ко всему без исключений', '💰 Безлимитная казна — все монетные бонусы x5', '👑 Корона вечности — каждый день +500 монет', '📈 Абсолют — сообщения и гудки дают огромный XP', '💎 Воля владельца — ежедневный дар +5 Лешинксов']
         };
 
         const ROLE_BONUS = {
-            vip:       { msg:1, horn:2 },
-            premium:   { dailyCoin:25, sticker:2 },
-            veteran:   { game:5, long:2 },
-            gold:      { msg:1, taxi:5 },
-            mentor:    { dailyCoin:15, leshMsg:0.08 },
-            platinum:  { horn:3, game:8 },
-            moderator: { horn:2, dailyCoin:20 },
-            dev:       { game:10, long:3 },
-            legend:    { horn:4, dailyCoin:25 },
-            admin:     { horn:3, msg:1 },
-            titan:     { game:12, msg:1 },
-            ultra:     { game:10, sticker:3 },
-            nova:      { horn:3, msg:1 },
-            quant:     { game:15, long:3 },
-            cyber:     { msg:2, horn:3 },
-            cosmos:    { sticker:4, dailyCoin:30 },
-            immortal:  { game:18, msg:1 },
-            avatar:    { horn:4, dailyCoin:30 },
-            prime:     { msg:2, game:20 },
-            shadow:    { horn:4, msg:1 },
-            phoenix:   { game:16, dailyCoin:35 },
-            galaxy:    { sticker:5, dailyCoin:35 },
-            dragon:    { game:22, msg:2 },
-            pharaoh:   { dailyCoin:40, msg:2 },
-            virus:     { horn:4, sticker:5 },
-            emperor:   { dailyCoin:50, msg:3 },
-            colossus:  { game:30, msg:2 },
-            myth:      { horn:6, dailyCoin:45 },
-            infinity:  { msg:3, sticker:6 },
-            void:      { horn:6, game:35 },
-            omega:     { dailyCoin:60, msg:3 },
-            chaos:     { game:40, sticker:7 },
-            divine:    { dailyCoin:80, msg:4 },
-            apex:      { horn:8, dailyCoin:70 },
-            god:       { dailyCoin:200, msg:5 },
-            owner:     { dailyCoin:500, msg:25, horn:50, sticker:50, game:100 }
+            vip:       { msg:1, horn:2, msgXp:1, hornCh:0.25, hornAmt:3 },
+            premium:   { dailyCoin:25, sticker:2, stickerXp:2, dailyLesh:1 },
+            veteran:   { game:5, long:2, gameXp:3, hornCh:0.3, hornAmt:3 },
+            gold:      { msg:1, taxi:5, msgXp:1, taxiXp:3 },
+            mentor:    { dailyCoin:15, leshMsg:0.08, msgXp:1, leshGame:0.1 },
+            platinum:  { horn:3, game:8, hornXp:2, coinCh:0.15, coinAmt:5 },
+            moderator: { horn:2, dailyCoin:20, msgXp:1, hornCh:0.3, hornAmt:3 },
+            dev:       { game:10, long:3, gameXp:4, leshGame:0.08 },
+            legend:    { horn:4, dailyCoin:25, hornXp:3, coinCh:0.2, coinAmt:6 },
+            admin:     { horn:3, msg:1, msgXp:2, leshHorn:0.08 },
+            titan:     { game:12, msg:1, gameXp:5, coinCh:0.2, coinAmt:7 },
+            ultra:     { game:10, sticker:3, stickerXp:3, leshGame:0.08 },
+            nova:      { horn:3, msg:1, hornXp:3, coinCh:0.25, coinAmt:7 },
+            quant:     { game:15, long:3, gameXp:6, leshHorn:0.1 },
+            cyber:     { msg:2, horn:3, msgXp:2, hornCh:0.35, hornAmt:5 },
+            cosmos:    { sticker:4, dailyCoin:30, stickerXp:5, dailyLesh:1 },
+            immortal:  { game:18, msg:1, gameXp:8, coinCh:0.25, coinAmt:8 },
+            avatar:    { horn:4, dailyCoin:30, hornXp:4, leshHorn:0.12 },
+            prime:     { msg:2, game:20, msgXp:3, leshGame:0.12 },
+            shadow:    { horn:4, msg:1, hornXp:4, coinCh:0.3, coinAmt:9 },
+            phoenix:   { game:16, dailyCoin:35, gameXp:7, dailyLesh:1 },
+            galaxy:    { sticker:5, dailyCoin:35, stickerXp:6, leshGame:0.1 },
+            dragon:    { game:22, msg:2, gameXp:10, leshHorn:0.15 },
+            pharaoh:   { dailyCoin:40, msg:2, msgXp:3, dailyLesh:1 },
+            virus:     { horn:4, sticker:5, hornXp:5, leshGame:0.15 },
+            emperor:   { dailyCoin:50, msg:3, msgXp:4, dailyLesh:2 },
+            colossus:  { game:30, msg:2, gameXp:12, coinCh:0.35, coinAmt:10 },
+            myth:      { horn:6, dailyCoin:45, hornXp:6, leshHorn:0.18 },
+            infinity:  { msg:3, sticker:6, msgXp:5, dailyLesh:2 },
+            void:      { horn:6, game:35, hornXp:6, leshGame:0.18 },
+            omega:     { dailyCoin:60, msg:3, msgXp:5, dailyLesh:2 },
+            chaos:     { game:40, sticker:7, gameXp:15, leshGame:0.2 },
+            divine:    { dailyCoin:80, msg:4, msgXp:6, dailyLesh:3 },
+            apex:      { horn:8, dailyCoin:70, hornXp:8, leshHorn:0.25 },
+            god:       { dailyCoin:200, msg:5, msgXp:10, dailyLesh:5 },
+            owner:     { dailyCoin:500, msg:25, horn:50, sticker:50, game:100, msgXp:50, hornXp:30, gameXp:30, dailyLesh:5 }
         };
         function roleBonus(action, extra) {
             if (!state || isOwner()) return;
@@ -4130,19 +4208,29 @@ function unmuteAd(video) {
             if (!b) return;
             const r = Math.random;
             function tell(n, txt) { addCoins(n); if (n >= 5) notify(txt, 'success'); }
+            function tellXp(n, txt) { addXP(n); if (n >= 5) notify(txt, 'success'); }
             if (action === 'message') {
                 if (b.msg) tell(b.msg, `💰 Роль-бонус: +${b.msg} монет`);
+                if (b.msgXp) tellXp(b.msgXp, `📈 Роль-бонус: +${b.msgXp} XP за сообщение`);
                 if (b.long && extra && extra.length >= 20) { addXP(b.long); notify(`📜 Роль-бонус: +${b.long} XP за длинное сообщение`, 'success'); }
                 if (b.leshMsg && r() < b.leshMsg) { addLeshinksy(1); notify('💎 Роль-бонус: +1 Лешинкс', 'success'); }
             } else if (action === 'horn') {
                 if (b.horn) tell(b.horn, `💰 Роль-бонус: +${b.horn} монет`);
+                if (b.hornXp) tellXp(b.hornXp, `📈 Роль-бонус: +${b.hornXp} XP за гудок`);
+                if ((b.hornCh || 0) > 0 && b.hornAmt && r() < b.hornCh) { tell(b.hornAmt, `🎰 Роль-бонус: повезло! +${b.hornAmt} монет`); }
+                if (b.leshHorn && r() < b.leshHorn) { addLeshinksy(1); notify('💎 Роль-бонус: +1 Лешинкс за гудок', 'success'); }
             } else if (action === 'sticker') {
                 if (b.sticker) tell(b.sticker, `💰 Роль-бонус: +${b.sticker} монет`);
+                if (b.stickerXp) tellXp(b.stickerXp, `📈 Роль-бонус: +${b.stickerXp} XP за стикер`);
             } else if (action === 'game') {
                 if (b.game) { addCoins(b.game); notify(`💰 Роль-бонус: +${b.game} монет за игру`, 'success'); }
+                if (b.gameXp) tellXp(b.gameXp, `📈 Роль-бонус: +${b.gameXp} XP за игру`);
+                if (b.leshGame && r() < b.leshGame) { addLeshinksy(1); notify('💎 Роль-бонус: +1 Лешинкс за игру', 'success'); }
             } else if (action === 'taxi') {
                 if (b.taxi) tell(b.taxi, `💰 Роль-бонус: +${b.taxi} монет`);
+                if (b.taxiXp) tellXp(b.taxiXp, `📈 Роль-бонус: +${b.taxiXp} XP за доставку`);
             }
+            if (b.coinCh && b.coinAmt && r() < b.coinCh) { tell(b.coinAmt, `🎰 Роль-бонус: удачный бросок! +${b.coinAmt} монет`); }
         }
         const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -4540,6 +4628,13 @@ function unmuteAd(video) {
                 state.roleBonuses.dailyCoinBonus = now;
                 addCoins(dBonus);
                 notify(`💰 ${ROLE_NAMES[state.role]}: дневная казна +${dBonus} монет!`, 'success');
+                saveState(true);
+            }
+            const nightly = ROLE_BONUS[state.role] && ROLE_BONUS[state.role].dailyLesh;
+            if (nightly && (!state.roleBonuses.dailyLeshBonus || now - state.roleBonuses.dailyLeshBonus > 24 * 60 * 60 * 1000)) {
+                state.roleBonuses.dailyLeshBonus = now;
+                addLeshinksy(nightly);
+                notify(`💎 ${ROLE_NAMES[state.role]}: ежедневный дар +${nightly} Лешинкс!`, 'success');
                 saveState(true);
             }
         }
@@ -6068,7 +6163,6 @@ function unmuteAd(video) {
     // ====== CLIPS — Multi-source: Local, VK, Rutube, YouTube ======
     var CLIPS_SOURCES = {
         local: [
-            { src:'ad_novoice.mp4', title:'Брум-Брум — из будущего', author:'@brumbrum', avatar:'🚗', desc:'Брум-Брум — мессенджер для машин! Чаты по номеру авто, роли, суперспособности и бот Алёша 🚀 #brumbrum', c1:'#00f0ff', c2:'#a855f7', music:'Брум-Брум — Гимн', likes:99999, comments:999, shares:999 },
             { src:'https://assets.mixkit.co/videos/64/64-720.mp4', title:'Спорткар — Панель приборов', author:'@auto_vibes', avatar:'🏎️', desc:'Роскошная панель спортивного автомобиля 🔥 #sportcar', c1:'#ff0040', c2:'#ff6600', music:'Phonk City — Drift King', likes:4521, comments:312, shares:89 },
             { src:'https://assets.mixkit.co/videos/74/74-720.mp4', title:'Красный спорткар — Вид сзади', author:'@drift_club', avatar:'🏁', desc:'Красная敞篷ка в подземном паркинге! #drift #bmw', c1:'#0066ff', c2:'#00ccff', music:'DJ Blyatman — Russian Drift', likes:8934, comments:567, shares:234 },
             { src:'https://assets.mixkit.co/videos/63/63-720.mp4', title:'Спорткар крупным планом', author:'@tesla_club_ru', avatar:'⚡', desc:'Крупный план красного спорткара ⚡ #tesla', c1:'#00ff88', c2:'#0088ff', music:'Synthwave Driver — Night Ride', likes:12043, comments:891, shares:456 },
@@ -6236,14 +6330,15 @@ function unmuteAd(video) {
     }
 
     function _buildAdSlideHTML() {
-        return '<div class="ad-orb"></div>' +
-            '<video class="vk-clip-video" id="ad-clip-video" src="ad_novoice.mp4" muted playsinline preload="auto" loop></video>' +
-            '<div class="vk-clip-unmute" id="ad-clip-unmute" onclick="event.stopPropagation();adClipToggleSound()">' +
+        return '<div class="ad-orb" style="position:absolute;inset:0;z-index:0;background:radial-gradient(120% 120% at 20% 0%, #1a0b3a 0%, #050510 60%, #000 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;">' +
+            '<div style="font-size:120px;animation:tFloat 2.6s ease-in-out infinite;filter:drop-shadow(0 0 24px rgba(0,240,255,0.5));">🏎️</div>' +
+            '</div>' +
+            '<div class="vk-clip-unmute" id="ad-clip-unmute" style="display:none;" onclick="event.stopPropagation();adClipToggleSound()">' +
                 '<span class="unmute-icon">🔊</span>' +
                 '<span class="unmute-text">Звук</span>' +
             '</div>' +
             '<div class="vk-clip-gradient"></div>' +
-            '<div class="vk-clip-poster" id="ad-clip-poster" style="font-size:90px;">🎬</div>' +
+            '<div class="vk-clip-poster" id="ad-clip-poster" style="display:none;"></div>' +
             '<div class="ad-clip-subtitles"><span class="sub-caption" id="ad-clip-caption"></span></div>' +
             '<div class="vk-clip-top">' +
                 '<div class="vk-clip-top-logo">🎬 Реклама • Брум-Брум</div>' +
@@ -6257,10 +6352,10 @@ function unmuteAd(video) {
                 '<div class="vk-clip-desc">Обгони время в мессенджере будущего БРУМ-БРУМ: чаты по номеру авто, гараж, роли, игры и бот Алёша!</div>' +
             '</div>' +
             '<div class="vk-clip-actions" style="display:none;"></div>' +
-            '<div class="ad-content">' +
-                '<div class="ad-badge">РЕКЛАМА • Без голоса</div>' +
+            '<div class="ad-content" style="position:relative;z-index:1;top:auto;bottom:20px;">' +
+                '<div class="ad-badge">РЕКЛАМА • БРУМ-БРУМ</div>' +
                 '<div class="ad-title">БРУМ-БРУМ<br>из будущего</div>' +
-                '<div class="ad-hint">Ролик без озвучки. Видео в файле <b>ad_novoice.mp4</b> рядом.</div>' +
+                '<div class="ad-hint">Мессенджер, который обгоняет время</div>' +
             '</div>';
     }
 
@@ -6581,11 +6676,10 @@ function unmuteAd(video) {
             <div style="font-size:15px;color:rgba(255,255,255,0.6);">Загружаем рекламный ролик...</div>
         </div>
         <div id="adPlaceholder" class="ad-placeholder" style="display:none;">
-            <div class="ap-badge">РЕКЛАМА • ФИЛЬМ О БРУМ-БРУМ</div>
+            <div class="ap-badge">РЕКЛАМА • БРУМ-БРУМ</div>
             <div class="ap-title">БРУМ-БРУМ<br>из будущего</div>
-            <div class="ap-sub">Видео должно лежать рядом как <b>ad_novoice.mp4</b> (без голоса). Здесь крутится рекламный ролик с субтитрами, но без озвучки.</div>
+            <div class="ap-sub">Мессенджер будущего: чаты по номеру авто, гараж, роли с суперспособностями, игры и бот Алёша.</div>
             <button class="ap-play" onclick="openPromoVideo()">▶ Смотреть превью</button>
-            <div class="ap-note">Сценарий для генерации — в сценарии проекта</div>
         </div>
         <video id="adVideo" style="display:none;" playsinline muted></video>
         <div class="ad-subtitles" id="adSubtitles"><span class="sub-caption" id="adSubCaption"></span></div>
