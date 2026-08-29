@@ -2420,10 +2420,25 @@ function unmuteAd(video) {
             var gl = document.getElementById('devGamesList'); gl.innerHTML='';
             state.dev.games.forEach(function(g, idx){
                 var d=document.createElement('div');
+                var stBadge = g.published
+                    ? '<span style="color:#4ade80;font-size:10px;">✔ Выложено</span>'
+                    : (g.approved
+                        ? '<span style="color:#22d3ee;font-size:10px;">✅ Ссылка одобрена — можно выложить</span>'
+                        : (g.pubRejected
+                            ? '<span style="color:#ef4444;font-size:10px;">⛔ Ссылка отклонена</span>'
+                            : '<span style="color:#fbbf24;font-size:10px;">⏳ Ждёт одобрения ссылки</span>'));
+                var btns = g.published
+                    ? '<button onclick="devUnpublish('+idx+')" style="padding:5px 10px;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;margin-left:4px;">📉 Снять</button>'
+                    : (g.approved
+                        ? '<button onclick="devPublish('+idx+')" style="padding:5px 10px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;margin-left:4px;">📤 Выложить</button>'
+                        : (g.pubRejected
+                            ? '<button onclick="devPublish('+idx+')" style="padding:5px 10px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;margin-left:4px;">📤 Вновь на проверку</button>'
+                            : '<button onclick="openDevLink(\''+g.name.replace(/\'/g,'')+'\', \''+g.link.replace(/\'/g,'')+'\')" style="padding:5px 10px;background:linear-gradient(135deg,#0ea5e9,#0284c7);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;margin-left:4px;">👁 Просмотр</button>'));
                 d.style.cssText='display:flex;justify-content:space-between;align-items:center;background:var(--bg-input);border:1px solid rgba(0,240,255,0.15);border-radius:10px;padding:8px 12px;';
                 d.innerHTML='<div><b>🎮 '+g.name+'</b><div style="font-size:11px;color:var(--text-muted)">'+g.desc+'</div>'+
-                    '<div style="font-size:10px;color:#34d399">🔗 '+g.link+'</div></div>'+
-                    '<button onclick="openDevLink(\''+g.name.replace(/\'/g,'')+'\', \''+g.link.replace(/\'/g,'')+'\')" style="padding:6px 12px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:12px;cursor:pointer;">▶ Играть</button>';
+                    '<div style="font-size:10px;color:#34d399">'+(g.published?'📎 публичная ссылка: ':'🔗 ')+g.link+'</div>'+stBadge+'</div>'+
+                    '<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">'+btns+
+                    '<button onclick="devDeleteGame('+idx+')" style="padding:4px 10px;background:#ef4444;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;">🗑 Удалить</button></div>';
                 gl.appendChild(d);
             });
             if (!state.dev.games.length) { var e=document.createElement('div'); e.style.cssText='font-size:12px;color:var(--text-muted)'; e.textContent='Игр пока нет. Создай первую!'; gl.appendChild(e); }
@@ -2431,23 +2446,49 @@ function unmuteAd(video) {
             var cl = document.getElementById('devClipsList'); cl.innerHTML='';
             state.dev.clips.forEach(function(c, idx){
                 var d=document.createElement('div');
+                var stBadge = c.published
+                    ? '<span style="color:#4ade80;font-size:10px;">✔ Выложено</span>'
+                    : (c.approved
+                        ? '<span style="color:#22d3ee;font-size:10px;">✅ Ссылка одобрена — можно выложить</span>'
+                        : (c.pubRejected
+                            ? '<span style="color:#ef4444;font-size:10px;">⛔ Ссылка отклонена</span>'
+                            : '<span style="color:#fbbf24;font-size:10px;">⏳ Ждёт одобрения ссылки</span>'));
+                var cbtns = c.published
+                    ? '<button onclick="devUnpublishClip('+idx+')" style="padding:4px 10px;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;">📉 Снять</button>'
+                    : (c.approved
+                        ? '<button onclick="devPublishClip('+idx+')" style="padding:4px 10px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;">📤 Выложить</button>'
+                        : (c.pubRejected
+                            ? '<button onclick="devRePublishClip('+idx+')" style="padding:4px 10px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;">📤 Вновь на проверку</button>'
+                            : '<button onclick="openDevLink(\''+c.name.replace(/\'/g,'')+'\', \''+c.link.replace(/\'/g,'')+'\')" style="padding:4px 10px;background:linear-gradient(135deg,#0ea5e9,#0284c7);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;">👁 Просмотр</button>'));
                 d.style.cssText='display:flex;justify-content:space-between;align-items:center;background:var(--bg-input);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:8px 12px;';
-                d.innerHTML='<div><b>🎬 '+c.name+'</b><div style="font-size:10px;color:#34d399">🔗 '+c.link+'</div></div>'+
-                    '<button onclick="openDevLink(\''+c.name.replace(/\'/g,'')+'\', \''+c.link.replace(/\'/g,'')+'\')" style="padding:6px 12px;background:linear-gradient(135deg,#a78bfa,#8b5cf6);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:12px;cursor:pointer;">▶ Смотреть</button>';
+                d.innerHTML='<div><b>🎬 '+c.name+'</b><div style="font-size:10px;color:#34d399">'+(c.published?'📎 публичная ссылка: ':'🔗 ')+c.link+'</div>'+stBadge+'</div>'+
+                    '<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">'+cbtns+
+                    '<button onclick="devDeleteClip('+idx+')" style="padding:4px 10px;background:#ef4444;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;">🗑 Удалить</button></div>';
                 cl.appendChild(d);
             });
             if (!state.dev.clips.length) { var e=document.createElement('div'); e.style.cssText='font-size:12px;color:var(--text-muted)'; e.textContent='Клипов пока нет.'; cl.appendChild(e); }
             // версии
             var vl = document.getElementById('devVersionsList'); vl.innerHTML='';
             state.dev.versions.forEach(function(v, idx){
-                var st = v.status === 'approved' ? '<span style="color:#4ade80">✔ ОДОБРЕНА</span>' : (v.status === 'pending' ? '<span style="color:#fbbf24">⏳ на проверке</span>' : '<span style="color:var(--text-muted)">черновик</span>');
-                var vOpen = v.status === 'approved' ? '<button onclick="openDevLink(\''+v.name.replace(/\'/g,'')+'\', \''+v.link.replace(/\'/g,'')+'\')" style="padding:5px 10px;background:linear-gradient(135deg,#0ea5e9,#0284c7);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;margin-top:4px;">▶ Открыть</button>' : '';
+                var stBadge = v.published
+                    ? '<span style="color:#4ade80;font-size:10px;">✔ Выложено</span>'
+                    : (v.status === 'approved'
+                        ? '<span style="color:#22d3ee;font-size:10px;">✅ Ссылка одобрена — можно выложить</span>'
+                        : (v.status === 'pending'
+                            ? '<span style="color:#fbbf24;font-size:10px;">⏳ на проверке ссылки</span>'
+                            : (v.pubRejected ? '<span style="color:#ef4444;font-size:10px;">⛔ Ссылка отклонена</span>' : '<span style="color:var(--text-muted);font-size:10px;">черновик</span>')));
+                var vBtns = v.published
+                    ? '<button onclick="devUnpublishVersion('+idx+')" style="padding:4px 10px;background:linear-gradient(135deg,#f59e0b,#d97706);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;">📉 Снять</button>'
+                    : (v.status === 'approved'
+                        ? '<button onclick="devPublishVersion('+idx+')" style="padding:4px 10px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;">📤 Выложить</button>'
+                        : (v.status === 'pending'
+                            ? '<button onclick="openDevLink(\''+v.name.replace(/\'/g,'')+'\', \''+v.link.replace(/\'/g,'')+'\')" style="padding:4px 10px;background:linear-gradient(135deg,#0ea5e9,#0284c7);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;">👁 Просмотр</button>'
+                            : '<button onclick="devSubmitVersion('+idx+')" style="padding:4px 10px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:8px;color:#000;font-weight:700;font-size:11px;cursor:pointer;">📤 Отправить на проверку</button>'));
                 var d=document.createElement('div');
                 d.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--bg-input);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:8px 12px;';
-                d.innerHTML='<div><b>📦 '+v.name+'</b><div style="font-size:11px;color:var(--text-muted)">'+v.desc+'</div></div>'+
-                    '<div style="text-align:right;display:flex;flex-direction:column;gap:4px;align-items:flex-end">'+st+vOpen+
-                    (st.indexOf('черновик')!==-1 ? '<button onclick="devSubmitVersion('+idx+')" style="padding:4px 10px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:8px;color:#000;font-weight:700;font-size:11px;cursor:pointer;">📤 Отправить</button>' : '')+
-                    '</div>';
+                d.innerHTML='<div><b>📦 '+v.name+'</b><div style="font-size:11px;color:var(--text-muted)">'+v.desc+'</div><div style="font-size:10px;color:#34d399">'+(v.published?'📎 публичная ссылка: ':'🔗 ')+v.link+'</div>'+stBadge+'</div>'+
+                    '<div style="text-align:right;display:flex;flex-direction:column;gap:4px;align-items:flex-end">'+vBtns+
+                    '<button onclick="devDeleteVersion('+idx+')" style="padding:4px 10px;background:#ef4444;border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;">🗑 Удалить</button></div>';
                 vl.appendChild(d);
             });
             if (!state.dev.versions.length) { var e=document.createElement('div'); e.style.cssText='font-size:12px;color:var(--text-muted)'; e.textContent='Версий пока нет. Собери первую!'; vl.appendChild(e); }
@@ -2570,13 +2611,13 @@ function unmuteAd(video) {
             var vcheck = validHttpLink(l);
             if (!vcheck.ok) { notify(vcheck.msg,'error'); return; }
             var gid = 'g'+Date.now();
-            state.dev.games.push({ name:n, desc:d, link:l, id:gid });
+            state.dev.games.push({ name:n, desc:d, link:l, id:gid, pubStatus:'pending', pubRejected:false, devU:state.dev.name });
             (state.devRegistry||[]).forEach(function(r){ if(r.name===state.dev.name) r.games=state.dev.games.length; });
             state.devReviews.push({ type:'game', id:gid, name:n, desc:d, devU:state.dev.name, status:'pending', link:l });
             document.getElementById('devGameName').value='';
             document.getElementById('devGameDesc').value='';
             document.getElementById('devGameLink').value='';
-            devSave(); notify('🎮 Игра «'+n+'» отправлена Основателю на проверку!','ok');
+            devSave(); notify('🎮 Игра «'+n+'» отправлена Основателю на одобрение ссылки!','ok');
         }
         function grantDevSubscription(reason) {
             state.dev.subActive=true;
@@ -2597,11 +2638,11 @@ function unmuteAd(video) {
             var vcheck = validHttpLink(l);
             if (!vcheck.ok) { notify(vcheck.msg,'error'); return; }
             var cid = 'c'+Date.now();
-            state.dev.clips.push({ name:c, link:l, id:cid });
+            state.dev.clips.push({ name:c, link:l, id:cid, pubStatus:'pending', pubRejected:false, devU:state.dev.name });
             state.devReviews.push({ type:'clip', id:cid, name:c, desc:'Клип от '+state.dev.name, devU:state.dev.name, status:'pending', link:l });
             document.getElementById('devClipText').value='';
             document.getElementById('devClipLink').value='';
-            devSave(); notify('🎬 Клип отправлен Основателю на проверку!','ok');
+            devSave(); notify('🎬 Клип отправлен Основателю на одобрение ссылки!','ok');
         }
         function devAddVersion() {
             devSeed();
@@ -2635,40 +2676,139 @@ function unmuteAd(video) {
             var r2=state.devReviews[idx];
             if (!r2) return;
             state.devReviews.splice(idx,1);
-            // пометить исходный материал одобренным и вынести в общий раздел
+            // одобрить ССЫЛКУ — разрешить публикацию. Публикуется отдельно, когда разработчик захочет.
             if (r2.type === 'version') {
-                (state.dev.versions||[]).forEach(function(v){ if (v.id===r2.id) v.status='approved'; });
+                (state.dev.versions||[]).forEach(function(v){ if (v.id===r2.id) v.status='approved'; }); // ссылка разрешена, но не опубликована
             } else if (r2.type === 'game') {
-                (state.dev.games||[]).forEach(function(g){ if (g.id===r2.id) g.approved = true; });
+                (state.dev.games||[]).forEach(function(g){ if (g.id===r2.id){ g.approved = true; g.pubRejected=false; g.pubStatus = g.pubStatus==='pending' ? 'approved' : (g.pubStatus||'approved'); } });
             } else if (r2.type === 'clip') {
-                (state.dev.clips||[]).forEach(function(c){ if (c.id===r2.id) c.approved = true; });
+                (state.dev.clips||[]).forEach(function(c){ if (c.id===r2.id){ c.approved = true; c.pubRejected=false; c.pubStatus = c.pubStatus==='pending' ? 'approved' : (c.pubStatus||'approved'); } });
             }
-            state.approvedItems.push({ type: r2.type||'version', name:r2.name, desc:r2.desc, link:r2.link||('dev_'+r2.id+'.html'), dev:r2.devU });
             // стать разработчиком можно после 5 одобренных игр этого разработчика
             if (r2.type === 'game') {
-                var approvedGamesForDev = (state.approvedItems||[]).filter(function(it){ return it.type==='game' && it.dev === r2.devU; }).length;
+                var approvedGamesForDev = (state.dev.games||[]).filter(function(g){ return (g.devU===r2.devU || (!g.devU && state.dev.name===r2.devU)) && g.approved; }).length;
                 if (approvedGamesForDev >= 5) {
                     var targetDev = state.dev.name === r2.devU ? state.dev : null;
-                    if (targetDev) {
-                        if (!targetDev.subActive) {
-                            targetDev.subActive = true;
-                            targetDev.role = 'dev';
-                            grantDevSubscription('5 игр');
-                        }
+                    if (targetDev && !targetDev.subActive) {
+                        targetDev.subActive = true;
+                        targetDev.role = 'dev';
+                        grantDevSubscription('5 игр');
                     }
                 }
             }
-            notify('✅ «'+r2.name+'» одобрено и опубликовано в общий раздел!','ok');
+            notify('✅ Ссылка «'+r2.name+'» одобрена! Теперь её можно выложить.','ok');
             saveState(); renderDevPanel(); renderApprovedSections();
         }
         function devReject(idx) {
             devSeed();
             var r2=state.devReviews[idx];
-            if (r2 && r2.type === 'version') {
-                (state.dev.versions||[]).forEach(function(v){ if (v.id===r2.id) v.status='draft'; });
+            if (r2) {
+                if (r2.type === 'version') {
+                    (state.dev.versions||[]).forEach(function(v){ if (v.id===r2.id){ v.status='draft'; v.pubRejected=true; } });
+                } else if (r2.type === 'game') {
+                    (state.dev.games||[]).forEach(function(g){ if (g.id===r2.id){ g.pubRejected=true; g.pubStatus='rejected'; } });
+                } else if (r2.type === 'clip') {
+                    (state.dev.clips||[]).forEach(function(c){ if (c.id===r2.id){ c.pubRejected=true; c.pubStatus='rejected'; } });
+                }
             }
             state.devReviews.splice(idx,1);
-            saveState(); renderDevPanel(); notify('Материал отклонён основателем.','error');
+            saveState(); renderDevPanel(); notify('Ссылка отклонена Основателем.','error');
+        }
+
+        function _devTrackDev(g) { if (!g.devName) g.devName = state.dev.name; }
+        function devPublish(idx) {
+            devSeed();
+            var g=state.dev.games[idx]; if (!g) return;
+            _devTrackDev(g);
+            if (!g.approved && !g.pubRejected) { notify('Ссылка ещё не одобрена Основателем','error'); return; }
+            if (g.pubRejected) { g.pubRejected=false; g.pubStatus='pending'; g.approved=false; }
+            if (g.published) { notify('Уже выложено','info'); return; }
+            g.published=true; g.pubStatus='published';
+            state.approvedItems.push({ type:'game', name:g.name, desc:g.desc, link:g.link, dev:g.devName||state.dev.name });
+            saveState(); renderDevPanel(); renderApprovedSections();
+            notify('🎮 Игра «'+g.name+'» выложена!','ok');
+        }
+        function devUnpublish(idx) {
+            devSeed();
+            var g=state.dev.games[idx]; if (!g) return;
+            if (g.published) {
+                g.published=false; g.pubStatus='approved';
+                state.approvedItems = (state.approvedItems||[]).filter(function(it){ return !(it.type==='game' && it.link===g.link && it.name===g.name); });
+            }
+            saveState(); renderDevPanel(); renderApprovedSections();
+        }
+        function devDeleteGame(idx) {
+            devSeed();
+            var g=state.dev.games[idx]; if (!g) return;
+            if (g.published) state.approvedItems = (state.approvedItems||[]).filter(function(it){ return !(it.type==='game' && it.link===g.link && it.name===g.name); });
+            state.dev.games.splice(idx,1);
+            saveState(); renderDevPanel(); renderApprovedSections();
+            notify('Игра «'+g.name+'» удалена','info');
+        }
+        function devPublishClip(idx) {
+            devSeed();
+            var c=state.dev.clips[idx]; if (!c) return;
+            if (!c.approved && !c.pubRejected) { notify('Ссылка ещё не одобрена Основателем','error'); return; }
+            if (c.pubRejected) { c.pubRejected=false; c.pubStatus='pending'; c.approved=false; }
+            if (c.published) { notify('Уже выложено','info'); return; }
+            c.published=true; c.pubStatus='published';
+            state.approvedItems.push({ type:'clip', name:c.name, desc:'Клип', link:c.link, dev:state.dev.name });
+            saveState(); renderDevPanel(); renderApprovedSections();
+            notify('🎬 Клип «'+c.name+'» выложен!','ok');
+        }
+        function devDeleteClip(idx) {
+            devSeed();
+            var c=state.dev.clips[idx]; if (!c) return;
+            if (c.published) state.approvedItems = (state.approvedItems||[]).filter(function(it){ return !(it.type==='clip' && it.link===c.link && it.name===c.name); });
+            state.dev.clips.splice(idx,1);
+            saveState(); renderDevPanel(); renderApprovedSections();
+            notify('Клип «'+c.name+'» удалён','info');
+        }
+        function devUnpublishClip(idx) {
+            devSeed();
+            var c=state.dev.clips[idx]; if (!c) return;
+            if (c.published) {
+                c.published=false;
+                c.approved=true;
+                state.approvedItems = (state.approvedItems||[]).filter(function(it){ return !(it.type==='clip' && it.link===c.link && it.name===c.name); });
+            }
+            saveState(); renderDevPanel(); renderApprovedSections();
+        }
+        function devRePublishClip(idx) {
+            devSeed();
+            var c=state.dev.clips[idx]; if (!c) return;
+            c.pubRejected=false; c.approved=false; c.pubStatus='pending';
+            state.devReviews.push({ type:'clip', id:c.id, name:c.name, desc:'Клип от '+state.dev.name, devU:state.dev.name, status:'pending', link:c.link });
+            saveState(); renderDevPanel();
+            notify('🎬 Клип снова отправлен Основателю на одобрение','ok');
+        }
+        function devPublishVersion(idx) {
+            devSeed();
+            var v=state.dev.versions[idx]; if (!v) return;
+            if (v.status !== 'approved') { notify('Версия ещё не одобрена Основателем','error'); return; }
+            if (v.published) { notify('Уже выложено','info'); return; }
+            v.published=true;
+            state.approvedItems.push({ type:'version', name:v.name, desc:v.desc, link:v.link, dev:state.dev.name });
+            saveState(); renderDevPanel(); renderApprovedSections();
+            notify('📦 Версия «'+v.name+'» выложена!','ok');
+        }
+        function devDeleteVersion(idx) {
+            devSeed();
+            var v=state.dev.versions[idx]; if (!v) return;
+            if (v.published) state.approvedItems = (state.approvedItems||[]).filter(function(it){ return !(it.type==='version' && it.link===v.link && it.name===v.name); });
+            state.dev.versions.splice(idx,1);
+            saveState(); renderDevPanel(); renderApprovedSections();
+            notify('Версия «'+v.name+'» удалена','info');
+        }
+        function devUnpublishVersion(idx) {
+            devSeed();
+            var v=state.dev.versions[idx]; if (!v) return;
+            if (v.published) {
+                v.published=false;
+                v.status='approved';
+                state.approvedItems = (state.approvedItems||[]).filter(function(it){ return !(it.type==='version' && it.link===v.link && it.name===v.name); });
+            }
+            saveState(); renderDevPanel(); renderApprovedSections();
         }
 
         function switchTab(tab) {
@@ -4435,8 +4575,13 @@ function unmuteAd(video) {
             var isLesh = cur === '2';
             var priceCur = isLesh ? Math.max(1, Math.round(price / 30)) : price;
             state.auction.push({ role:s.id, seller: state.myName || 'Игрок', sellerId: state.myPlate || state.authToken || '?', until:s.until, price:priceCur, cur:isLesh?'lesh':'coin', ts:Date.now() });
-            saveState(); renderAuction();
-            notify('📤 Подписка выставлена на аукцион!','ok');
+            // подписка уходит от продавца — он её больше не имеет
+            var subs = subsGet();
+            if (subs[s.id]) delete subs[s.id];
+            state.subs = subs;
+            if (state.role === s.id) state.role = _subBestActive();
+            saveState(); renderAuction(); renderRoleShop();
+            notify('📤 Подписка выставлена на аукцион и ушла от тебя!','ok');
         }
         function buyAuction(idx) {
             acSeed();
