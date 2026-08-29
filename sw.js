@@ -1,4 +1,4 @@
-const CACHE = 'tuk-tuk-v1';
+const CACHE = 'brum-brum-v2';
 const ASSETS = [
   './',
   './manifest.webmanifest',
