@@ -853,7 +853,7 @@
                 <button class="nav-tab" data-tab="garage" onclick="switchTab('garage')">🏎️<span>Гараж</span></button>
                 <button class="nav-tab" data-tab="shop" onclick="switchTab('shop')">🛒<span>Магазин</span></button>
                 <button class="nav-tab" data-tab="bot" onclick="switchTab('bot')">🤖<span>Бот</span></button>
-                <button class="nav-tab" data-tab="dev" onclick="switchTab('dev')">⚙️<span>Разработка</span></button>
+                <button class="nav-tab" data-tab="dev" onclick="switchTab('dev')">⚙️<span>Разработка</span><span id="devNavBadge" style="display:none;margin-left:4px;background:var(--danger);color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;"></span></button>
                 <button class="nav-tab" data-tab="profile" onclick="switchTab('profile')">👤<span>Профиль</span></button>
                 <button class="nav-tab" data-tab="mod" onclick="switchTab('mod')" id="modTab" style="display:none;">🛡️<span>Мод</span></button>
                 <button class="nav-tab" data-tab="owner" onclick="switchTab('owner')" id="ownerTab" style="display:none;">👁️<span>Владелец</span></button>
@@ -979,6 +979,13 @@
                         <h3 style="font-family:'Orbitron';font-size:16px;margin-bottom:5px;color:var(--warning);">💳 Подписки</h3>
                         <p style="font-size:11px;color:var(--text-muted);margin-bottom:15px;">Купи роль (демо-оплата картой, деньги не списываются)</p>
                         <div id="roleShopList"></div>
+                    </div>
+
+                    <div style="margin-top:25px;margin-bottom:20px;border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;">
+                        <h3 style="font-family:'Orbitron';font-size:16px;margin-bottom:5px;color:var(--warning);">🔨 Аукцион подписок</h3>
+                        <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">Продай ненужную подписку или купи активную роль у другого игрока.</p>
+                        <div id="auctionList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
+                        <button onclick="openAuctionForm()" style="width:100%;padding:12px;background:linear-gradient(135deg,#22d3ee,#0ea5e9);border:none;border-radius:12px;color:#000;font-weight:700;font-size:13px;cursor:pointer;">📤 Выставить свою подписку на аукцион</button>
                     </div>
 
                     <div style="margin-top:25px;border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;">
@@ -1118,7 +1125,7 @@
             <div class="panel" id="panel-dev">
                 <div class="dev-panel-content" style="padding:20px;max-width:760px;margin:0 auto;">
                     <h2 style="margin:0 0 4px;">⚙️ Режим разработчиков</h2>
-                    <p style="margin:0 0 16px;color:var(--text-muted);font-size:13px;">Создавай игры, клипы и свои версии Тук-Тук. Выпусти <b>хотя бы 2 игры</b> — и получишь подписку <b>«Разработчик»</b> (чуть слабее админа), и тебя узнает весь мессенджер!</p>
+                    <p style="margin:0 0 16px;color:var(--text-muted);font-size:13px;">Создавай игры, клипы и свои версии Тук-Тук. Дождись одобрения Основателя. После <b>5 одобренных игр</b> — получишь подписку <b>«Разработчик»</b> (чуть слабее админа), и тебя узнает весь мессенджер! Купить её можно и в магазине.</p>
 
                     <div id="devNotRegistered" style="display:none;">
                         <div style="background:linear-gradient(135deg,rgba(0,240,255,0.08),rgba(167,139,250,0.08));border:1px solid rgba(0,240,255,0.3);border-radius:16px;padding:20px;text-align:center;">
@@ -1143,16 +1150,16 @@
                             </div>
                             <div style="flex:1;min-width:180px;background:var(--bg-card);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px;">
                                 <div style="font-size:11px;color:var(--text-muted);">Выпущено игр</div>
-                                <div id="devGamesCount" style="font-weight:700;font-size:15px;">0 / 2</div>
+                                <div id="devGamesCount" style="font-weight:700;font-size:15px;">0 / 5</div>
                             </div>
                         </div>
 
                         <div id="devKnownBanner" style="display:none;background:linear-gradient(135deg,rgba(255,215,120,0.12),rgba(167,139,250,0.12));border:1px solid rgba(255,215,120,0.5);border-radius:14px;padding:12px;margin-bottom:14px;text-align:center;font-weight:700;">
-                            🎉 Ты выпустил 2 игры — получил подписку «Разработчик»! Тебя знает ВЕСЬ Тук-Тук.
+                            🎉 Ты выпустил 5 игр, одобренных Основателем — получил подписку «Разработчик»! Тебя знает ВЕСЬ Тук-Тук.
                         </div>
 
                         <div style="background:var(--bg-card);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:14px;">
-                            <h3 style="margin:0 0 10px;">🎮 Мои игры <span style="font-size:10px;color:var(--text-muted)">(выпусти 2, чтобы получить подписку Разработчика)</span></h3>
+                            <h3 style="margin:0 0 10px;">🎮 Мои игры <span style="font-size:10px;color:var(--text-muted)">(5 одобренных Основателем игр = подписка Разработчика)</span></h3>
                             <div id="devGamesList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>
                             <div style="display:flex;gap:8px;flex-wrap:wrap;">
                                 <input type="text" id="devGameName" placeholder="Название игры" style="flex:1.2;min-width:120px;padding:9px 12px;background:var(--bg-input);border:1px solid rgba(0,240,255,0.25);border-radius:10px;color:var(--text);font-size:13px;outline:none;">
@@ -1186,7 +1193,7 @@
 
                         <div id="devReviewsBox" style="display:none;margin-bottom:14px;background:var(--bg-card);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;">
                             <h3 style="margin:0 0 4px;">📥 Предложения для Основателя (проверка)</h3>
-                            <p style="margin:0 0 10px;color:var(--text-muted);font-size:12px;">Основатель (Владелец) видит отправленные версии и решает — принять (тогда автор станет АДМИНОМ за 2 игры — подписка Разработчик) или отклонить.</p>
+                            <p style="margin:0 0 10px;color:var(--text-muted);font-size:12px;">Основатель (Владелец) видит отправленные игры, клипы и версии и решает — принять или отклонить. После 5 одобренных игр автор получит подписку Разработчик.</p>
                             <div id="devReviewsList" style="display:flex;flex-direction:column;gap:8px;"></div>
                         </div>
 
@@ -2391,6 +2398,7 @@ function unmuteAd(video) {
             if (!state.devRegistry) state.devRegistry = [];
             if (!state.devReviews) state.devReviews = [];
             if (!state.approvedItems) state.approvedItems = [];
+            if (!state.auction) state.auction = [];
         }
         function devMe() { devSeed(); return state.dev; }
         function isFounder() { return (state.role === 'owner' || state.role === 'god'); }
@@ -2406,7 +2414,7 @@ function unmuteAd(video) {
             var sub = state.dev.subActive;
             document.getElementById('devStatusShown').textContent = sub ? '🛠️ РАЗРАБОТЧИК' : 'нет';
             document.getElementById('devStatusShown').style.color = sub ? '#7dd3fc' : 'var(--warning)';
-            document.getElementById('devGamesCount').textContent = state.dev.games.length + ' / 2';
+            document.getElementById('devGamesCount').textContent = (state.dev.games||[]).length + ' / 5';
             document.getElementById('devKnownBanner').style.display = sub ? 'block' : 'none';
             // игры
             var gl = document.getElementById('devGamesList'); gl.innerHTML='';
@@ -2470,12 +2478,22 @@ function unmuteAd(video) {
                 regl.appendChild(d);
             });
             if (!state.devRegistry.length) { var e=document.createElement('div'); e.style.cssText='font-size:12px;color:var(--text-muted)'; e.textContent='Пока никого нет. Стань первым!'; regl.appendChild(e); }
+            updateDevNavBadge();
         }
 
         function ltoHttp(u) {
             u = u.trim();
             if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
             return u;
+        }
+        function validHttpLink(u) {
+            u = (u||'').trim();
+            if (!u) return { ok:false, msg:'Вставь публичную ссылку https://...' };
+            try { new URL(u); } catch(e) { return { ok:false, msg:'Ссылка не похожа на настоящую. Нужен формат https://...' }; }
+            if (!/^https?:\/\//i.test(u)) return { ok:false, msg:'Ссылка должна начинаться с https://' };
+            var clean = u.replace(/^https?:\/\//i,'');
+            if (clean.length < 3 || !clean.includes('.')) return { ok:false, msg:'Ссылка не существует — похоже на неполный адрес' };
+            return { ok:true, msg:'' };
         }
         function renderApprovedSections() {
             devSeed();
@@ -2523,6 +2541,13 @@ function unmuteAd(video) {
             wrap.id='devLinkWrap';
             document.body.appendChild(wrap);
         }
+        function updateDevNavBadge() {
+            var badge = document.getElementById('devNavBadge');
+            if (!badge) return;
+            var n = isFounder() ? (state.devReviews||[]).length : 0;
+            if (n > 0) { badge.style.display='inline-block'; badge.textContent = n; }
+            else badge.style.display='none';
+        }
         function openDevExternal(url) { window.open(url, '_blank'); }
 
         function devRegister() {
@@ -2542,20 +2567,25 @@ function unmuteAd(video) {
             if (!d) d='Новая игра от разработчика';
             if (!l) { notify('Вставь публичную ссылку https://... на игру!','error'); return; }
             l = ltoHttp(l);
+            var vcheck = validHttpLink(l);
+            if (!vcheck.ok) { notify(vcheck.msg,'error'); return; }
             var gid = 'g'+Date.now();
             state.dev.games.push({ name:n, desc:d, link:l, id:gid });
             (state.devRegistry||[]).forEach(function(r){ if(r.name===state.dev.name) r.games=state.dev.games.length; });
             state.devReviews.push({ type:'game', id:gid, name:n, desc:d, devU:state.dev.name, status:'pending', link:l });
-            if (state.dev.games.length>=2 && !state.dev.subActive) grantDevSubscription();
             document.getElementById('devGameName').value='';
             document.getElementById('devGameDesc').value='';
             document.getElementById('devGameLink').value='';
-            devSave(); notify('🎮 Игра «'+n+'» выпущена и отправлена на проверку Основателю!','ok');
+            devSave(); notify('🎮 Игра «'+n+'» отправлена Основателю на проверку!','ok');
         }
-        function grantDevSubscription() {
+        function grantDevSubscription(reason) {
             state.dev.subActive=true;
             state.role = 'dev';
-            notify('🛠️ Подписка «Разработчик» получена! Тебя знает весь Тук-Тук.','ok');
+            var subs = subsGet();
+            subs['dev'] = Date.now() + 30*24*60*60*1000;
+            state.subs = subs;
+            saveState();
+            notify('🛠️ Подписка «Разработчик» получена за '+(reason||'5 одобренных игр')+'! Тебя знает весь Тук-Тук.','ok');
         }
         function devAddClip() {
             devSeed();
@@ -2564,6 +2594,8 @@ function unmuteAd(video) {
             if (!c) { notify('Введи название клипа!','error'); return; }
             if (!l) { notify('Вставь публичную ссылку https://... на клип!','error'); return; }
             l = ltoHttp(l);
+            var vcheck = validHttpLink(l);
+            if (!vcheck.ok) { notify(vcheck.msg,'error'); return; }
             var cid = 'c'+Date.now();
             state.dev.clips.push({ name:c, link:l, id:cid });
             state.devReviews.push({ type:'clip', id:cid, name:c, desc:'Клип от '+state.dev.name, devU:state.dev.name, status:'pending', link:l });
@@ -2580,6 +2612,8 @@ function unmuteAd(video) {
             if (!d) d='Описание версии';
             if (!l) { notify('Вставь публичную ссылку https://... на версию!','error'); return; }
             l = ltoHttp(l);
+            var vcheck = validHttpLink(l);
+            if (!vcheck.ok) { notify(vcheck.msg,'error'); return; }
             state.dev.versions.push({ name:n, desc:d, link:l, status:'draft', id:'v'+Date.now() });
             document.getElementById('devVersionName').value='';
             document.getElementById('devVersionDesc').value='';
@@ -2604,8 +2638,26 @@ function unmuteAd(video) {
             // пометить исходный материал одобренным и вынести в общий раздел
             if (r2.type === 'version') {
                 (state.dev.versions||[]).forEach(function(v){ if (v.id===r2.id) v.status='approved'; });
+            } else if (r2.type === 'game') {
+                (state.dev.games||[]).forEach(function(g){ if (g.id===r2.id) g.approved = true; });
+            } else if (r2.type === 'clip') {
+                (state.dev.clips||[]).forEach(function(c){ if (c.id===r2.id) c.approved = true; });
             }
             state.approvedItems.push({ type: r2.type||'version', name:r2.name, desc:r2.desc, link:r2.link||('dev_'+r2.id+'.html'), dev:r2.devU });
+            // стать разработчиком можно после 5 одобренных игр этого разработчика
+            if (r2.type === 'game') {
+                var approvedGamesForDev = (state.approvedItems||[]).filter(function(it){ return it.type==='game' && it.dev === r2.devU; }).length;
+                if (approvedGamesForDev >= 5) {
+                    var targetDev = state.dev.name === r2.devU ? state.dev : null;
+                    if (targetDev) {
+                        if (!targetDev.subActive) {
+                            targetDev.subActive = true;
+                            targetDev.role = 'dev';
+                            grantDevSubscription('5 игр');
+                        }
+                    }
+                }
+            }
             notify('✅ «'+r2.name+'» одобрено и опубликовано в общий раздел!','ok');
             saveState(); renderDevPanel(); renderApprovedSections();
         }
@@ -2628,7 +2680,7 @@ function unmuteAd(video) {
             const panel = document.getElementById(`panel-${tab}`);
             if (panel) panel.classList.add('active');
             if (tab !== 'clips' && typeof ClipMusic !== 'undefined') ClipMusic.stop();
-            if (tab === 'shop') { renderShop(); renderRoleShop(); renderUpgradeShop(); updateCoinsUI(); updateLeshinksyUI(); }
+            if (tab === 'shop') { renderShop(); renderRoleShop(); renderUpgradeShop(); renderAuction(); updateCoinsUI(); updateLeshinksyUI(); }
             if (tab === 'owner') renderOwnerPanel();
             if (tab === 'mod') renderModPanel();
             if (tab === 'garage') renderGarage();
@@ -3794,6 +3846,7 @@ function unmuteAd(video) {
             { id:'mentor', name:'Mentor', emoji:'🎓', price:599, period:'мес', xp:'x1.4 XP', desc:'Наставник на месяц', colors:['#06b6d4','#0891b2'] },
             { id:'platinum', name:'Платина', emoji:'💎', price:799, period:'мес', xp:'x1.8 XP', desc:'Платиновая подписка', colors:['#93c5fd','#60a5fa'] },
             { id:'moderator', name:'Moderator', emoji:'🛡️', price:899, period:'мес', xp:'x1.5 XP', desc:'Модератор на месяц', colors:['#3b82f6','#2563eb'] },
+            { id:'dev', name:'Разработчик', emoji:'🛠️', price:149, period:'мес', xp:'x1.9 XP', desc:'Мастерская игр: выпускай игры, клипы и версии Тук-Тук', colors:['#22d3ee','#7dd3fc'] },
             { id:'legend', name:'Легенда', emoji:'🏆', price:1299, period:'мес', xp:'x2.2 XP', desc:'Легендарная подписка', colors:['#f97316','#ea580c'] },
             { id:'admin', name:'Admin', emoji:'👑', price:1499, period:'мес', xp:'x2 XP', desc:'Администратор на месяц', colors:['#f59e0b','#d97706'] },
             { id:'titan', name:'Титан', emoji:'🔮', price:2499, period:'мес', xp:'x2.5 XP', desc:'Подписка Титана из будущего', colors:['#a855f7','#6d28d9'] },
@@ -3823,10 +3876,10 @@ function unmuteAd(video) {
             { id:'god', name:'Бог', emoji:'🧿', price:399999, period:'мес', xp:'x30 XP', desc:'Божественная подписка Бога', colors:['#a78bfa','#8b5cf6'] },
             { id:'owner', name:'Владелец', emoji:'👑👑', price:1000000, period:'мес', xp:'x99 XP', desc:'Верховный владелец — доступ ко всему, без исключений', colors:['#ff0066','#ff00aa'] },
         ];
-        const ROLE_SHOP_ORDER = ['user','vip','premium','veteran','gold','mentor','platinum','moderator','legend','admin','titan','ultra','nova','quant','cyber','cosmos','immortal','avatar','prime','shadow','phoenix','galaxy','dragon','pharaoh','virus','emperor','colossus','myth','infinity','void','omega','chaos','divine','apex','god','owner'];
-        const ROLE_POWER = { user:1, vip:2, premium:3, veteran:4, gold:5, mentor:6, platinum:7, moderator:8, legend:9, admin:10, titan:11, ultra:12, nova:13, quant:14, cyber:15, cosmos:16, immortal:17, avatar:18, prime:19, shadow:20, phoenix:21, galaxy:22, dragon:23, pharaoh:24, virus:25, emperor:26, colossus:27, myth:28, infinity:29, void:30, omega:31, chaos:32, divine:33, apex:34, god:35, owner:99 };
-        const COIN_PRICE = { user:0, vip:5000, premium:10000, veteran:15000, gold:30000, mentor:40000, platinum:60000, moderator:80000, legend:150000, admin:250000, titan:500000, ultra:900000, nova:1500000, quant:3000000, cyber:5000000, cosmos:10000000, immortal:20000000, avatar:35000000, prime:70000000, shadow:120000000, phoenix:200000000, galaxy:350000000, dragon:600000000, pharaoh:1000000000, virus:1800000000, emperor:3000000000, colossus:5000000000, myth:9000000000, infinity:15000000000, void:25000000000, omega:40000000000, chaos:60000000000, divine:80000000000, apex:90000000000, god:99000000000, owner:100000000000 };
-        const LESH_PRICE = { user:0, vip:10, premium:15, veteran:20, gold:30, mentor:40, platinum:55, moderator:75, legend:100, admin:130, titan:165, ultra:200, nova:240, quant:285, cyber:330, cosmos:380, immortal:430, avatar:480, prime:530, shadow:580, phoenix:620, galaxy:660, dragon:700, pharaoh:740, virus:775, emperor:815, colossus:850, myth:880, infinity:905, void:930, omega:950, chaos:968, divine:984, apex:996, god:1000, owner:1000 };
+        const ROLE_SHOP_ORDER = ['user','vip','premium','veteran','gold','mentor','platinum','moderator','dev','legend','admin','titan','ultra','nova','quant','cyber','cosmos','immortal','avatar','prime','shadow','phoenix','galaxy','dragon','pharaoh','virus','emperor','colossus','myth','infinity','void','omega','chaos','divine','apex','god','owner'];
+        const ROLE_POWER = { user:1, vip:2, premium:3, veteran:4, gold:5, mentor:6, platinum:7, moderator:8, dev:9, legend:10, admin:11, titan:12, ultra:13, nova:14, quant:15, cyber:16, cosmos:17, immortal:18, avatar:19, prime:20, shadow:21, phoenix:22, galaxy:23, dragon:24, pharaoh:25, virus:26, emperor:27, colossus:28, myth:29, infinity:30, void:31, omega:32, chaos:33, divine:34, apex:35, god:36, owner:99 };
+        const COIN_PRICE = { user:0, vip:5000, premium:10000, veteran:15000, gold:30000, mentor:40000, platinum:60000, moderator:80000, dev:120000, legend:150000, admin:250000, titan:500000, ultra:900000, nova:1500000, quant:3000000, cyber:5000000, cosmos:10000000, immortal:20000000, avatar:35000000, prime:70000000, shadow:120000000, phoenix:200000000, galaxy:350000000, dragon:600000000, pharaoh:1000000000, virus:1800000000, emperor:3000000000, colossus:5000000000, myth:9000000000, infinity:15000000000, void:25000000000, omega:40000000000, chaos:60000000000, divine:80000000000, apex:90000000000, god:99000000000, owner:100000000000 };
+        const LESH_PRICE = { user:0, vip:10, premium:15, veteran:20, gold:30, mentor:40, platinum:55, moderator:75, dev:90, legend:100, admin:130, titan:165, ultra:200, nova:240, quant:285, cyber:330, cosmos:380, immortal:430, avatar:480, prime:530, shadow:580, phoenix:620, galaxy:660, dragon:700, pharaoh:740, virus:775, emperor:815, colossus:850, myth:880, infinity:905, void:930, omega:950, chaos:968, divine:984, apex:996, god:1000, owner:1000 };
 
         const ROLE_ABILITIES = {
             vip:       '⭐ Золотой гудок — гудок даёт вдвое больше XP',
@@ -3836,6 +3889,7 @@ function unmuteAd(video) {
             mentor:    '🎓 Мудрость — секретные слова дают +50% XP',
             platinum:  '💎 Двойной гудок — гудок засчитывается дважды',
             moderator: '🛡️ Патруль — раз в день бесплатные +30 XP',
+            dev:       '🛠️ Мастерская — выпускай игры, клипы и версии Тук-Тук, минус 60% комиссии с продаж',
             legend:    '🏆 Легендарный гудок — гудок даёт конфетти и +3 XP',
             admin:     '👑 Админ-крит — 5% шанс на удвоенный XP',
             titan:     '🔮 Титан-крит — 25% шанс на x2 XP',
@@ -4318,6 +4372,100 @@ function unmuteAd(video) {
 
                 container.appendChild(card);
             });
+        }
+
+        // ============ АУКЦИОН ПОДПИСОК ============
+        function acSeed() { if (!state.auction) state.auction = []; }
+        function activeSubsOwned() {
+            var subs = subsGet();
+            var out = [];
+            Object.keys(subs).forEach(function(id){
+                if (id === 'dev') return;
+                if (subs[id] && subs[id] > Date.now()) out.push({ id:id, until:subs[id] });
+            });
+            return out;
+        }
+        function renderAuction() {
+            acSeed();
+            var list = document.getElementById('auctionList');
+            if (!list) return;
+            list.innerHTML = '';
+            if (!state.auction.length) {
+                list.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px 0;">Пока пусто. Выставь свою подписку первым!</div>';
+                return;
+            }
+            state.auction.forEach(function(it, idx){
+                var d = document.createElement('div');
+                var col = (ROLE_COLORS[it.role] || '#7dd3fc');
+                var btn = it.sellerId === (state.myPlate || state.authToken || '?')
+                    ? '<button onclick="removeAuction('+idx+')" style="padding:6px 12px;background:linear-gradient(135deg,#ef4444,#b91c1c);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:12px;cursor:pointer;">✕ Снять</button>'
+                    : '<button onclick="buyAuction('+idx+')" style="padding:6px 12px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:12px;cursor:pointer;">💰 Купить за '+it.price+' '+ (it.cur==='lesh'?'💎':'💰') +'</button>';
+                d.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--bg-input);border:1px solid rgba(0,240,255,0.2);border-radius:10px;padding:8px 12px;';
+                d.innerHTML='<div><b style="color:'+col+'">'+(ROLE_NAMES[it.role]||it.role)+'</b> <span style="font-size:11px;color:var(--text-muted)">от '+it.seller+'</span><div style="font-size:10px;color:#64748b">активна до '+new Date(it.until).toLocaleDateString('ru-RU')+'</div></div>'+btn;
+                list.appendChild(d);
+            });
+        }
+        function openAuctionForm() {
+            acSeed();
+            var mine = activeSubsOwned();
+            if (!mine.length) { notify('У тебя нет активных подписок (кроме Разработчика) для продажи','error'); return; }
+            var inner = mine.map(function(s,i){
+                return '<button onclick="listAuction('+i+')" style="width:100%;margin:4px 0;padding:10px;background:var(--bg-card);border:1px solid '+(ROLE_COLORS[s.id]||'#7dd3fc')+';border-radius:10px;color:'+(ROLE_COLORS[s.id]||'#7dd3fc')+';font-weight:700;font-size:13px;cursor:pointer;">'+(ROLE_NAMES[s.id]||s.id)+' → выставить</button>';
+            }).join('');
+            var wrap=document.createElement('div');
+            wrap.style.cssText='position:fixed;inset:0;z-index:250000;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+            var f=document.createElement('div');
+            f.style.cssText='background:var(--bg-card);border:1px solid rgba(0,240,255,0.4);border-radius:16px;padding:20px;width:100%;max-width:360px;';
+            f.innerHTML='<h3 style="font-family:Orbitron;margin:0 0 12px;color:var(--warning);">📤 Выставить на аукцион</h3>'+inner+
+                '<button onclick="document.getElementById(\'auctionFormWrap\').remove()" style="width:100%;margin-top:8px;padding:10px;background:#ef4444;border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;">✕ Отмена</button>';
+            wrap.appendChild(f); wrap.id='auctionFormWrap';
+            document.body.appendChild(wrap);
+        }
+        function listAuction(idx) {
+            acSeed();
+            var mine = activeSubsOwned();
+            var s = mine[idx];
+            if (!s) return;
+            document.getElementById('auctionFormWrap').remove();
+            var price = prompt('Цена в рублях (₽/мес) для подписки '+(ROLE_NAMES[s.id]||s.id)+':', String(Math.round((ROLE_SHOP_ROLES.find(function(r){return r.id===s.id})||{}).price / 2 || 50)));
+            if (price === null) return;
+            price = parseInt(price,10);
+            if (isNaN(price) || price <= 0) { notify('Некорректная цена','error'); return; }
+            var cur = prompt('Валюта продажи: 1 = монеты 💰, 2 = лешинксы 💎', '1');
+            var isLesh = cur === '2';
+            var priceCur = isLesh ? Math.max(1, Math.round(price / 30)) : price;
+            state.auction.push({ role:s.id, seller: state.myName || 'Игрок', sellerId: state.myPlate || state.authToken || '?', until:s.until, price:priceCur, cur:isLesh?'lesh':'coin', ts:Date.now() });
+            saveState(); renderAuction();
+            notify('📤 Подписка выставлена на аукцион!','ok');
+        }
+        function buyAuction(idx) {
+            acSeed();
+            var it = state.auction[idx];
+            if (!it) return;
+            if (it.sellerId === (state.myPlate || state.authToken || '?')) { notify('Нельзя купить свою же подписку','error'); return; }
+            if (it.until < Date.now()) { state.auction.splice(idx,1); saveState(); renderAuction(); notify('Подписка уже истекла','error'); return; }
+            if (it.cur === 'lesh') {
+                if ((state.leshinksy||0) < it.price) { notify('Недостаточно 💎','error'); return; }
+                state.leshinksy -= it.price;
+            } else {
+                if ((state.coins||0) < it.price) { notify('Недостаточно 💰','error'); return; }
+                state.coins -= it.price;
+            }
+            var subs = subsGet();
+            subs[it.role] = it.until;
+            state.subs = subs;
+            if (!state.proceeds) state.proceeds = {};
+            state.proceeds[(it.sellerId||'?')] = (state.proceeds[(it.sellerId||'?')] || 0) + it.price + (it.cur==='lesh'?'':0);
+            if ((ROLE_POWER[it.role]||0) > (ROLE_POWER[state.role]||1)) state.role = it.role;
+            state.auction.splice(idx,1);
+            saveState(); renderAuction(); renderRoleShop(); updateCoinsUI(); updateLeshinksyUI();
+            notify('🎉 Подписка '+(ROLE_NAMES[it.role]||it.role)+' теперь твоя!','ok');
+        }
+        function removeAuction(idx) {
+            acSeed();
+            if (!state.auction[idx]) return;
+            state.auction.splice(idx,1);
+            saveState(); renderAuction(); notify('Подписка снята с аукциона','info');
         }
 
         let _serverDemo = null;
