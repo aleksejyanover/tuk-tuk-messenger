@@ -1,4 +1,4 @@
-const CACHE = 'brum-brum-v4';
+const CACHE = 'brum-brum-v5';
 const ASSETS = [
   './',
   './manifest.webmanifest',
