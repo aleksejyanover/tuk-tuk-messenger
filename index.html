@@ -1910,7 +1910,7 @@
                 title='🚀 Мессенджер Брум-Брум';
                 body='<div class="media-modal-symbol">🚗</div>'+
                     '<p>Брум-Брум — мессенджер для водителей. Связывайся по номеру авто, общайся, играй и зарабатывай монеты 💰 и Лешинксы 💎 вместе с ботом Алёшей.</p>'+
-                    '<p style="font-size:12px;color:var(--text-muted);margin-top:8px;">Перетаскивай кнопку водителя 🧰 куда удобно, делись геолокацией, отправляй аудио- и видеосообщения, включай «Трезвый водитель».</p>';
+                    '<p style="font-size:12px;color:var(--text-muted);margin-top:8px;">Добавляй друзей по номеру авто, отправляй сообщения и стикеры прямо в чат, играй и прокачивай суперспособности своей роли.</p>';
             } else if (type==='flag') {
                 title='🚩 Флаг мессенджера Брум-Брум Алёши';
                 body='<div class="media-modal-symbol">🚩</div>'+
@@ -2240,8 +2240,134 @@ function setTheme(mode) {
             if (checkBan()) return;
             document.getElementById('app').classList.add('active');
             initApp();
+            setTimeout(showStartupAd, 600);
         }
 
+        var AD_VIDEO_URL = ''; /* онлайн-запасной: прямая ссылка на mp4-видео, напр. 'https://example.com/ad.mp4' */
+        var AD_SUBTITLES = [
+            { t: 0.2,  text: 'БРУМ-БРУМ — мессенджер для машин.' },
+            { t: 2.5,  text: 'Связь без телефона — по номеру машины.' },
+            { t: 5.6,  text: 'Монеты 💰 и редкие Лешинксы 💎.' },
+            { t: 8.0,  text: 'Секретная роль ВЛАДЕЛЕЦ 🔒.' },
+            { t: 11.1, text: 'Роль ВЛАДЕЛЕЦ активирована!' },
+            { t: 13.4, text: 'Владелец: баны, реклама, полный доступ.' },
+            { t: 15.9, text: 'Бот Алёша 🤖 всегда на связи.' },
+            { t: 18.4, text: 'Гараж: собирай коллекцию машин.' },
+            { t: 20.9, text: 'Игры: зарабатывай монеты.' },
+            { t: 23.2, text: 'Такси: зарплата на дороге 🚕.' },
+            { t: 25.5, text: 'Сканируй QR и скачивай Брум-Брум!' }
+        ];
+        function _startAdSubtitles(vid, capEl) {
+            if (!vid || !capEl || !AD_SUBTITLES.length) return;
+            function tick() {
+                var time = vid.currentTime || 0;
+                var show = '';
+                for (var i = AD_SUBTITLES.length - 1; i >= 0; i--) {
+                    if (time >= AD_SUBTITLES[i].t) { show = AD_SUBTITLES[i].text; break; }
+                }
+                if (capEl.textContent !== show) { capEl.textContent = show; }
+                capEl.classList.toggle('show', !!show);
+                requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+        }
+        function _tryAdSources(vid, index, callbacks) {
+            var sources = ['ad_novoice.mp4'];
+            if (AD_VIDEO_URL) sources.push(AD_VIDEO_URL);
+            if (index >= sources.length) { if (callbacks.onError) callbacks.onError(); return; }
+            var settled = false;
+            function fail() { if (settled) return; settled = true; vid.onerror = null; vid.oncanplay = null; vid.onplaying = null; _tryAdSources(vid, index + 1, callbacks); }
+            function succeed() { if (settled) return; settled = true; vid.onerror = null; vid.oncanplay = null; vid.onplaying = null; if (callbacks.onPlay) callbacks.onPlay(); }
+            vid.src = sources[index];
+            vid.load();
+            vid.muted = true;
+            var guard = setTimeout(fail, 4000);
+            vid.onerror = function() { clearTimeout(guard); fail(); };
+            vid.oncanplay = function() {
+                clearTimeout(guard);
+                var p = vid.play();
+                if (p && p.catch) p.catch(function(){});
+            };
+            vid.onplaying = function() { succeed(); };
+
+            vid.addEventListener('timeupdate', function onTU() {
+                if (vid.duration && (vid.currentTime >= vid.duration - 3)) {
+                    var sk = document.getElementById('adSkipBtn');
+                    if (sk) sk.style.display = 'block';
+                }
+            });
+            var p = vid.play();
+            if (p && p.catch) p.catch(function(){});
+        }
+        function showStartupAd() {
+            var ov = document.getElementById('adOverlay');
+            if (!ov) return;
+            var vid = document.getElementById('adVideo');
+            var place = document.getElementById('adPlaceholder');
+            var load = document.getElementById('adLoading');
+            var skip = document.getElementById('adSkipBtn');
+            ov.classList.add('active');
+            load.style.display = 'flex';
+            place.style.display = 'none';
+            vid.style.display = 'none';
+            skip.style.display = 'none';
+            vid.muted = true;
+            vid.onended = function() { closeStartupAd(); };
+            _tryAdSources(vid, 0, {
+                onPlay: function() {
+                    load.style.display = 'none';
+                    vid.style.display = 'block';
+                    _startAdSubtitles(vid, document.getElementById('adSubCaption'));
+                    setTimeout(function() { try { unmuteAd(vid); } catch(e){} }, 400);
+                },
+                onError: function() {
+                    load.style.display = 'none';
+                    place.style.display = 'flex';
+                    skip.style.display = 'block';
+                }
+            });
+        }
+
+        
+function unmuteAd(video) {
+            var muted = video.muted;
+            if (muted) {
+                video.muted = false;
+                video.play().catch(function(){});
+            }
+        }
+
+        function openPromoVideo() {
+            var vid = document.getElementById('adVideo');
+            var place = document.getElementById('adPlaceholder');
+            var load = document.getElementById('adLoading');
+            var skip = document.getElementById('adSkipBtn');
+            place.style.display = 'none';
+            load.style.display = 'flex';
+            vid.style.display = 'block';
+            skip.style.display = 'block';
+            vid.muted = true;
+            vid.onended = function() { closeStartupAd(); };
+            _tryAdSources(vid, 0, {
+                onPlay: function() {
+                    load.style.display = 'none';
+                    _startAdSubtitles(vid, document.getElementById('adSubCaption'));
+                    setTimeout(function() { try { unmuteAd(vid); } catch(e){} }, 300);
+                },
+                onError: function() {
+                    load.style.display = 'none';
+                    place.style.display = 'flex';
+                }
+            });
+        }
+
+        function closeStartupAd() {
+            var ov = document.getElementById('adOverlay');
+            var vid = document.getElementById('adVideo');
+            if (!ov) return;
+            ov.classList.remove('active');
+            if (vid) { try { vid.pause(); } catch(e){} }
+        }
 
         function checkBan() {
             try {
@@ -3066,6 +3192,7 @@ function setTheme(mode) {
             if (!state.messages[state.currentChat]) state.messages[state.currentChat] = [];
             state.messages[state.currentChat].push({ text:s, type:'sticker', time });
             updateStats('message');
+            roleBonus('sticker');
             addXP(2);
             renderMessages(); renderChatList();
             const p = document.getElementById('stickerPicker');
@@ -3282,6 +3409,7 @@ function setTheme(mode) {
             if (!state.messages[state.currentChat]) state.messages[state.currentChat] = [];
             state.messages[state.currentChat].push({ text, type:'sent', time });
             updateStats('message');
+            roleBonus('message', text);
             addXP(3);
             if (!isOwner() && Math.random() < 0.01) { addLeshinksy(1); notify('💎 Редкая находка! +1 Лешинкс', 'success'); }
             if (state.role === 'cosmos') addXP(1);
@@ -3665,6 +3793,7 @@ function setTheme(mode) {
             if (!state.messages[state.currentChat]) state.messages[state.currentChat] = [];
             state.messages[state.currentChat].push({ text:'📯', type:'horn', time });
             updateStats('horn');
+            roleBonus('horn');
             var hornBase = 2;
             if (ROLE_ABILITIES[state.role]) {
                 if (state.role === 'vip' || state.role === 'avatar') hornBase = 4;
@@ -3919,43 +4048,102 @@ function setTheme(mode) {
         const LESH_PRICE = { user:0, vip:10, premium:15, veteran:20, gold:30, mentor:40, platinum:55, moderator:75, dev:90, legend:100, admin:130, titan:165, ultra:200, nova:240, quant:285, cyber:330, cosmos:380, immortal:430, avatar:480, prime:530, shadow:580, phoenix:620, galaxy:660, dragon:700, pharaoh:740, virus:775, emperor:815, colossus:850, myth:880, infinity:905, void:930, omega:950, chaos:968, divine:984, apex:996, god:1000, owner:1000 };
 
         const ROLE_ABILITIES = {
-            vip:       '⭐ Золотой гудок — гудок даёт вдвое больше XP',
-            premium:   '💎 Бонус дня — раз в день бесплатные +30 XP',
-            veteran:   '🎖️ Опыт ветерана — мини-игры дают +20% XP',
-            gold:      '🥇 Золотая удача — шанс +5 XP за каждое сообщение',
-            mentor:    '🎓 Мудрость — секретные слова дают +50% XP',
-            platinum:  '💎 Двойной гудок — гудок засчитывается дважды',
-            moderator: '🛡️ Патруль — раз в день бесплатные +30 XP',
-            dev:       '🛠️ Мастерская — выпускай игры, клипы и версии Брум-Брум, минус 60% комиссии с продаж',
-            legend:    '🏆 Легендарный гудок — гудок даёт конфетти и +3 XP',
-            admin:     '👑 Админ-крит — 5% шанс на удвоенный XP',
-            titan:     '🔮 Титан-крит — 25% шанс на x2 XP',
-            ultra:     '☄️ Ультра-спид — мини-игры дают +50% XP',
-            nova:      '🪐 Нова-серия — каждая 3-я игра +30 XP',
-            quant:     '🌀 Квант-реактор — 35% шанс на x3 XP',
-            cyber:     '🤖 Кибер-хак — раз в час бесплатные +50 XP',
-            cosmos:    '🌌 Невесомость — каждое сообщение даёт +1 XP',
-            immortal:  '🔥 Бессмертный — мини-игры дают +60% XP',
-            avatar:    '⚡ Стихии — все гудки дают x2 XP',
-            prime:     '✨ Прайм-разум — все бонусы и 50% шанс на x3 XP',
-            shadow:    '🌑 Тень-удар — гудок даёт конфетти и +3 XP, как у Легенды',
-            phoenix:   '🐦‍🔥 Возрождение — раз в день бесплатные +40 XP, мини-игры +25%',
-            galaxy:    '🌠 Звёздный поток — каждое 2-е сообщение даёт +2 XP',
-            dragon:    '🐉 Огненный крит — 40% шанс на x3 XP',
-            pharaoh:   '⚱️ Наследие — мини-игры дают +70% XP',
-            virus:     '🦠 Зараза — 50% шанс на x3 XP, каждый 5-й гудок +10 XP',
-            emperor:   '🏛️ Власть — ежедневно бесплатные +50 XP, все бонусы',
-            colossus:  '🗿 Колосс — мини-игры дают вдвое больше XP',
-            myth:      '🐐 Миф-удача — 60% шанс на x4 XP',
-            infinity:  '♾️ Бесконечность — ВСЁ XP удваивается',
-            void:      '⚫️ Из ниоткуда — каждое сообщение даёт +2 XP',
-            omega:     '🔱 Финальный — 70% шанс на x5 крит',
-            chaos:     '🌪️ Удача хаоса — мини-игры дают тройной XP',
-            divine:    '😇 Благословение — раз в день бесплатные +100 XP',
-            apex:      '🎯 Снайпер — 80% шанс на x5 крит',
-            god:       '🧿 Всемогущество — все способности ролей сразу',
-            owner:     '👑👑 ВЕРХОВНЫЙ ВЛАДЕЛЕЦ — всё открыто, максимальный множитель, доступ ко всему без исключений'
+            vip:       ['⭐ Золотой гудок — гудок даёт вдвое больше XP', '💰 Гудок-навар — каждый гудок даёт +2 монеты', '🎙️ Скорописец — каждое сообщение даёт +1 монету'],
+            premium:   ['💎 Бонус дня — раз в день бесплатные +30 XP', '💰 Премиум-кубыш — раз в день бесплатные +25 монет', '🎁 Стикер-плюс — каждый стикер даёт +2 монеты'],
+            veteran:   ['🎖️ Опыт ветерана — мини-игры дают +20% XP', '💰 Ветеранский паёк — каждая игра даёт +5 монет', '📜 Длинная речь — сообщения от 20 символов дают +2 XP'],
+            gold:      ['🥇 Золотая удача — шанс +5 XP за каждое сообщение', '💰 Золотая жила — каждое сообщение даёт +1 монету', '🚕 Такси-золото — каждая доставка пассажира +5 монет'],
+            mentor:    ['🎓 Мудрость — секретные слова дают +50% XP', '💡 Наставник — каждое 3-е сообщение даёт +1 Лешинкс (шанс)', '💰 Пенсия мастера — каждый день +15 монет'],
+            platinum:  ['💎 Двойной гудок — гудок засчитывается дважды', '💰 Платиновый гудок — каждый гудок +3 монеты', '👥 Статус — каждая игра даёт +8 монет'],
+            moderator: ['🛡️ Патруль — раз в день бесплатные +30 XP', '💰 Штрафной сбор — каждый гудок +2 монеты', '🚔 Охрана — каждый день +20 монет'],
+            dev:       ['🛠️ Мастерская — выпускай игры, клипы и версии Брум-Брум, минус 60% комиссии с продаж', '💻 Код-мастер — каждая игра даёт +10 монет', '🔓 Взлом бонуса — каждое сообщение длиной от 20 символов даёт +3 XP'],
+            legend:    ['🏆 Легендарный гудок — гудок даёт конфетти и +3 XP', '💰 Наследие легенды — каждый гудок +4 монеты', '🏅 Слава — каждый день +25 монет'],
+            admin:     ['👑 Админ-крит — 5% шанс на удвоенный XP', '💰 Админский налог — каждый гудок +3 монеты', '👑 Власть монет — каждое сообщение +1 монета'],
+            titan:     ['🔮 Титан-крит — 25% шанс на x2 XP', '💰 Титан-кубок — каждая игра +12 монет', '🪙 Титан-руда — каждое сообщение +1 монета'],
+            ultra:     ['☄️ Ультра-спид — мини-игры дают +50% XP', '💰 Ультра-приз — каждая игра +10 монет', '📨 Ультра-поток — каждый стикер +3 монеты'],
+            nova:      ['🪐 Нова-серия — каждая 3-я игра +30 XP', '💰 Нова-монета — каждый гудок +3 монеты', '🌠 Нова-свет — каждое сообщение +1 монета'],
+            quant:     ['🌀 Квант-реактор — 35% шанс на x3 XP', '💰 Квант-кванта — каждая игра +15 монет', '🔁 Квант-петля — длинные сообщения (20+) дают +3 XP'],
+            cyber:     ['🤖 Кибер-хак — раз в час бесплатные +50 XP', '💰 Кибер-крипта — каждое сообщение +2 монеты', '💾 Кибер-скелет — каждый гудок +3 монеты'],
+            cosmos:    ['🌌 Невесомость — каждое сообщение даёт +1 XP', '💰 Космо-пыль — каждый стикер +4 монеты', '🪐 Астероид — каждый день +30 монет'],
+            immortal:  ['🔥 Бессмертный — мини-игры дают +60% XP', '💰 Бессмертный кошелёк — каждая игра +18 монет', '🔥 Пламя мира — каждое сообщение +1 монета'],
+            avatar:    ['⚡ Стихии — все гудки дают x2 XP', '💰 Стихийный клад — каждый гудок +4 монеты', '🌪️ Стихийный вихрь — каждый день +30 монет'],
+            prime:     ['✨ Прайм-разум — все бонусы и 50% шанс на x3 XP', '💰 Прайм-банк — каждое сообщение +2 монеты', '✨ Прайм-заговор — каждая игра +20 монет'],
+            shadow:    ['🌑 Тень-удар — гудок даёт конфетти и +3 XP, как у Легенды', '💰 Теневой куш — каждый гудок +4 монеты', '🕶️ Теневая сеть — каждое сообщение +1 монета'],
+            phoenix:   ['🐦‍🔥 Возрождение — раз в день бесплатные +40 XP, мини-игры +25%', '💰 Пепел в золото — каждая игра +16 монет', '🔥 Птица удачи — каждый день +35 монет'],
+            galaxy:    ['🌠 Звёздный поток — каждое 2-е сообщение даёт +2 XP', '💰 Звёздный дождь — каждый стикер +5 монет', '🌌 Галактический банк — каждый день +35 монет'],
+            dragon:    ['🐉 Огненный крит — 40% шанс на x3 XP', '💰 Сокровищница дракона — каждая игра +22 монеты', '🐲 Чешуя золота — каждое сообщение +2 монеты'],
+            pharaoh:   ['⚱️ Наследие — мини-игры дают +70% XP', '💰 Сокровища фараона — каждый день +40 монет', '⚱️ Песок монет — каждое сообщение +2 монеты'],
+            virus:     ['🦠 Зараза — 50% шанс на x3 XP, каждый 5-й гудок +10 XP', '💰 Вирусный вирус — каждый гудок +4 монеты', '🦠 Штамм богатства — каждый стикер +5 монет'],
+            emperor:   ['🏛️ Власть — ежедневно бесплатные +50 XP, все бонусы', '💰 Казна империи — каждый день +50 монет', '👑 Имперский налог — каждое сообщение +3 монеты'],
+            colossus:  ['🗿 Колосс — мини-игры дают вдвое больше XP', '💰 Колосс-комиссия — каждая игра +30 монет', '🗿 Гранит — каждое сообщение +2 монеты'],
+            myth:      ['🐐 Миф-удача — 60% шанс на x4 XP', '💰 Миф-золото — каждый гудок +6 монет', '🐐 Легенда монет — каждый день +45 монет'],
+            infinity:  ['♾️ Бесконечность — ВСЁ XP удваивается', '💰 Бесконечный банк — каждое сообщение +3 монеты', '♾️ Бесконечный поток — каждый стикер +6 монет'],
+            void:      ['⚫️ Из ниоткуда — каждое сообщение даёт +2 XP', '💰 Пустота-кошелёк — каждый гудок +6 монет', '⚫️ Чёрная дыра — каждая игра +35 монет'],
+            omega:     ['🔱 Финальный — 70% шанс на x5 крит', '💰 Финальный банк — каждый день +60 монет', '🔱 Омега-казна — каждое сообщение +3 монеты'],
+            chaos:     ['🌪️ Удача хаоса — мини-игры дают тройной XP', '💰 Хаос-монета — каждая игра +40 монет', '🌪️ Хаос-дождь — каждый стикер +7 монет'],
+            divine:    ['😇 Благословение — раз в день бесплатные +100 XP', '💰 Небесная казна — каждый день +80 монет', '😇 Божественная пыль — каждое сообщение +4 монеты'],
+            apex:      ['🎯 Снайпер — 80% шанс на x5 крит', '💰 Снайперский выстрел — каждый гудок +8 монет', '🎯 Точный банк — каждый день +70 монет'],
+            god:       ['🧿 Всемогущество — все способности ролей сразу', '💰 Божественный банк — каждый день +200 монет', '🧿 Божественный поток — каждое сообщение +5 монет'],
+            owner:     ['👑👑 ВЕРХОВНЫЙ ВЛАДЕЛЕЦ — всё открыто, максимальный множитель, доступ ко всему без исключений', '💰 Безлимитная казна — все монетные бонусы x5', '👑 Корона вечности — каждый день +500 монет']
         };
+
+        const ROLE_BONUS = {
+            vip:       { msg:1, horn:2 },
+            premium:   { dailyCoin:25, sticker:2 },
+            veteran:   { game:5, long:2 },
+            gold:      { msg:1, taxi:5 },
+            mentor:    { dailyCoin:15, leshMsg:0.08 },
+            platinum:  { horn:3, game:8 },
+            moderator: { horn:2, dailyCoin:20 },
+            dev:       { game:10, long:3 },
+            legend:    { horn:4, dailyCoin:25 },
+            admin:     { horn:3, msg:1 },
+            titan:     { game:12, msg:1 },
+            ultra:     { game:10, sticker:3 },
+            nova:      { horn:3, msg:1 },
+            quant:     { game:15, long:3 },
+            cyber:     { msg:2, horn:3 },
+            cosmos:    { sticker:4, dailyCoin:30 },
+            immortal:  { game:18, msg:1 },
+            avatar:    { horn:4, dailyCoin:30 },
+            prime:     { msg:2, game:20 },
+            shadow:    { horn:4, msg:1 },
+            phoenix:   { game:16, dailyCoin:35 },
+            galaxy:    { sticker:5, dailyCoin:35 },
+            dragon:    { game:22, msg:2 },
+            pharaoh:   { dailyCoin:40, msg:2 },
+            virus:     { horn:4, sticker:5 },
+            emperor:   { dailyCoin:50, msg:3 },
+            colossus:  { game:30, msg:2 },
+            myth:      { horn:6, dailyCoin:45 },
+            infinity:  { msg:3, sticker:6 },
+            void:      { horn:6, game:35 },
+            omega:     { dailyCoin:60, msg:3 },
+            chaos:     { game:40, sticker:7 },
+            divine:    { dailyCoin:80, msg:4 },
+            apex:      { horn:8, dailyCoin:70 },
+            god:       { dailyCoin:200, msg:5 },
+            owner:     { dailyCoin:500, msg:25, horn:50, sticker:50, game:100 }
+        };
+        function roleBonus(action, extra) {
+            if (!state || isOwner()) return;
+            const b = ROLE_BONUS[state.role];
+            if (!b) return;
+            const r = Math.random;
+            function tell(n, txt) { addCoins(n); if (n >= 5) notify(txt, 'success'); }
+            if (action === 'message') {
+                if (b.msg) tell(b.msg, `💰 Роль-бонус: +${b.msg} монет`);
+                if (b.long && extra && extra.length >= 20) { addXP(b.long); notify(`📜 Роль-бонус: +${b.long} XP за длинное сообщение`, 'success'); }
+                if (b.leshMsg && r() < b.leshMsg) { addLeshinksy(1); notify('💎 Роль-бонус: +1 Лешинкс', 'success'); }
+            } else if (action === 'horn') {
+                if (b.horn) tell(b.horn, `💰 Роль-бонус: +${b.horn} монет`);
+            } else if (action === 'sticker') {
+                if (b.sticker) tell(b.sticker, `💰 Роль-бонус: +${b.sticker} монет`);
+            } else if (action === 'game') {
+                if (b.game) { addCoins(b.game); notify(`💰 Роль-бонус: +${b.game} монет за игру`, 'success'); }
+            } else if (action === 'taxi') {
+                if (b.taxi) tell(b.taxi, `💰 Роль-бонус: +${b.taxi} монет`);
+            }
+        }
         const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
 
         function subsGet() {
@@ -4277,6 +4465,7 @@ function setTheme(mode) {
             state.taxiPassengers = (state.taxiPassengers || 0) + 1;
             state.taxiEarned = (state.taxiEarned || 0) + 10;
             addCoins(10);
+            roleBonus('taxi');
             const st = document.getElementById('taxiStatus');
             if (st) st.textContent = `✅ Пассажир доставлен! +10 💰 (всего ${state.taxiEarned} 💰)`;
             const e = document.getElementById('taxiEarned');
@@ -4346,6 +4535,13 @@ function setTheme(mode) {
                 notify(`🤖 Кибер-хак: +50 XP!`, 'success');
                 saveState(true);
             }
+            const dBonus = ROLE_BONUS[state.role] && ROLE_BONUS[state.role].dailyCoin;
+            if (dBonus && (!state.roleBonuses.dailyCoinBonus || now - state.roleBonuses.dailyCoinBonus > 24 * 60 * 60 * 1000)) {
+                state.roleBonuses.dailyCoinBonus = now;
+                addCoins(dBonus);
+                notify(`💰 ${ROLE_NAMES[state.role]}: дневная казна +${dBonus} монет!`, 'success');
+                saveState(true);
+            }
         }
         if (window.ttSubsInited !== true) { window.ttSubsInited = true; setTimeout(function(){ claimRoleBonus(); _expireLoop(); }, 1000); }
 
@@ -4388,7 +4584,8 @@ function setTheme(mode) {
                         `<button class="role-shop-buy" onclick="leshOwnRole('${role.id}')" style="margin-left:6px;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;">💎 ${(LESH_PRICE[role.id] || 0).toLocaleString('ru-RU')} Леш</button>`;
                 }
 
-                const ability = ROLE_ABILITIES[role.id] || '';
+                const abilities = ROLE_ABILITIES[role.id] || [];
+                const abilityHtml = (Array.isArray(abilities) ? abilities : [abilities]).map(ab => `<div class="role-shop-ability" style="color:${role.colors[0]};">🛠️ ${ab}</div>`).join('');
                 const period = hasSub
                     ? `🔄 активна до ${new Date(subUntil).toLocaleDateString('ru-RU')} • отменить можно в любой момент`
                     : `🔄 списание раз в месяц • отменить можно в любой момент`;
@@ -4400,7 +4597,7 @@ function setTheme(mode) {
                         `<div class="role-shop-info">` +
                             `<div class="role-shop-name" style="color:${role.colors[0]};">${role.name}</div>` +
                             `<div class="role-shop-desc">${role.desc}</div>` +
-                            (ability ? `<div class="role-shop-ability" style="color:${role.colors[0]};">🛠️ Способность: ${ability}</div>` : '') +
+                            (abilityHtml) +
                             `<div class="role-shop-period">${period}</div>` +
                         `</div>` +
                         `<div class="role-shop-price" style="color:${role.colors[0]};">${role.price} <span class="role-shop-xp">₽/мес • ${role.xp}</span></div>` +
@@ -5021,6 +5218,7 @@ function setTheme(mode) {
             __ttReplay = replay || null;
             updateStats('game');
             addCoins(1);
+            roleBonus('game');
             if (!isOwner() && Math.random() < 0.03) { addLeshinksy(1); notify('💎 Джекпот! +1 Лешинкс за игру', 'success'); }
             let gBase = Math.max(0, xp);
             const gB = { veteran:1.2, ultra:1.5, immortal:1.6, avatar:1.4, phoenix:1.25, pharaoh:1.7, colossus:2.0, chaos:3.0, god:4.0 }[state.role];
@@ -5870,7 +6068,7 @@ function setTheme(mode) {
     // ====== CLIPS — Multi-source: Local, VK, Rutube, YouTube ======
     var CLIPS_SOURCES = {
         local: [
-            { src:'ad.mp4', title:'Тук-Тук больше нету — печалька', author:'@archive', avatar:'🚗', desc:'Тук-Тук больше нету печалька 😢 Это последнее видео старого бренда. Сохрани на память!', c1:'#334455', c2:'#8899aa', music:'Adieu — Тук-Тук', likes:7777, comments:666, shares:333 },
+            { src:'ad_novoice.mp4', title:'Брум-Брум — из будущего', author:'@brumbrum', avatar:'🚗', desc:'Брум-Брум — мессенджер для машин! Чаты по номеру авто, роли, суперспособности и бот Алёша 🚀 #brumbrum', c1:'#00f0ff', c2:'#a855f7', music:'Брум-Брум — Гимн', likes:99999, comments:999, shares:999 },
             { src:'https://assets.mixkit.co/videos/64/64-720.mp4', title:'Спорткар — Панель приборов', author:'@auto_vibes', avatar:'🏎️', desc:'Роскошная панель спортивного автомобиля 🔥 #sportcar', c1:'#ff0040', c2:'#ff6600', music:'Phonk City — Drift King', likes:4521, comments:312, shares:89 },
             { src:'https://assets.mixkit.co/videos/74/74-720.mp4', title:'Красный спорткар — Вид сзади', author:'@drift_club', avatar:'🏁', desc:'Красная敞篷ка в подземном паркинге! #drift #bmw', c1:'#0066ff', c2:'#00ccff', music:'DJ Blyatman — Russian Drift', likes:8934, comments:567, shares:234 },
             { src:'https://assets.mixkit.co/videos/63/63-720.mp4', title:'Спорткар крупным планом', author:'@tesla_club_ru', avatar:'⚡', desc:'Крупный план красного спорткара ⚡ #tesla', c1:'#00ff88', c2:'#0088ff', music:'Synthwave Driver — Night Ride', likes:12043, comments:891, shares:456 },
@@ -6037,6 +6235,44 @@ function setTheme(mode) {
             progressHTML;
     }
 
+    function _buildAdSlideHTML() {
+        return '<div class="ad-orb"></div>' +
+            '<video class="vk-clip-video" id="ad-clip-video" src="ad_novoice.mp4" muted playsinline preload="auto" loop></video>' +
+            '<div class="vk-clip-unmute" id="ad-clip-unmute" onclick="event.stopPropagation();adClipToggleSound()">' +
+                '<span class="unmute-icon">🔊</span>' +
+                '<span class="unmute-text">Звук</span>' +
+            '</div>' +
+            '<div class="vk-clip-gradient"></div>' +
+            '<div class="vk-clip-poster" id="ad-clip-poster" style="font-size:90px;">🎬</div>' +
+            '<div class="ad-clip-subtitles"><span class="sub-caption" id="ad-clip-caption"></span></div>' +
+            '<div class="vk-clip-top">' +
+                '<div class="vk-clip-top-logo">🎬 Реклама • Брум-Брум</div>' +
+                '<button class="vk-clip-close" onclick="switchTab(\'chats\')">&times;</button>' +
+            '</div>' +
+            '<div class="vk-clip-info">' +
+                '<div class="vk-clip-author-row">' +
+                    '<div class="vk-clip-avatar">🎬</div>' +
+                    '<div class="vk-clip-author-name">Фильм о Брум-Брум</div>' +
+                '</div>' +
+                '<div class="vk-clip-desc">Обгони время в мессенджере будущего БРУМ-БРУМ: чаты по номеру авто, гараж, роли, игры и бот Алёша!</div>' +
+            '</div>' +
+            '<div class="vk-clip-actions" style="display:none;"></div>' +
+            '<div class="ad-content">' +
+                '<div class="ad-badge">РЕКЛАМА • Без голоса</div>' +
+                '<div class="ad-title">БРУМ-БРУМ<br>из будущего</div>' +
+                '<div class="ad-hint">Ролик без озвучки. Видео в файле <b>ad_novoice.mp4</b> рядом.</div>' +
+            '</div>';
+    }
+
+    function adClipToggleSound() {
+        var v = document.getElementById('ad-clip-video');
+        var b = document.getElementById('ad-clip-unmute');
+        if (!v) return;
+        v.muted = !v.muted;
+        if (!v.muted) { var p = v.play(); if (p && p.catch) p.catch(function(){}); }
+        _startAdSubtitles(v, document.getElementById('ad-clip-caption'));
+        if (b) { var t = b.querySelector('.unmute-text'); var i = b.querySelector('.unmute-icon'); if (t) t.textContent = v.muted ? 'Звук' : 'Выкл'; if (i) i.textContent = v.muted ? '🔇' : '🔊'; }
+    }
 
     function renderClips() {
         var feed = document.getElementById('vkClipsFeed');
@@ -6071,6 +6307,24 @@ function setTheme(mode) {
 
             feed.appendChild(slide);
         });
+
+        if (vkClips.source === 'local') {
+            var adIdx = pool.length;
+            var adSlide = document.createElement('div');
+            adSlide.className = 'vk-clip vk-clip-ad';
+            adSlide.setAttribute('data-clip-idx', adIdx);
+            adSlide.setAttribute('data-pool-idx', -1);
+            adSlide.innerHTML = _buildAdSlideHTML();
+            var adTap = 0;
+            adSlide.addEventListener('click', function(e) {
+                if (e.target.closest('.vk-clip-top') || e.target.closest('.ad-cta') || e.target.closest('.vk-clip-actions')) return;
+                var now = Date.now();
+                if (now - adTap < 300) { adTap = 0; return; }
+                adTap = now;
+                setTimeout(function() { if (adTap !== 0) { adTap = 0; } }, 400);
+            });
+            feed.appendChild(adSlide);
+        }
 
         vkClips.idx = 0;
         _initClipsScroll(feed);
@@ -6320,6 +6574,32 @@ function setTheme(mode) {
         setTimeout(function() { t.remove(); }, 2000);
     }
     </script>
+    <div class="ad-overlay" id="adOverlay">
+        <div class="ad-skip" id="adSkipBtn" style="display:none;" onclick="closeStartupAd()">Пропустить ➔</div>
+        <div class="ad-overlay-loading" id="adLoading">
+            <div class="ap-badge">РЕКЛАМА • БРУМ-БРУМ</div>
+            <div style="font-size:15px;color:rgba(255,255,255,0.6);">Загружаем рекламный ролик...</div>
+        </div>
+        <div id="adPlaceholder" class="ad-placeholder" style="display:none;">
+            <div class="ap-badge">РЕКЛАМА • ФИЛЬМ О БРУМ-БРУМ</div>
+            <div class="ap-title">БРУМ-БРУМ<br>из будущего</div>
+            <div class="ap-sub">Видео должно лежать рядом как <b>ad_novoice.mp4</b> (без голоса). Здесь крутится рекламный ролик с субтитрами, но без озвучки.</div>
+            <button class="ap-play" onclick="openPromoVideo()">▶ Смотреть превью</button>
+            <div class="ap-note">Сценарий для генерации — в сценарии проекта</div>
+        </div>
+        <video id="adVideo" style="display:none;" playsinline muted></video>
+        <div class="ad-subtitles" id="adSubtitles"><span class="sub-caption" id="adSubCaption"></span></div>
+        <div class="ad-trailer" id="adTrailer">
+            <div class="trailer-particles" id="trailerParticles"></div>
+            <div class="trailer-scene" data-t="0" data-sp="true"><div class="t-badge">РЕКЛАМА • БРУМ-БРУМ</div><div class="t-emoji">🏎️</div><div class="t-title">БРУМ-БРУМ<br>из будущего</div><div class="t-text">Мессенджер, который обгоняет время</div></div>
+            <div class="trailer-scene" data-t="5" data-sp="true"><div class="t-badge">ЧАТЫ ПО НОМЕРУ</div><div class="t-emoji">📱</div><div class="t-text">Переписывайся с водителями по номеру машины — без телефонов и лишнего</div></div>
+            <div class="trailer-scene" data-t="12" data-sp="true"><div class="t-badge">ГАРАЖ И ВАЛЮТА</div><div class="t-emoji">🏎️💎</div><div class="t-text">Собирай гараж, зарабатывай монеты и редчайшие Лешинксы — валюту, названную в честь владельца Алексея</div></div>
+            <div class="trailer-scene" data-t="19" data-sp="true"><div class="t-badge">РОЛИ И БОТ</div><div class="t-emoji">👑🤖</div><div class="t-text">Прокачивай роль до самого Владельца и спрашивай всё у ИИ-бота Алёши</div></div>
+            <div class="trailer-scene" data-t="26" data-sp="true"><div class="t-badge">ИГРЫ • КЛИПЫ • ТАКСИ</div><div class="t-emoji">🎮🎬🚕</div><div class="t-text">Игры, клипы, такси-зарплата — развлечений хватит на всю дорогу</div></div>
+            <div class="trailer-scene" data-t="34" data-sp="false"><div class="t-badge">БРУМ-БРУМ</div><div class="trailer-logo">Скачивай<br>и заводи двигатель!</div><div class="t-emoji">🚀</div></div>
+            <div class="trailer-caption"><span class="sub-caption" id="trailerCaption"></span></div>
+        </div>
+    </div>
     <script>
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js', { scope: './' }).catch(function(){});
@@ -6340,273 +6620,6 @@ function setTheme(mode) {
             else if (isIOS) { btn.textContent = '① Поделиться → ② На экран «Домой» → ③ Добавить'; }
             else { btn.style.display = 'none'; }
         });
-    })();
-    </script>
-    <script>
-    (function(){
-        var cssId = 'tukFeatCss';
-        if (!document.getElementById(cssId)) {
-            var s = document.createElement('style'); s.id = cssId; s.textContent = [
-            '#tukFab{position:fixed;left:16px;bottom:16px;z-index:9995;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#00f0ff,#22d3ee);display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;box-shadow:0 8px 22px rgba(0,240,255,.45);font-size:24px;border:none;user-select:none}',
-            '#tukFab.drag{cursor:grabbing;opacity:.85}',
-            '#tukPanel{position:fixed;left:60px;bottom:16px;z-index:9995;width:min(260px,85vw);background:rgba(10,14,26,.97);border:1px solid rgba(0,240,255,.3);border-radius:14px;padding:9px;display:flex;flex-direction:column;color:#e2e8f0}',
-            '#tukPanel h3{margin:0 0 7px;font-size:12px;color:#00f0ff;cursor:move;user-select:none;text-align:center}',
-            '.tk-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}',
-            '.tk-tile{border:none;border-radius:8px;padding:9px 6px;font-weight:700;cursor:pointer;font-size:12px;text-align:center;line-height:1.2}',
-            '#tukPanel h3{margin:0 0 10px;font-size:15px;color:#00f0ff;cursor:move;user-select:none;text-align:center}',
-            '.tk-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;padding:9px 10px;background:rgba(255,255,255,.05);border-radius:10px}',
-            '.tk-row .lbl{font-size:13px;flex:1}',
-            '.tk-btn{border:none;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:12px}',
-            '.tk-on{background:linear-gradient(135deg,#22c55e,#16a34a);color:#000}',
-            '.tk-off{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}',
-            '.tk-a{background:linear-gradient(135deg,#00f0ff,#22d3ee);color:#000}',
-            '.tk-violet{background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff}',
-            '.tk-soft{background:rgba(255,255,255,.1);color:#cbd5e1;border-radius:8px;padding:8px 12px;font-size:12px;border:1px solid rgba(255,255,255,.15);margin-top:6px;width:100%;cursor:pointer}',
-            '#soberBadge{display:none;position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9999;background:linear-gradient(135deg,#22c55e,#16a34a);color:#000;font-weight:800;padding:8px 18px;border-radius:30px;box-shadow:0 8px 25px rgba(34,197,94,.5);font-size:14px}',
-            '.tk-status{font-size:12px;color:#94a3b8;margin-top:2px;margin-bottom:6px}',
-            '.tk-note{font-size:11px;color:#64748b;margin-top:8px;line-height:1.4;text-align:center}',
-            '.tk-send{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;border:none;border-radius:8px;padding:9px 12px;font-weight:800;cursor:pointer;font-size:13px;width:100%;margin-top:8px;display:none}'
-            ].join('\n');
-            document.head.appendChild(s);
-        }
-        if (!document.getElementById('soberBadge')) {
-            var sb = document.createElement('div'); sb.id = 'soberBadge'; sb.textContent = '✅ Трезвый водитель'; document.body.appendChild(sb);
-        }
-
-        // --- helper: поделиться текстом в текущий чат ---
-        function tukSendText(txt){
-            try {
-                if (typeof state === 'undefined' || !state || !state.currentChat || state.currentChat === 'bot') {
-                    alert('📤 Выберите друга в чате, чтобы отправить сообщение!');
-                    return false;
-                }
-                var time = new Date().toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' });
-                if (!state.messages[state.currentChat]) state.messages[state.currentChat] = [];
-                state.messages[state.currentChat].push({ text: txt, type:'sent', time: time });
-                if (typeof renderMessages === 'function') renderMessages();
-                if (typeof renderChatList === 'function') renderChatList();
-                if (typeof saveState === 'function') saveState();
-                if (typeof addXP === 'function') addXP(3);
-                return true;
-            } catch(e){ alert('Не удалось отправить в чат.'); return false; }
-        }
-        window.tukSendText = tukSendText;
-
-        // --- drag & drop для FAB и панели ---
-        function loadPos(){
-            try { return JSON.parse(localStorage.getItem('tukFabPos') || '{}'); } catch(e){ return {}; }
-        }
-        function savePos(){
-            try { localStorage.setItem('tukFabPos', JSON.stringify({ fx: fab.style.left, fy: fab.style.top, px: panel.style.left, py: panel.style.top })); } catch(e){}
-        }
-        var saved = loadPos();
-
-        // --- FAB ---
-        var fab = document.getElementById('tukFab') || document.createElement('div');
-        if (!fab.parentNode) { fab.id='tukFab'; fab.textContent='🧰'; fab.title='Функции водителя (перетащи, чтобы переместить)'; document.body.appendChild(fab); }
-        fab.style.cursor = 'grab';
-        if (saved.fx) fab.style.left = saved.fx; if (saved.fy) fab.style.top = saved.fy;
-
-        // --- panel ---
-        var panel = document.createElement('div'); panel.id = 'tukPanel';
-        panel.innerHTML =
-          '<h3>🧰 Водитель <span style="font-size:9px;color:#64748b;font-weight:400">(тяни)</span></h3>' +
-          '<div class="tk-grid">' +
-            '<button class="tk-tile tk-off" id="soberBtn">🚸 Трезвый</button>' +
-            '<button class="tk-tile tk-a" id="geoBtn">📍 Гео</button>' +
-            '<button class="tk-tile tk-a" id="audioBtn">🎙 Аудио</button>' +
-            '<button class="tk-tile tk-a" id="videoBtn">🎥 Видео</button>' +
-            '<button class="tk-tile tk-violet" id="engineBtn">🔊 Врум</button>' +
-            '<button class="tk-tile tk-soft" id="resetPosBtn">↻ Место</button>' +
-          '</div>' +
-          '<div class="tk-status" id="geoStatus" style="display:none"></div>' +
-          '<div class="tk-status" id="soberStatus" style="display:none"></div>' +
-          '<audio id="tukAudio" controls preload="none" style="width:100%;margin-top:6px;display:none"></audio>' +
-          '<video id="tukVideo" controls playsinline preload="none" style="width:100%;margin-top:6px;display:none;border-radius:10px"></video>' +
-          '<button class="tk-send" id="audioSend">📤 Отправить аудио в чат</button>' +
-          '<button class="tk-send" id="videoSend">📤 Отправить видео в чат</button>';
-        document.body.appendChild(panel);
-        if (saved.px) panel.style.left = saved.px; if (saved.py) panel.style.top = saved.py;
-
-        fab.onclick = function(){ if (fab._dragging) return; panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex'; };
-
-        function makeDragable(el, which){
-            var startX=0,startY=0,origX=0,origY=0;
-            function onDown(X,Y){
-                startX=X; startY=Y;
-                var r = el.getBoundingClientRect();
-                origX=r.left; origY=r.top;
-                el._dragging=true;
-                if (el===fab) fab.classList.add('drag');
-            }
-            function onMove(X,Y){
-                if(!el._dragging) return;
-                var dx = X-startX, dy = Y-startY;
-                var vw = window.innerWidth, vh = window.innerHeight;
-                var ew = el.offsetWidth, eh = el.offsetHeight;
-                var nx = Math.max(4, Math.min(vw-ew-4, origX+dx));
-                var ny = Math.max(4, Math.min(vh-eh-4, origY+dy));
-                el.style.left = nx+'px'; el.style.top = ny+'px'; el.style.right='auto'; el.style.bottom='auto';
-            }
-            function onUp(){
-                if(el._dragging){ el._dragging=false; if(el===fab) fab.classList.remove('drag'); savePos(); }
-            }
-            el.addEventListener('mousedown', function(e){ e.preventDefault(); onDown(e.clientX,e.clientY); window.addEventListener('mousemove', onMove); });
-            window.addEventListener('mouseup', function(){ onUp(); window.removeEventListener('mousemove', onMove); });
-            el.addEventListener('touchstart', function(e){ var t=e.touches[0]; onDown(t.clientX,t.clientY); }, {passive:true});
-            el.addEventListener('touchmove', function(e){ var t=e.touches[0]; onMove(t.clientX,t.clientY); }, {passive:true});
-            el.addEventListener('touchend', function(){ onUp(); }, {passive:true});
-        }
-        makeDragable(fab, 'fab');
-        makeDragable(panel, 'panel');
-        // drag panel only by its header
-        var pH = panel.querySelector('h3');
-        pH.addEventListener('mousedown', function(e){ e.stopPropagation(); });
-        panel.addEventListener('mousedown', function(e){ if(e.target !== pH) e.stopPropagation(); });
-
-        var resetBtn = document.getElementById('resetPosBtn');
-        resetBtn.onclick = function(){
-            fab.style.left='16px'; fab.style.top='auto'; fab.style.bottom='16px'; fab.style.right='auto';
-            panel.style.left='60px'; panel.style.top='auto'; panel.style.bottom='16px'; panel.style.right='auto';
-            try { localStorage.removeItem('tukFabPos'); } catch(e){}
-        };
-
-        // --- трезвый водитель ---
-        var soberOn = false;
-        var soberBtn = document.getElementById('soberBtn');
-        var soberBadge = document.getElementById('soberBadge');
-        var soberStatus = document.getElementById('soberStatus');
-        soberBtn.onclick = function(){
-            soberOn = !soberOn;
-            if (soberOn) {
-                soberBtn.textContent = 'Включено'; soberBtn.className = 'tk-btn tk-on';
-                soberBadge.style.display = 'flex';
-                soberStatus.textContent = '✅ Подтверждено: ты трезв за рулём.';
-            } else {
-                soberBtn.textContent = 'Выключено'; soberBtn.className = 'tk-btn tk-off';
-                soberBadge.style.display = 'none';
-                soberStatus.textContent = 'Статус трезвости выключен.';
-            }
-        };
-        if (window.tukSoberState && window.tukSoberState.get) {
-            try { if (window.tukSoberState.get()) { soberOn = true; soberBtn.textContent='Включено'; soberBtn.className='tk-btn tk-on'; soberBadge.style.display='flex'; } } catch(e){}
-        }
-
-        // --- геопозиция + шеринг ---
-        var geoBtn = document.getElementById('geoBtn');
-        var geoStatus = document.getElementById('geoStatus');
-        var lastGeo = null;
-        geoBtn.onclick = function(){
-            if (!navigator.geolocation) { geoStatus.textContent = '❌ Геолокация не поддерживается.'; return; }
-            var ok = confirm('📍 Брум-Брум хочет получить вашу геопозицию, чтобы показать и отправить её в чат.\n\nРазрешить доступ к геопозиции?');
-            if (!ok) { geoStatus.textContent = '🚫 Вы отказали в доступе к геопозиции.'; return; }
-            geoStatus.textContent = '📍 Запрашиваем координаты...';
-            navigator.geolocation.getCurrentPosition(function(pos){
-                var lat = pos.coords.latitude.toFixed(5), lon = pos.coords.longitude.toFixed(5);
-                lastGeo = { lat: lat, lon: lon };
-                var mapLink = 'https://www.openstreetmap.org/?mlat=' + lat + '&mlon=' + lon + '#map=16/' + lat + '/' + lon;
-                geoStatus.innerHTML = '📍 <b>Ваша позиция:</b> ' + lat + ', ' + lon + '<br><a href="'+mapLink+'" target="_blank" style="color:#00f0ff">Открыть карту</a>';
-                geoBtn.textContent = 'Получить ещё';
-                window.tukSendText('📍 Моя геопозиция: ' + lat + ', ' + lon + ' (' + mapLink + ')');
-            }, function(err){
-                geoStatus.textContent = '🚫 Отказано или ошибка доступа к геопозиции (' + err.code + ').';
-            }, { enableHighAccuracy: true, timeout: 8000 });
-        };
-
-        // --- аудио ---
-        var audioBtn = document.getElementById('audioBtn');
-        var audioEl = document.getElementById('tukAudio');
-        var audioSend = document.getElementById('audioSend');
-        var mediaRec = null, audioChunks = [], lastAudioBlob = null;
-        function audioCbReset(){
-            audioBtn.onclick = function(){ audioRecord(); };
-            audioBtn.textContent = '🎙 Записать';
-        }
-        function audioRecord(){
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { alert('Запись аудио не поддерживается в этом браузере.'); return; }
-            var ok = confirm('🎙 Брум-Брум хочет использовать микрофон для записи аудиосообщения.\n\nРазрешить доступ к микрофону?');
-            if (!ok) { alert('Вы отказали в доступе к микрофону.'); return; }
-            navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream){
-                mediaRec = new MediaRecorder(stream);
-                audioChunks = [];
-                mediaRec.ondataavailable = function(e){ if (e.data.size) audioChunks.push(e.data); };
-                mediaRec.onstop = function(){
-                    lastAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    audioEl.src = URL.createObjectURL(lastAudioBlob);
-                    audioEl.style.display = 'block';
-                    audioSend.style.display = 'block';
-                    stream.getTracks().forEach(function(t){ t.stop(); });
-                };
-                mediaRec.start();
-                audioBtn.textContent = '⏹ Остановить';
-                audioBtn.onclick = function(){ mediaRec.stop(); audioCbReset(); };
-            }).catch(function(){ alert('🚫 Доступ к микрофону отклонён или недоступен.'); });
-        }
-        audioBtn.onclick = audioRecord;
-        audioSend.onclick = function(){
-            if (!lastAudioBlob) return;
-            if (tukSendText('🎙 Голосовое сообщение (аудио ' + Math.round(lastAudioBlob.size/1024) + ' КБ)')) {
-                audioSend.style.display='none'; lastAudioBlob=null;
-            }
-        };
-
-        // --- видео ---
-        var videoBtn = document.getElementById('videoBtn');
-        var videoEl = document.getElementById('tukVideo');
-        var videoSend = document.getElementById('videoSend');
-        var lastVideoBlob = null;
-        function videoCbReset(){
-            videoBtn.onclick = function(){ videoRecord(); };
-            videoBtn.textContent = '🎥 Снять';
-        }
-        function videoRecord(){
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { alert('Запись видео не поддерживается.'); return; }
-            var ok = confirm('🎥 Брум-Брум хочет использовать камеру для видеосообщения.\n\nРазрешить доступ к камере?');
-            if (!ok) { alert('Вы отказали в доступе к камере.'); return; }
-            navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function(stream){
-                var rec = null, chunks = [];
-                videoEl.srcObject = stream;
-                videoEl.style.display = 'block';
-                videoEl.play();
-                rec = new MediaRecorder(stream);
-                rec.ondataavailable = function(e){ if (e.data.size) chunks.push(e.data); };
-                rec.onstop = function(){
-                    lastVideoBlob = new Blob(chunks, { type: 'video/webm' });
-                    videoEl.srcObject = null;
-                    videoEl.src = URL.createObjectURL(lastVideoBlob);
-                    videoSend.style.display = 'block';
-                    stream.getTracks().forEach(function(t){ t.stop(); });
-                };
-                rec.start();
-                videoBtn.textContent = '⏹ Стоп';
-                videoBtn.onclick = function(){ rec.stop(); videoCbReset(); };
-            }).catch(function(){ alert('🚫 Доступ к камере отклонён или недоступен.'); });
-        }
-        videoBtn.onclick = videoRecord;
-        videoSend.onclick = function(){
-            if (!lastVideoBlob) return;
-            if (tukSendText('🎥 Видеосообщение (видео ' + Math.round(lastVideoBlob.size/1024) + ' КБ)')) {
-                videoSend.style.display='none'; lastVideoBlob=null;
-            }
-        };
-
-        // --- звук двигателя (WebAudio) ---
-        var engineBtn = document.getElementById('engineBtn');
-        engineBtn.onclick = function(){
-            try {
-                var ctx = new (window.AudioContext || window.webkitAudioContext)();
-                var osc = ctx.createOscillator(); var gain = ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(70, ctx.currentTime);
-                osc.frequency.linearRampToValueAtTime(150, ctx.currentTime + 0.7);
-                osc.frequency.linearRampToValueAtTime(90, ctx.currentTime + 1.6);
-                gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.05);
-                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.6);
-                osc.connect(gain); gain.connect(ctx.destination);
-                osc.start(); osc.stop(ctx.currentTime + 1.7);
-            } catch(e){ alert('Звук двигателя не поддерживается.'); }
-        };
     })();
     </script>
 </body>
