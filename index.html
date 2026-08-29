@@ -7,6 +7,8 @@
     <meta name="theme-color" content="#0a0e1a">
     <meta name="color-scheme" content="dark">
     <title>Тук-Тук — мессенджер для машин</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚗</text></svg>">
     <meta property="og:title" content="Тук-Тук — мессенджер для машин">
     <meta property="og:description" content="Чаты по номеру авто, гараж, игры, роли и бот Алёша.">
@@ -6527,5 +6529,10 @@ function unmuteAd(video) {
             <div class="trailer-caption"><span class="sub-caption" id="trailerCaption"></span></div>
         </div>
     </div>
+    <script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js', { scope: './' }).catch(function(){});
+    }
+    </script>
 </body>
 </html>
