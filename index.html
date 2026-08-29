@@ -1298,7 +1298,6 @@
         ];
 
         const secretPlates = {
-            'ТУТТУК':{name:'Маскот',avatar:'🚗',color:'#00f0ff',msg:'Секрет! 🎊'},
             'БРУМ-БРУМ':{name:'Маскот',avatar:'🚗',color:'#00f0ff',msg:'Секрет! 🎊'},
             'МАСКОТ':{name:'Маскот',avatar:'🚗',color:'#00f0ff',msg:'Секрет! 🎊'},
             '777777':{name:'Удача',avatar:'🍀',color:'#f59e0b',msg:'+50 XP!'},
@@ -1907,13 +1906,11 @@
         }
         function openMedia(type) {
             var title='', body='', footer='';
-            if (type==='anthem') {
-                title='🎵 Гимн мессенджера Брум-Брум Алёши';
-                body='<div class="media-modal-symbol">🎵</div><p>Слушай гимн нашего мессенджера — про Брум-Брум, машины, монеты, Лешинксы и бота Алёшу. Голос и мелодия играют автоматически.</p>';
-                footer='<div style="margin-top:14px;display:flex;gap:8px"><button class="media-btn" onclick="playAnthem()">▶ Слушать</button><button class="media-btn" onclick="stopAnthem()">⏹ Стоп</button></div>'+
-                    '<p style="font-size:11px;color:var(--text-muted);margin-top:10px;">'+
-                    'Брум-Брум, Брум-Брум — мессенджер для машин.<br>По номеру авто мы свяжемся в один миг.<br>Монеты и Лешинксы в кармане у тебя.<br>И бот Алёша рядом — поможет он всегда.'+
-                    '</p>';
+            if (type==='about') {
+                title='🚀 Мессенджер Брум-Брум';
+                body='<div class="media-modal-symbol">🚗</div>'+
+                    '<p>Брум-Брум — мессенджер для водителей. Связывайся по номеру авто, общайся, играй и зарабатывай монеты 💰 и Лешинксы 💎 вместе с ботом Алёшей.</p>'+
+                    '<p style="font-size:12px;color:var(--text-muted);margin-top:8px;">Перетаскивай кнопку водителя 🧰 куда удобно, делись геолокацией, отправляй аудио- и видеосообщения, включай «Трезвый водитель».</p>';
             } else if (type==='flag') {
                 title='🚩 Флаг мессенджера Брум-Брум Алёши';
                 body='<div class="media-modal-symbol">🚩</div>'+
@@ -2951,7 +2948,7 @@ function unmuteAd(video) {
             if (lower === 'погода' || lower === 'weather') { notify(`🌤️ ${['☀️','🌧️','❄️','🌫️'][Math.floor(Math.random()*4)]}`, 'warning'); return true; }
             if (lower === 'статус' || lower === 'status') { notify(`📊 Ур:${state.level} XP:${state.xp}`, 'warning'); return true; }
             if (lower === 'помощь' || lower === 'help') { notify('💡 Команды: огонь, скорость, удача, бонус, сюрприз, магия, тишина, время, погода, статус', 'warning'); return true; }
-            if (lower === 'туктук' || lower === 'тук-тук') { spawnFlyingCar(); notify('🚗 Тук-тук!', 'success'); return false; }
+            if (lower === 'брумбрум' || lower === 'брум-брум') { spawnFlyingCar(); notify('🚗 Брум-брум!', 'success'); return false; }
             if (lower === 'конфетти') { spawnConfetti(); notify('🎉 Конфетти!', 'success'); return false; }
             if (lower === 'ночь') { document.body.classList.toggle('night-mode'); notify('🌙 Ночь', 'success'); saveState(); return true; }
             if (lower === 'радуга') { document.body.classList.toggle('rainbow-mode'); notify('🌈 Радуга', 'success'); saveState(); return true; }
@@ -3927,7 +3924,7 @@ function unmuteAd(video) {
                 let reply;
                 const alesha = AI_BOTS[0]; // Василич = Алёша
                 if (l.includes('секрет')) {
-                    reply = 'Секреты: ТУТТУК, БРУМ-БРУМ, МАСКОТ, 777777, ИЛОН, БОСС, 666666, ПРИЗРАК, НИНДЗЯ, КОСМОС. Команды: огонь, скорость, удача, бонус, сюрприз, магия, конфетти, туктук, ночь, радуга, матрица, хоррор, зеркало, нитро, чит';
+                    reply = 'Секреты: БРУМ-БРУМ, МАСКОТ, 777777, ИЛОН, БОСС, 666666, ПРИЗРАК, НИНДЗЯ, КОСМОС. Команды: огонь, скорость, удача, бонус, сюрприз, магия, конфетти, брумбрум, ночь, радуга, матрица, хоррор, зеркало, нитро, чит';
                 } else if (l.includes('анекдот') || l.includes('шутк') || l.includes('насмеш')) {
                     reply = AI_Humor(alesha);
                 } else if (l.includes('помощь') || l.includes('help') || l.includes('что умеешь')) {
@@ -6129,7 +6126,7 @@ function unmuteAd(video) {
             playPauseHTML +
             '<div class="vk-clip-heart" id="heart-' + displayIdx + '">❤️</div>' +
             '<div class="vk-clip-top">' +
-                '<div class="vk-clip-top-logo">Тук Тук</div>' +
+                '<div class="vk-clip-top-logo">Брум Брум</div>' +
                 '<button class="vk-clip-close" onclick="switchTab(\'chats\')">&times;</button>' +
             '</div>' +
             '<div class="vk-clip-info">' +
@@ -6487,7 +6484,7 @@ function unmuteAd(video) {
 
     function vkClipShare(displayIdx) {
         var url = window.location.origin || 'https://car-messenger.serveousercontent.com';
-        if (navigator.share) { navigator.share({ title: 'Тук Тук клип', url: url }).catch(function() {}); }
+        if (navigator.share) {             navigator.share({ title: 'Брум Брум клип', url: url }).catch(function() {}); }
         else if (navigator.clipboard) { navigator.clipboard.writeText(url).then(function() { _vkClipToast('🔗 Ссылка скопирована!'); }); }
         else { _vkClipToast('↗️ Клип скопирован!'); }
     }
