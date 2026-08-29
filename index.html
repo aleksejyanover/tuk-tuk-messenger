@@ -2240,134 +2240,8 @@ function setTheme(mode) {
             if (checkBan()) return;
             document.getElementById('app').classList.add('active');
             initApp();
-            setTimeout(showStartupAd, 600);
         }
 
-        var AD_VIDEO_URL = ''; /* онлайн-запасной: прямая ссылка на mp4-видео, напр. 'https://example.com/ad.mp4' */
-        var AD_SUBTITLES = [
-            { t: 0.2,  text: 'БРУМ-БРУМ — мессенджер для машин.' },
-            { t: 2.5,  text: 'Связь без телефона — по номеру машины.' },
-            { t: 5.6,  text: 'Монеты 💰 и редкие Лешинксы 💎.' },
-            { t: 8.0,  text: 'Секретная роль ВЛАДЕЛЕЦ 🔒.' },
-            { t: 11.1, text: 'Роль ВЛАДЕЛЕЦ активирована!' },
-            { t: 13.4, text: 'Владелец: баны, реклама, полный доступ.' },
-            { t: 15.9, text: 'Бот Алёша 🤖 всегда на связи.' },
-            { t: 18.4, text: 'Гараж: собирай коллекцию машин.' },
-            { t: 20.9, text: 'Игры: зарабатывай монеты.' },
-            { t: 23.2, text: 'Такси: зарплата на дороге 🚕.' },
-            { t: 25.5, text: 'Сканируй QR и скачивай Брум-Брум!' }
-        ];
-        function _startAdSubtitles(vid, capEl) {
-            if (!vid || !capEl || !AD_SUBTITLES.length) return;
-            function tick() {
-                var time = vid.currentTime || 0;
-                var show = '';
-                for (var i = AD_SUBTITLES.length - 1; i >= 0; i--) {
-                    if (time >= AD_SUBTITLES[i].t) { show = AD_SUBTITLES[i].text; break; }
-                }
-                if (capEl.textContent !== show) { capEl.textContent = show; }
-                capEl.classList.toggle('show', !!show);
-                requestAnimationFrame(tick);
-            }
-            requestAnimationFrame(tick);
-        }
-        function _tryAdSources(vid, index, callbacks) {
-            var sources = ['ad.mp4'];
-            if (AD_VIDEO_URL) sources.push(AD_VIDEO_URL);
-            if (index >= sources.length) { if (callbacks.onError) callbacks.onError(); return; }
-            var settled = false;
-            function fail() { if (settled) return; settled = true; vid.onerror = null; vid.oncanplay = null; vid.onplaying = null; _tryAdSources(vid, index + 1, callbacks); }
-            function succeed() { if (settled) return; settled = true; vid.onerror = null; vid.oncanplay = null; vid.onplaying = null; if (callbacks.onPlay) callbacks.onPlay(); }
-            vid.src = sources[index];
-            vid.load();
-            vid.muted = true;
-            var guard = setTimeout(fail, 4000);
-            vid.onerror = function() { clearTimeout(guard); fail(); };
-            vid.oncanplay = function() {
-                clearTimeout(guard);
-                var p = vid.play();
-                if (p && p.catch) p.catch(function(){});
-            };
-            vid.onplaying = function() { succeed(); };
-
-            vid.addEventListener('timeupdate', function onTU() {
-                if (vid.duration && (vid.currentTime >= vid.duration - 3)) {
-                    var sk = document.getElementById('adSkipBtn');
-                    if (sk) sk.style.display = 'block';
-                }
-            });
-            var p = vid.play();
-            if (p && p.catch) p.catch(function(){});
-        }
-        function showStartupAd() {
-            var ov = document.getElementById('adOverlay');
-            if (!ov) return;
-            var vid = document.getElementById('adVideo');
-            var place = document.getElementById('adPlaceholder');
-            var load = document.getElementById('adLoading');
-            var skip = document.getElementById('adSkipBtn');
-            ov.classList.add('active');
-            load.style.display = 'flex';
-            place.style.display = 'none';
-            vid.style.display = 'none';
-            skip.style.display = 'none';
-            vid.muted = true;
-            vid.onended = function() { closeStartupAd(); };
-            _tryAdSources(vid, 0, {
-                onPlay: function() {
-                    load.style.display = 'none';
-                    vid.style.display = 'block';
-                    _startAdSubtitles(vid, document.getElementById('adSubCaption'));
-                    setTimeout(function() { try { unmuteAd(vid); } catch(e){} }, 400);
-                },
-                onError: function() {
-                    load.style.display = 'none';
-                    place.style.display = 'flex';
-                    skip.style.display = 'block';
-                }
-            });
-        }
-
-        
-function unmuteAd(video) {
-            var muted = video.muted;
-            if (muted) {
-                video.muted = false;
-                video.play().catch(function(){});
-            }
-        }
-
-        function openPromoVideo() {
-            var vid = document.getElementById('adVideo');
-            var place = document.getElementById('adPlaceholder');
-            var load = document.getElementById('adLoading');
-            var skip = document.getElementById('adSkipBtn');
-            place.style.display = 'none';
-            load.style.display = 'flex';
-            vid.style.display = 'block';
-            skip.style.display = 'block';
-            vid.muted = true;
-            vid.onended = function() { closeStartupAd(); };
-            _tryAdSources(vid, 0, {
-                onPlay: function() {
-                    load.style.display = 'none';
-                    _startAdSubtitles(vid, document.getElementById('adSubCaption'));
-                    setTimeout(function() { try { unmuteAd(vid); } catch(e){} }, 300);
-                },
-                onError: function() {
-                    load.style.display = 'none';
-                    place.style.display = 'flex';
-                }
-            });
-        }
-
-        function closeStartupAd() {
-            var ov = document.getElementById('adOverlay');
-            var vid = document.getElementById('adVideo');
-            if (!ov) return;
-            ov.classList.remove('active');
-            if (vid) { try { vid.pause(); } catch(e){} }
-        }
 
         function checkBan() {
             try {
@@ -5996,6 +5870,7 @@ function unmuteAd(video) {
     // ====== CLIPS — Multi-source: Local, VK, Rutube, YouTube ======
     var CLIPS_SOURCES = {
         local: [
+            { src:'ad.mp4', title:'Тук-Тук больше нету — печалька', author:'@archive', avatar:'🚗', desc:'Тук-Тук больше нету печалька 😢 Это последнее видео старого бренда. Сохрани на память!', c1:'#334455', c2:'#8899aa', music:'Adieu — Тук-Тук', likes:7777, comments:666, shares:333 },
             { src:'https://assets.mixkit.co/videos/64/64-720.mp4', title:'Спорткар — Панель приборов', author:'@auto_vibes', avatar:'🏎️', desc:'Роскошная панель спортивного автомобиля 🔥 #sportcar', c1:'#ff0040', c2:'#ff6600', music:'Phonk City — Drift King', likes:4521, comments:312, shares:89 },
             { src:'https://assets.mixkit.co/videos/74/74-720.mp4', title:'Красный спорткар — Вид сзади', author:'@drift_club', avatar:'🏁', desc:'Красная敞篷ка в подземном паркинге! #drift #bmw', c1:'#0066ff', c2:'#00ccff', music:'DJ Blyatman — Russian Drift', likes:8934, comments:567, shares:234 },
             { src:'https://assets.mixkit.co/videos/63/63-720.mp4', title:'Спорткар крупным планом', author:'@tesla_club_ru', avatar:'⚡', desc:'Крупный план красного спорткара ⚡ #tesla', c1:'#00ff88', c2:'#0088ff', music:'Synthwave Driver — Night Ride', likes:12043, comments:891, shares:456 },
@@ -6162,44 +6037,6 @@ function unmuteAd(video) {
             progressHTML;
     }
 
-    function _buildAdSlideHTML() {
-        return '<div class="ad-orb"></div>' +
-            '<video class="vk-clip-video" id="ad-clip-video" src="ad.mp4" muted playsinline preload="auto" loop></video>' +
-            '<div class="vk-clip-unmute" id="ad-clip-unmute" onclick="event.stopPropagation();adClipToggleSound()">' +
-                '<span class="unmute-icon">🔊</span>' +
-                '<span class="unmute-text">Звук</span>' +
-            '</div>' +
-            '<div class="vk-clip-gradient"></div>' +
-            '<div class="vk-clip-poster" id="ad-clip-poster" style="font-size:90px;">🎬</div>' +
-            '<div class="ad-clip-subtitles"><span class="sub-caption" id="ad-clip-caption"></span></div>' +
-            '<div class="vk-clip-top">' +
-                '<div class="vk-clip-top-logo">🎬 Реклама • Брум-Брум</div>' +
-                '<button class="vk-clip-close" onclick="switchTab(\'chats\')">&times;</button>' +
-            '</div>' +
-            '<div class="vk-clip-info">' +
-                '<div class="vk-clip-author-row">' +
-                    '<div class="vk-clip-avatar">🎬</div>' +
-                    '<div class="vk-clip-author-name">Фильм о Брум-Брум</div>' +
-                '</div>' +
-                '<div class="vk-clip-desc">Обгони время в мессенджере будущего БРУМ-БРУМ: чаты по номеру авто, гараж, роли, игры и бот Алёша!</div>' +
-            '</div>' +
-            '<div class="vk-clip-actions" style="display:none;"></div>' +
-            '<div class="ad-content">' +
-                '<div class="ad-badge">РЕКЛАМА • ad.mp4</div>' +
-                '<div class="ad-title">БРУМ-БРУМ<br>из будущего</div>' +
-                '<div class="ad-hint">Нажми звук 🔊 и посмотри ролик. Положи готовое видео как <b>ad.mp4</b> рядом.</div>' +
-            '</div>';
-    }
-
-    function adClipToggleSound() {
-        var v = document.getElementById('ad-clip-video');
-        var b = document.getElementById('ad-clip-unmute');
-        if (!v) return;
-        v.muted = !v.muted;
-        if (!v.muted) { var p = v.play(); if (p && p.catch) p.catch(function(){}); }
-        _startAdSubtitles(v, document.getElementById('ad-clip-caption'));
-        if (b) { var t = b.querySelector('.unmute-text'); var i = b.querySelector('.unmute-icon'); if (t) t.textContent = v.muted ? 'Звук' : 'Выкл'; if (i) i.textContent = v.muted ? '🔇' : '🔊'; }
-    }
 
     function renderClips() {
         var feed = document.getElementById('vkClipsFeed');
@@ -6234,24 +6071,6 @@ function unmuteAd(video) {
 
             feed.appendChild(slide);
         });
-
-        if (vkClips.source === 'local') {
-            var adIdx = pool.length;
-            var adSlide = document.createElement('div');
-            adSlide.className = 'vk-clip vk-clip-ad';
-            adSlide.setAttribute('data-clip-idx', adIdx);
-            adSlide.setAttribute('data-pool-idx', -1);
-            adSlide.innerHTML = _buildAdSlideHTML();
-            var adTap = 0;
-            adSlide.addEventListener('click', function(e) {
-                if (e.target.closest('.vk-clip-top') || e.target.closest('.ad-cta') || e.target.closest('.vk-clip-actions')) return;
-                var now = Date.now();
-                if (now - adTap < 300) { adTap = 0; return; }
-                adTap = now;
-                setTimeout(function() { if (adTap !== 0) { adTap = 0; } }, 400);
-            });
-            feed.appendChild(adSlide);
-        }
 
         vkClips.idx = 0;
         _initClipsScroll(feed);
@@ -6501,32 +6320,6 @@ function unmuteAd(video) {
         setTimeout(function() { t.remove(); }, 2000);
     }
     </script>
-    <div class="ad-overlay" id="adOverlay">
-        <div class="ad-skip" id="adSkipBtn" style="display:none;" onclick="closeStartupAd()">Пропустить ➔</div>
-        <div class="ad-overlay-loading" id="adLoading">
-            <div class="ap-badge">РЕКЛАМА • БРУМ-БРУМ</div>
-            <div style="font-size:15px;color:rgba(255,255,255,0.6);">Загружаем рекламный ролик...</div>
-        </div>
-        <div id="adPlaceholder" class="ad-placeholder" style="display:none;">
-            <div class="ap-badge">РЕКЛАМА • ФИЛЬМ О БРУМ-БРУМ</div>
-            <div class="ap-title">БРУМ-БРУМ<br>из будущего</div>
-            <div class="ap-sub">Положи рядом с этим файлом видео <b>ad.mp4</b> (или укажи онлайн-ссылку в константе <b>AD_VIDEO_URL</b> в коде) — и здесь будет крутиться рекламный ролик с озвучкой и субтитрами.</div>
-            <button class="ap-play" onclick="openPromoVideo()">▶ Смотреть превью</button>
-            <div class="ap-note">Сценарий для генерации — в сценарии проекта</div>
-        </div>
-        <video id="adVideo" style="display:none;" playsinline muted></video>
-        <div class="ad-subtitles" id="adSubtitles"><span class="sub-caption" id="adSubCaption"></span></div>
-        <div class="ad-trailer" id="adTrailer">
-            <div class="trailer-particles" id="trailerParticles"></div>
-            <div class="trailer-scene" data-t="0" data-sp="true"><div class="t-badge">РЕКЛАМА • БРУМ-БРУМ</div><div class="t-emoji">🏎️</div><div class="t-title">БРУМ-БРУМ<br>из будущего</div><div class="t-text">Мессенджер, который обгоняет время</div></div>
-            <div class="trailer-scene" data-t="5" data-sp="true"><div class="t-badge">ЧАТЫ ПО НОМЕРУ</div><div class="t-emoji">📱</div><div class="t-text">Переписывайся с водителями по номеру машины — без телефонов и лишнего</div></div>
-            <div class="trailer-scene" data-t="12" data-sp="true"><div class="t-badge">ГАРАЖ И ВАЛЮТА</div><div class="t-emoji">🏎️💎</div><div class="t-text">Собирай гараж, зарабатывай монеты и редчайшие Лешинксы — валюту, названную в честь владельца Алексея</div></div>
-            <div class="trailer-scene" data-t="19" data-sp="true"><div class="t-badge">РОЛИ И БОТ</div><div class="t-emoji">👑🤖</div><div class="t-text">Прокачивай роль до самого Владельца и спрашивай всё у ИИ-бота Алёши</div></div>
-            <div class="trailer-scene" data-t="26" data-sp="true"><div class="t-badge">ИГРЫ • КЛИПЫ • ТАКСИ</div><div class="t-emoji">🎮🎬🚕</div><div class="t-text">Игры, клипы, такси-зарплата — развлечений хватит на всю дорогу</div></div>
-            <div class="trailer-scene" data-t="34" data-sp="false"><div class="t-badge">БРУМ-БРУМ</div><div class="trailer-logo">Скачивай<br>и заводи двигатель!</div><div class="t-emoji">🚀</div></div>
-            <div class="trailer-caption"><span class="sub-caption" id="trailerCaption"></span></div>
-        </div>
-    </div>
     <script>
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js', { scope: './' }).catch(function(){});
