@@ -6557,45 +6557,127 @@ function unmuteAd(video) {
         var cssId = 'tukFeatCss';
         if (!document.getElementById(cssId)) {
             var s = document.createElement('style'); s.id = cssId; s.textContent = [
-            '#tukFab{position:fixed;left:16px;bottom:16px;z-index:9995;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#00f0ff,#22d3ee);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 22px rgba(0,240,255,.45);font-size:24px;border:none}',
-            '#tukPanel{position:fixed;left:16px;bottom:84px;z-index:9995;width:min(330px,90vw);background:rgba(10,14,26,.97);border:1px solid rgba(0,240,255,.3);border-radius:16px;padding:14px;display:none;color:#e2e8f0}',
-            '#tukPanel h3{margin:0 0 10px;font-size:15px;color:#00f0ff}',
-            '.tk-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;padding:10px;background:rgba(255,255,255,.05);border-radius:10px}',
+            '#tukFab{position:fixed;left:16px;bottom:16px;z-index:9995;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#00f0ff,#22d3ee);display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;box-shadow:0 8px 22px rgba(0,240,255,.45);font-size:24px;border:none;user-select:none}',
+            '#tukFab.drag{cursor:grabbing;opacity:.85}',
+            '#tukPanel{position:fixed;left:60px;bottom:16px;z-index:9995;width:min(330px,90vw);background:rgba(10,14,26,.97);border:1px solid rgba(0,240,255,.3);border-radius:16px;padding:14px;display:flex;flex-direction:column;color:#e2e8f0}',
+            '#tukPanel h3{margin:0 0 10px;font-size:15px;color:#00f0ff;cursor:move;user-select:none;text-align:center}',
+            '.tk-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;padding:9px 10px;background:rgba(255,255,255,.05);border-radius:10px}',
             '.tk-row .lbl{font-size:13px;flex:1}',
             '.tk-btn{border:none;border-radius:8px;padding:8px 12px;font-weight:700;cursor:pointer;font-size:12px}',
             '.tk-on{background:linear-gradient(135deg,#22c55e,#16a34a);color:#000}',
             '.tk-off{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}',
             '.tk-a{background:linear-gradient(135deg,#00f0ff,#22d3ee);color:#000}',
+            '.tk-violet{background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff}',
             '.tk-soft{background:rgba(255,255,255,.1);color:#cbd5e1;border-radius:8px;padding:8px 12px;font-size:12px;border:1px solid rgba(255,255,255,.15);margin-top:6px;width:100%;cursor:pointer}',
             '#soberBadge{display:none;position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9999;background:linear-gradient(135deg,#22c55e,#16a34a);color:#000;font-weight:800;padding:8px 18px;border-radius:30px;box-shadow:0 8px 25px rgba(34,197,94,.5);font-size:14px}',
-            '.tk-status{font-size:12px;color:#94a3b8;margin-top:4px}',
-            '.tk-note{font-size:11px;color:#64748b;margin-top:8px;line-height:1.4}'
+            '.tk-status{font-size:12px;color:#94a3b8;margin-top:2px;margin-bottom:6px}',
+            '.tk-note{font-size:11px;color:#64748b;margin-top:8px;line-height:1.4;text-align:center}',
+            '.tk-send{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;border:none;border-radius:8px;padding:9px 12px;font-weight:800;cursor:pointer;font-size:13px;width:100%;margin-top:8px;display:none}'
             ].join('\n');
             document.head.appendChild(s);
         }
         if (!document.getElementById('soberBadge')) {
             var sb = document.createElement('div'); sb.id = 'soberBadge'; sb.textContent = '✅ Трезвый водитель'; document.body.appendChild(sb);
         }
-        if (!document.getElementById('tukFab')) {
-            var fab = document.createElement('div'); fab.id = 'tukFab'; fab.textContent = '🧰'; fab.title = 'Функции водителя';
-            fab.onclick = function(){ var p = document.getElementById('tukPanel'); p.style.display = p.style.display === 'block' ? 'none' : 'block'; };
-            document.body.appendChild(fab);
+
+        // --- helper: поделиться текстом в текущий чат ---
+        function tukSendText(txt){
+            try {
+                if (typeof state === 'undefined' || !state || !state.currentChat || state.currentChat === 'bot') {
+                    alert('📤 Выберите друга в чате, чтобы отправить сообщение!');
+                    return false;
+                }
+                var time = new Date().toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' });
+                if (!state.messages[state.currentChat]) state.messages[state.currentChat] = [];
+                state.messages[state.currentChat].push({ text: txt, type:'sent', time: time });
+                if (typeof renderMessages === 'function') renderMessages();
+                if (typeof renderChatList === 'function') renderChatList();
+                if (typeof saveState === 'function') saveState();
+                if (typeof addXP === 'function') addXP(3);
+                return true;
+            } catch(e){ alert('Не удалось отправить в чат.'); return false; }
         }
-        if (document.getElementById('tukPanel')) return;
+        window.tukSendText = tukSendText;
+
+        // --- drag & drop для FAB и панели ---
+        function loadPos(){
+            try { return JSON.parse(localStorage.getItem('tukFabPos') || '{}'); } catch(e){ return {}; }
+        }
+        function savePos(){
+            try { localStorage.setItem('tukFabPos', JSON.stringify({ fx: fab.style.left, fy: fab.style.top, px: panel.style.left, py: panel.style.top })); } catch(e){}
+        }
+        var saved = loadPos();
+
+        // --- FAB ---
+        var fab = document.getElementById('tukFab') || document.createElement('div');
+        if (!fab.parentNode) { fab.id='tukFab'; fab.textContent='🧰'; fab.title='Функции водителя (перетащи, чтобы переместить)'; document.body.appendChild(fab); }
+        fab.style.cursor = 'grab';
+        if (saved.fx) fab.style.left = saved.fx; if (saved.fy) fab.style.top = saved.fy;
+
+        // --- panel ---
         var panel = document.createElement('div'); panel.id = 'tukPanel';
         panel.innerHTML =
-          '<h3>🧰 Функции водителя</h3>' +
+          '<h3>🧰 Функции водителя <span style="font-size:10px;color:#64748b">(тяни заголовок)</span></h3>' +
           '<div class="tk-row"><span class="lbl">🚸 Трезвый водитель</span><button class="tk-btn tk-off" id="soberBtn">Выключено</button></div>' +
-          '<div class="tk-status" id="soberStatus">Статус виден в профиле. Ты сам подтверждаешь трезвость.</div>' +
-          '<div class="tk-row"><span class="lbl">📍 Моя геопозиция</span><button class="tk-btn tk-a" id="geoBtn">Запросить</button></div>' +
-          '<div class="tk-status" id="geoStatus">Мы спросим разрешение на доступ к геопозиции.</div>' +
+          '<div class="tk-status" id="soberStatus">Ты сам подтверждаешь трезвость. Друзья видят зелёную отметку.</div>' +
+          '<div class="tk-row"><span class="lbl">📍 Моя геопозиция</span><button class="tk-btn tk-a" id="geoBtn">Получить</button></div>' +
+          '<div class="tk-status" id="geoStatus">Спросим разрешение и покажем координаты. Можно отправить в чат.</div>' +
           '<div class="tk-row"><span class="lbl">🎙 Аудиосообщение</span><button class="tk-btn tk-a" id="audioBtn">Записать</button></div>' +
-          '<audio id="tukAudio" controls style="width:100%;margin-top:6px;display:none"></audio>' +
+          '<audio id="tukAudio" controls style="width:100%;margin-top:4px;display:none"></audio>' +
+          '<button class="tk-send" id="audioSend">📤 Отправить аудио в чат</button>' +
           '<div class="tk-row"><span class="lbl">🎥 Видеосообщение</span><button class="tk-btn tk-a" id="videoBtn">Снять</button></div>' +
-          '<video id="tukVideo" controls playsinline style="width:100%;margin-top:6px;display:none;border-radius:10px"></video>' +
-          '<div class="tk-note">Каждый доступ (гео, микрофон, камера) запрашивается отдельно перед использованием. Можно отключить в любой момент.</div>';
+          '<video id="tukVideo" controls playsinline style="width:100%;margin-top:4px;display:none;border-radius:10px"></video>' +
+          '<button class="tk-send" id="videoSend">📤 Отправить видео в чат</button>' +
+          '<div class="tk-row"><span class="lbl">🔊 Звук двигателя</span><button class="tk-btn tk-violet" id="engineBtn">Врум-врум</button></div>' +
+          '<button class="tk-soft" id="resetPosBtn">↻ Сбросить позицию кнопки</button>' +
+          '<div class="tk-note">🔒 Все разрешения (гео, микрофон, камера) запрашиваются отдельно перед использованием.</div>';
         document.body.appendChild(panel);
+        if (saved.px) panel.style.left = saved.px; if (saved.py) panel.style.top = saved.py;
 
+        fab.onclick = function(){ if (fab._dragging) return; panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex'; };
+
+        function makeDragable(el, which){
+            var startX=0,startY=0,origX=0,origY=0;
+            function onDown(X,Y){
+                startX=X; startY=Y;
+                var r = el.getBoundingClientRect();
+                origX=r.left; origY=r.top;
+                el._dragging=true;
+                if (el===fab) fab.classList.add('drag');
+            }
+            function onMove(X,Y){
+                if(!el._dragging) return;
+                var dx = X-startX, dy = Y-startY;
+                var vw = window.innerWidth, vh = window.innerHeight;
+                var ew = el.offsetWidth, eh = el.offsetHeight;
+                var nx = Math.max(4, Math.min(vw-ew-4, origX+dx));
+                var ny = Math.max(4, Math.min(vh-eh-4, origY+dy));
+                el.style.left = nx+'px'; el.style.top = ny+'px'; el.style.right='auto'; el.style.bottom='auto';
+            }
+            function onUp(){
+                if(el._dragging){ el._dragging=false; if(el===fab) fab.classList.remove('drag'); savePos(); }
+            }
+            el.addEventListener('mousedown', function(e){ e.preventDefault(); onDown(e.clientX,e.clientY); window.addEventListener('mousemove', onMove); });
+            window.addEventListener('mouseup', function(){ onUp(); window.removeEventListener('mousemove', onMove); });
+            el.addEventListener('touchstart', function(e){ var t=e.touches[0]; onDown(t.clientX,t.clientY); }, {passive:true});
+            el.addEventListener('touchmove', function(e){ var t=e.touches[0]; onMove(t.clientX,t.clientY); }, {passive:true});
+            el.addEventListener('touchend', function(){ onUp(); }, {passive:true});
+        }
+        makeDragable(fab, 'fab');
+        makeDragable(panel, 'panel');
+        // drag panel only by its header
+        var pH = panel.querySelector('h3');
+        pH.addEventListener('mousedown', function(e){ e.stopPropagation(); });
+        panel.addEventListener('mousedown', function(e){ if(e.target !== pH) e.stopPropagation(); });
+
+        var resetBtn = document.getElementById('resetPosBtn');
+        resetBtn.onclick = function(){
+            fab.style.left='16px'; fab.style.top='auto'; fab.style.bottom='16px'; fab.style.right='auto';
+            panel.style.left='60px'; panel.style.top='auto'; panel.style.bottom='16px'; panel.style.right='auto';
+            try { localStorage.removeItem('tukFabPos'); } catch(e){}
+        };
+
+        // --- трезвый водитель ---
         var soberOn = false;
         var soberBtn = document.getElementById('soberBtn');
         var soberBadge = document.getElementById('soberBadge');
@@ -6605,7 +6687,7 @@ function unmuteAd(video) {
             if (soberOn) {
                 soberBtn.textContent = 'Включено'; soberBtn.className = 'tk-btn tk-on';
                 soberBadge.style.display = 'flex';
-                soberStatus.textContent = '✅ Подтверждено: ты трезв за рулём. Друзья видят зелёный статус.';
+                soberStatus.textContent = '✅ Подтверждено: ты трезв за рулём.';
             } else {
                 soberBtn.textContent = 'Выключено'; soberBtn.className = 'tk-btn tk-off';
                 soberBadge.style.display = 'none';
@@ -6616,28 +6698,37 @@ function unmuteAd(video) {
             try { if (window.tukSoberState.get()) { soberOn = true; soberBtn.textContent='Включено'; soberBtn.className='tk-btn tk-on'; soberBadge.style.display='flex'; } } catch(e){}
         }
 
+        // --- геопозиция + шеринг ---
         var geoBtn = document.getElementById('geoBtn');
         var geoStatus = document.getElementById('geoStatus');
+        var lastGeo = null;
         geoBtn.onclick = function(){
             if (!navigator.geolocation) { geoStatus.textContent = '❌ Геолокация не поддерживается.'; return; }
-            var ok = confirm('📍 Тук-Тук хочет получить вашу геопозицию, чтобы показать её в чате.\n\nРазрешить доступ к геопозиции?');
+            var ok = confirm('📍 Тук-Тук хочет получить вашу геопозицию, чтобы показать и отправить её в чат.\n\nРазрешить доступ к геопозиции?');
             if (!ok) { geoStatus.textContent = '🚫 Вы отказали в доступе к геопозиции.'; return; }
             geoStatus.textContent = '📍 Запрашиваем координаты...';
             navigator.geolocation.getCurrentPosition(function(pos){
                 var lat = pos.coords.latitude.toFixed(5), lon = pos.coords.longitude.toFixed(5);
-                geoStatus.textContent = '📍 Ваша позиция: ' + lat + ', ' + lon;
-                geoBtn.textContent = 'Ещё раз';
+                lastGeo = { lat: lat, lon: lon };
                 var mapLink = 'https://www.openstreetmap.org/?mlat=' + lat + '&mlon=' + lon + '#map=16/' + lat + '/' + lon;
-                window.open(mapLink, '_blank');
+                geoStatus.innerHTML = '📍 <b>Ваша позиция:</b> ' + lat + ', ' + lon + '<br><a href="'+mapLink+'" target="_blank" style="color:#00f0ff">Открыть карту</a>';
+                geoBtn.textContent = 'Получить ещё';
+                window.tukSendText('📍 Моя геопозиция: ' + lat + ', ' + lon + ' (' + mapLink + ')');
             }, function(err){
                 geoStatus.textContent = '🚫 Отказано или ошибка доступа к геопозиции (' + err.code + ').';
             }, { enableHighAccuracy: true, timeout: 8000 });
         };
 
+        // --- аудио ---
         var audioBtn = document.getElementById('audioBtn');
         var audioEl = document.getElementById('tukAudio');
-        var mediaRec = null, audioChunks = [];
-        audioBtn.onclick = function(){
+        var audioSend = document.getElementById('audioSend');
+        var mediaRec = null, audioChunks = [], lastAudioBlob = null;
+        function audioCbReset(){
+            audioBtn.onclick = function(){ audioRecord(); };
+            audioBtn.textContent = '🎙 Записать';
+        }
+        function audioRecord(){
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { alert('Запись аудио не поддерживается в этом браузере.'); return; }
             var ok = confirm('🎙 Тук-Тук хочет использовать микрофон для записи аудиосообщения.\n\nРазрешить доступ к микрофону?');
             if (!ok) { alert('Вы отказали в доступе к микрофону.'); return; }
@@ -6646,24 +6737,35 @@ function unmuteAd(video) {
                 audioChunks = [];
                 mediaRec.ondataavailable = function(e){ if (e.data.size) audioChunks.push(e.data); };
                 mediaRec.onstop = function(){
-                    var blob = new Blob(audioChunks, { type: 'audio/webm' });
-                    audioEl.src = URL.createObjectURL(blob);
+                    lastAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    audioEl.src = URL.createObjectURL(lastAudioBlob);
                     audioEl.style.display = 'block';
+                    audioSend.style.display = 'block';
                     stream.getTracks().forEach(function(t){ t.stop(); });
                 };
                 mediaRec.start();
                 audioBtn.textContent = '⏹ Остановить';
-                audioBtn.onclick = function(){
-                    mediaRec.stop();
-                    audioBtn.textContent = '🎙 Записать';
-                    audioBtn.onclick = arguments.callee;
-                };
+                audioBtn.onclick = function(){ mediaRec.stop(); audioCbReset(); };
             }).catch(function(){ alert('🚫 Доступ к микрофону отклонён или недоступен.'); });
+        }
+        audioBtn.onclick = audioRecord;
+        audioSend.onclick = function(){
+            if (!lastAudioBlob) return;
+            if (tukSendText('🎙 Голосовое сообщение (аудио ' + Math.round(lastAudioBlob.size/1024) + ' КБ)')) {
+                audioSend.style.display='none'; lastAudioBlob=null;
+            }
         };
 
+        // --- видео ---
         var videoBtn = document.getElementById('videoBtn');
         var videoEl = document.getElementById('tukVideo');
-        videoBtn.onclick = function(){
+        var videoSend = document.getElementById('videoSend');
+        var lastVideoBlob = null;
+        function videoCbReset(){
+            videoBtn.onclick = function(){ videoRecord(); };
+            videoBtn.textContent = '🎥 Снять';
+        }
+        function videoRecord(){
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { alert('Запись видео не поддерживается.'); return; }
             var ok = confirm('🎥 Тук-Тук хочет использовать камеру для видеосообщения.\n\nРазрешить доступ к камере?');
             if (!ok) { alert('Вы отказали в доступе к камере.'); return; }
@@ -6675,19 +6777,41 @@ function unmuteAd(video) {
                 rec = new MediaRecorder(stream);
                 rec.ondataavailable = function(e){ if (e.data.size) chunks.push(e.data); };
                 rec.onstop = function(){
-                    var blob = new Blob(chunks, { type: 'video/webm' });
+                    lastVideoBlob = new Blob(chunks, { type: 'video/webm' });
                     videoEl.srcObject = null;
-                    videoEl.src = URL.createObjectURL(blob);
+                    videoEl.src = URL.createObjectURL(lastVideoBlob);
+                    videoSend.style.display = 'block';
                     stream.getTracks().forEach(function(t){ t.stop(); });
                 };
                 rec.start();
                 videoBtn.textContent = '⏹ Стоп';
-                videoBtn.onclick = function(){
-                    rec.stop();
-                    videoBtn.textContent = '🎥 Снять';
-                    videoBtn.onclick = arguments.callee;
-                };
+                videoBtn.onclick = function(){ rec.stop(); videoCbReset(); };
             }).catch(function(){ alert('🚫 Доступ к камере отклонён или недоступен.'); });
+        }
+        videoBtn.onclick = videoRecord;
+        videoSend.onclick = function(){
+            if (!lastVideoBlob) return;
+            if (tukSendText('🎥 Видеосообщение (видео ' + Math.round(lastVideoBlob.size/1024) + ' КБ)')) {
+                videoSend.style.display='none'; lastVideoBlob=null;
+            }
+        };
+
+        // --- звук двигателя (WebAudio) ---
+        var engineBtn = document.getElementById('engineBtn');
+        engineBtn.onclick = function(){
+            try {
+                var ctx = new (window.AudioContext || window.webkitAudioContext)();
+                var osc = ctx.createOscillator(); var gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(70, ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(150, ctx.currentTime + 0.7);
+                osc.frequency.linearRampToValueAtTime(90, ctx.currentTime + 1.6);
+                gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.6);
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.start(); osc.stop(ctx.currentTime + 1.7);
+            } catch(e){ alert('Звук двигателя не поддерживается.'); }
         };
     })();
     </script>
