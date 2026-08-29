@@ -822,8 +822,8 @@
                     <h3 id="myName" style="font-size:13px;">Водитель</h3>
                     <p id="myPlate" style="font-size:11px;color:var(--text-muted);">А123БВ 77</p>
                     <div id="userLevel" style="font-size:10px;color:var(--warning);">⭐ Уровень 1</div>
-                    <div style="font-size:10px;color:#fbbf24;margin-top:2px;">🪙 <span id="topCoinBalance">0</span></div>
-                    <div style="font-size:10px;color:#a78bfa;margin-top:2px;">💠 <span id="topLechBalance">0</span> Лешинксы</div>
+                    <div style="font-size:10px;color:#fbbf24;margin-top:2px;">💰 <span id="topCoinBalance">0</span></div>
+                    <div style="font-size:10px;color:#a78bfa;margin-top:2px;">💎 <span id="topLechBalance">0</span> Лешинксы</div>
                     <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
                         <button class="media-btn" onclick="openMedia('anthem')">🎵 Гимн</button>
                         <button class="media-btn" onclick="openMedia('flag')">🚩 Флаг</button>
@@ -958,19 +958,19 @@
                 <div style="padding:20px;overflow-y:auto;">
                     <h2 style="font-family:'Orbitron';font-size:18px;margin-bottom:5px;color:var(--warning);">🛒 Магазин</h2>
                     <p style="font-size:11px;color:var(--text-muted);margin-bottom:15px;">Эффекты за XP</p>
-                    <div style="display:inline-block;padding:6px 14px;border-radius:12px;background:var(--bg-card);border:1px solid rgba(255,202,40,0.35);color:var(--warning);font-weight:700;font-size:14px;margin-bottom:15px;">🪙 Монеты: <span id="coinBalance">0</span></div>
-                    <div style="display:inline-block;padding:6px 14px;border-radius:12px;background:var(--bg-card);border:1px solid rgba(167,139,250,0.35);color:#a78bfa;font-weight:700;font-size:14px;margin-bottom:15px;">💠 Лешинксы: <span id="leshBalance">0</span></div>
+                    <div style="display:inline-block;padding:6px 14px;border-radius:12px;background:var(--bg-card);border:1px solid rgba(255,202,40,0.35);color:var(--warning);font-weight:700;font-size:14px;margin-bottom:15px;">💰 Монеты: <span id="coinBalance">0</span></div>
+                    <div style="display:inline-block;padding:6px 14px;border-radius:12px;background:var(--bg-card);border:1px solid rgba(167,139,250,0.35);color:#a78bfa;font-weight:700;font-size:14px;margin-bottom:15px;">💎 Лешинксы: <span id="leshBalance">0</span></div>
                     <div id="shopItems"></div>
 
                     <div style="margin-top:25px;margin-bottom:20px;border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;">
                         <h3 style="font-family:'Orbitron';font-size:16px;margin-bottom:5px;color:var(--warning);">⚡ Улучшения</h3>
-                        <p style="font-size:11px;color:var(--text-muted);margin-bottom:15px;">Множители XP и пакеты XP — за монеты 🪙 или демо-картой 💳</p>
+                        <p style="font-size:11px;color:var(--text-muted);margin-bottom:15px;">Множители XP и пакеты XP — за монеты 💰 или демо-картой 💳</p>
                         <div id="upgradeShopList"></div>
                     </div>
 
                     <div style="margin-top:5px;margin-bottom:20px;border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;">
                         <h3 style="font-family:'Orbitron';font-size:16px;margin-bottom:5px;color:var(--warning);">🚕 Такси</h3>
-                        <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">Будь водителем такси — подвези пассажира и получи +10 🪙 за каждого. Заработанные монеты: <b id="taxiEarned">0</b></p>
+                        <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">Будь водителем такси — подвези пассажира и получи +10 💰 за каждого. Заработанные монеты: <b id="taxiEarned">0</b></p>
                         <div id="taxiStatus" style="font-size:12px;color:var(--text-muted);margin-bottom:10px;min-height:16px;">Готов к работе. Принимай заказ!</div>
                         <button id="taxiBtn" onclick="taxiAction()" style="width:100%;padding:14px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:12px;color:#000;font-weight:700;font-size:14px;cursor:pointer;">🚕 Принять пассажира</button>
                     </div>
@@ -1252,7 +1252,7 @@
 
         const CODES = { owner:'063', admin:'228', moderator:'770', vip:'VIP', premium:'PRE', veteran:'VET', mentor:'MEN', gold:'GOLD', platinum:'PLAT', legend:'LEG', titan:'TITAN', ultra:'ULTRA', nova:'NOVA', quant:'QUANT', cyber:'CYBER', cosmos:'COSMO', immortal:'IMMORT', avatar:'AVATAR', prime:'PRIME', shadow:'SHADOW', phoenix:'PHOENIX', galaxy:'GALAXY', dragon:'DRAGON', pharaoh:'PHARAOH', virus:'VIRUS', emperor:'EMPEROR', colossus:'COLOS', myth:'MYTH', infinity:'INFIN', void:'VOID', omega:'OMEGA', chaos:'CHAOS', divine:'DIVINE', apex:'APEX', god:'GOD' };
         const ROLES = { user:1, vip:1.5, premium:1.25, veteran:1.3, gold:1.6, mentor:1.4, platinum:1.8, moderator:1.5, dev:1.9, legend:2.2, admin:2, titan:2.5, ultra:2.8, nova:3, quant:3.5, cyber:4, cosmos:5, immortal:6, avatar:7, prime:8, shadow:9, phoenix:10, galaxy:11, dragon:12, pharaoh:13, virus:14, emperor:15, colossus:16, myth:18, infinity:20, void:22, omega:25, chaos:30, divine:35, apex:40, god:50, owner:99 };
-        const ROLE_NAMES = { user:'👤 Игрок', vip:'⭐ VIP', premium:'💎 Премиум', veteran:'🎖️ Ветеран', gold:'🥇 Золотой', mentor:'🎓 Ментор', platinum:'💠 Платина', moderator:'🛡️ МОДЕРАТОР', legend:'🏆 Легенда', dev:'🛠️ РАЗРАБОТЧИК', admin:'👑 АДМИН', titan:'🔮 ТИТАН', ultra:'☄️ Ультра', nova:'🪐 Нова', quant:'🌀 Квант', cyber:'🤖 КИБЕР', cosmos:'🌌 КОСМОС', immortal:'🔥 БЕССМЕРТНЫЙ', avatar:'⚡ АВАТАР', prime:'✨ ПРАЙМ', shadow:'🌑 ТЕНЬ', phoenix:'🐦‍🔥 ФЕНИКС', galaxy:'🌠 ГАЛАКТИКА', dragon:'🐉 ДРАКОН', pharaoh:'⚱️ ФАРАОН', virus:'🦠 ВИРУС', emperor:'🏛️ ИМПЕРАТОР', colossus:'🗿 КОЛОСС', myth:'🐐 МИФ', infinity:'♾️ БЕСКОНЕЧНОСТЬ', void:'⚫️ ПУСТОТА', omega:'🔱 ОМЕГА', chaos:'🌪️ ХАОС', divine:'😇 БОЖЕСТВЕННЫЙ', apex:'🎯 АПЕКС', god:'🧿 БОГ', owner:'👑👑 ВЛАДЕЛЕЦ' };
+        const ROLE_NAMES = { user:'👤 Игрок', vip:'⭐ VIP', premium:'💎 Премиум', veteran:'🎖️ Ветеран', gold:'🥇 Золотой', mentor:'🎓 Ментор', platinum:'💎 Платина', moderator:'🛡️ МОДЕРАТОР', legend:'🏆 Легенда', dev:'🛠️ РАЗРАБОТЧИК', admin:'👑 АДМИН', titan:'🔮 ТИТАН', ultra:'☄️ Ультра', nova:'🪐 Нова', quant:'🌀 Квант', cyber:'🤖 КИБЕР', cosmos:'🌌 КОСМОС', immortal:'🔥 БЕССМЕРТНЫЙ', avatar:'⚡ АВАТАР', prime:'✨ ПРАЙМ', shadow:'🌑 ТЕНЬ', phoenix:'🐦‍🔥 ФЕНИКС', galaxy:'🌠 ГАЛАКТИКА', dragon:'🐉 ДРАКОН', pharaoh:'⚱️ ФАРАОН', virus:'🦠 ВИРУС', emperor:'🏛️ ИМПЕРАТОР', colossus:'🗿 КОЛОСС', myth:'🐐 МИФ', infinity:'♾️ БЕСКОНЕЧНОСТЬ', void:'⚫️ ПУСТОТА', omega:'🔱 ОМЕГА', chaos:'🌪️ ХАОС', divine:'😇 БОЖЕСТВЕННЫЙ', apex:'🎯 АПЕКС', god:'🧿 БОГ', owner:'👑👑 ВЛАДЕЛЕЦ' };
         const ROLE_COLORS = { user:'#64748b', vip:'#ffd700', premium:'#a855f7', veteran:'#10b981', gold:'#eab308', mentor:'#06b6d4', platinum:'#93c5fd', moderator:'#3b82f6', legend:'#f97316', dev:'#7dd3fc', admin:'#f59e0b', titan:'#a855f7', ultra:'#00f0ff', nova:'#ff44cc', quant:'#7bff00', cyber:'#c026d3', cosmos:'#38bdf8', immortal:'#ff0040', avatar:'#22d3ee', prime:'#fbbf24', shadow:'#334155', phoenix:'#fb923c', galaxy:'#818cf8', dragon:'#ef4444', pharaoh:'#fde047', virus:'#4ade80', emperor:'#facc15', colossus:'#94a3b8', myth:'#c084fc', infinity:'#ffffff', void:'#0f172a', omega:'#fbbf24', chaos:'#f472b6', divine:'#a5f3fc', apex:'#eab308', god:'#a78bfa', owner:'#ff0066' };
 
         const PK = 'tt_pass', SK = 'tt_state', UK = 'tt_users', BK = 'tt_bans';
@@ -1916,10 +1916,10 @@
             } else if (type==='herb') {
                 title='🛡️ Герб мессенджера Тук-Тук Алёши';
                 body='<div class="media-modal-symbol">🛡️</div>'+
-                    '<p>Щит с короной Владельца, машиной в центре и знаками валют мессенджера — монетой 🪙 и Лешинксом 💠. Внизу лента с названием «Тук-Тук».</p>'+
+                    '<p>Щит с короной Владельца, машиной в центре и знаками валют мессенджера — монетой 💰 и Лешинксом 💎. Внизу лента с названием «Тук-Тук».</p>'+
                     '<div style="display:flex;gap:10px;align-items:center;margin-top:10px">'+
                       '<span style="font-size:44px">👑</span><span style="color:#fbbf24;font-weight:700">ВЛАДЕЛЕЦ</span>'+
-                      '<span style="margin-left:auto;font-size:30px">🚗 🪙 💠</span>'+
+                      '<span style="margin-left:auto;font-size:30px">🚗 💰 💎</span>'+
                     '</div>';
             } else if (type==='promo') {
                 title='📢 Рекламные приколюхи Тук-Тук';
@@ -2240,7 +2240,7 @@ function setTheme(mode) {
         var AD_SUBTITLES = [
             { t: 0.2,  text: 'ТУК-ТУК — мессенджер для машин.' },
             { t: 2.5,  text: 'Связь без телефона — по номеру машины.' },
-            { t: 5.6,  text: 'Монеты 🪙 и редкие Лешинксы 💠.' },
+            { t: 5.6,  text: 'Монеты 💰 и редкие Лешинксы 💎.' },
             { t: 8.0,  text: 'Секретная роль ВЛАДЕЛЕЦ 🔒.' },
             { t: 11.1, text: 'Роль ВЛАДЕЛЕЦ активирована!' },
             { t: 13.4, text: 'Владелец: баны, реклама, полный доступ.' },
@@ -2775,7 +2775,7 @@ function unmuteAd(video) {
             if (lower === 'чит' || lower === 'cheat') { addXP(200); notify('🎮 +200 XP', 'success'); return true; }
             if (lower === 'неон' || lower === 'neon') {
                 document.body.classList.toggle('neon-mode');
-                notify('💠 Неоновое будущее!', 'success');
+                notify('💎 Неоновое будущее!', 'success');
                 if (document.body.classList.contains('neon-mode')) addXP(40);
                 saveState();
                 return true;
@@ -3217,7 +3217,7 @@ function unmuteAd(video) {
             state.messages[state.currentChat].push({ text, type:'sent', time });
             updateStats('message');
             addXP(3);
-            if (!isOwner() && Math.random() < 0.01) { addLeshinksy(1); notify('💠 Редкая находка! +1 Лешинкс', 'success'); }
+            if (!isOwner() && Math.random() < 0.01) { addLeshinksy(1); notify('💎 Редкая находка! +1 Лешинкс', 'success'); }
             if (state.role === 'cosmos') addXP(1);
             else if (state.role === 'gold' && Math.random() < 0.15) addXP(5);
             else if (state.role === 'galaxy' && (state.messages[state.currentChat].length % 2 === 0)) addXP(2);
@@ -3579,7 +3579,7 @@ function unmuteAd(video) {
             var rect = hornBtn ? hornBtn.getBoundingClientRect() : null;
             if (rect) { for (var i = 0; i < 5; i++) { (function(i) { setTimeout(function() { floatEmoji('📯', rect.left + Math.random() * 40 - 20, rect.top - 10); }, i * 80); })(i); } }
             state.totalHorns = (state.totalHorns || 0) + 1;
-            if (!isOwner() && Math.random() < 0.01) { addLeshinksy(1); notify('💠 Редкая находка! +1 Лешинкс', 'success'); }
+            if (!isOwner() && Math.random() < 0.01) { addLeshinksy(1); notify('💎 Редкая находка! +1 Лешинкс', 'success'); }
             const time = new Date().toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' });
             if (!state.messages[state.currentChat]) state.messages[state.currentChat] = [];
             state.messages[state.currentChat].push({ text:'📯', type:'horn', time });
@@ -3792,7 +3792,7 @@ function unmuteAd(video) {
             { id:'veteran', name:'Veteran', emoji:'🎖️', price:299, period:'мес', xp:'x1.3 XP', desc:'Статус ветерана на месяц', colors:['#10b981','#059669'] },
             { id:'gold', name:'Золотой', emoji:'🥇', price:499, period:'мес', xp:'x1.6 XP', desc:'Золотая подписка будущего', colors:['#eab308','#ca8a04'] },
             { id:'mentor', name:'Mentor', emoji:'🎓', price:599, period:'мес', xp:'x1.4 XP', desc:'Наставник на месяц', colors:['#06b6d4','#0891b2'] },
-            { id:'platinum', name:'Платина', emoji:'💠', price:799, period:'мес', xp:'x1.8 XP', desc:'Платиновая подписка', colors:['#93c5fd','#60a5fa'] },
+            { id:'platinum', name:'Платина', emoji:'💎', price:799, period:'мес', xp:'x1.8 XP', desc:'Платиновая подписка', colors:['#93c5fd','#60a5fa'] },
             { id:'moderator', name:'Moderator', emoji:'🛡️', price:899, period:'мес', xp:'x1.5 XP', desc:'Модератор на месяц', colors:['#3b82f6','#2563eb'] },
             { id:'legend', name:'Легенда', emoji:'🏆', price:1299, period:'мес', xp:'x2.2 XP', desc:'Легендарная подписка', colors:['#f97316','#ea580c'] },
             { id:'admin', name:'Admin', emoji:'👑', price:1499, period:'мес', xp:'x2 XP', desc:'Администратор на месяц', colors:['#f59e0b','#d97706'] },
@@ -3834,7 +3834,7 @@ function unmuteAd(video) {
             veteran:   '🎖️ Опыт ветерана — мини-игры дают +20% XP',
             gold:      '🥇 Золотая удача — шанс +5 XP за каждое сообщение',
             mentor:    '🎓 Мудрость — секретные слова дают +50% XP',
-            platinum:  '💠 Двойной гудок — гудок засчитывается дважды',
+            platinum:  '💎 Двойной гудок — гудок засчитывается дважды',
             moderator: '🛡️ Патруль — раз в день бесплатные +30 XP',
             legend:    '🏆 Легендарный гудок — гудок даёт конфетти и +3 XP',
             admin:     '👑 Админ-крит — 5% шанс на удвоенный XP',
@@ -3886,12 +3886,12 @@ function unmuteAd(video) {
             const price = COIN_PRICE[roleId];
             if (typeof price !== 'number' || price <= 0) { notify('Эту роль нельзя купить за монеты', 'info'); return; }
             if (roleUnavailable(roleId)) { notify('Эта роль недоступна — ниже (или равна) вашей', 'error'); return; }
-            if (!isOwner() && state.coins < price) { notify(`Нужно ${price.toLocaleString('ru-RU')} 🪙`, 'error'); return; }
+            if (!isOwner() && state.coins < price) { notify(`Нужно ${price.toLocaleString('ru-RU')} 💰`, 'error'); return; }
             if (!isOwner()) state.coins -= price;
             if (!state.coinRoles.includes(roleId)) state.coinRoles.push(roleId);
             state.role = roleId;
             applyRole(); updateProfile(); saveState(true); updateCoinsUI();
-            notify(`✅ ${ROLE_NAMES[roleId]} куплена за ${price.toLocaleString('ru-RU')} 🪙!`, 'success');
+            notify(`✅ ${ROLE_NAMES[roleId]} куплена за ${price.toLocaleString('ru-RU')} 💰!`, 'success');
             const shop = document.getElementById('panel-shop');
             if (shop) renderRoleShop();
         }
@@ -3899,12 +3899,12 @@ function unmuteAd(video) {
             const price = LESH_PRICE[roleId];
             if (typeof price !== 'number' || price <= 0) { notify('Эту роль нельзя купить за Лешинксы', 'info'); return; }
             if (roleUnavailable(roleId)) { notify('Эта роль недоступна — ниже (или равна) вашей', 'error'); return; }
-            if (!isOwner() && (state.leshinksy || 0) < price) { notify(`Нужно ${price.toLocaleString('ru-RU')} 💠`, 'error'); return; }
+            if (!isOwner() && (state.leshinksy || 0) < price) { notify(`Нужно ${price.toLocaleString('ru-RU')} 💎`, 'error'); return; }
             if (!isOwner()) state.leshinksy -= price;
             if (!state.coinRoles.includes(roleId)) state.coinRoles.push(roleId);
             state.role = roleId;
             applyRole(); updateProfile(); saveState(true); updateLeshinksyUI();
-            notify(`✅ ${ROLE_NAMES[roleId]} куплена за ${price.toLocaleString('ru-RU')} 💠 Лешинксов!`, 'success');
+            notify(`✅ ${ROLE_NAMES[roleId]} куплена за ${price.toLocaleString('ru-RU')} 💎 Лешинксов!`, 'success');
             const shop = document.getElementById('panel-shop');
             if (shop) renderRoleShop();
         }
@@ -3951,8 +3951,8 @@ function unmuteAd(video) {
                     div.innerHTML = `<div style="font-size:13px;font-weight:600;">${up.label}</div><div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;">${up.desc}</div><button disabled style="padding:6px 14px;border:none;border-radius:8px;background:rgba(34,197,94,0.3);color:#22c55e;font-size:11px;font-weight:600;">✅ Куплено</button>`;
                 } else {
                     div.innerHTML = `<div style="font-size:13px;font-weight:600;">${up.label}</div><div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;">${up.desc}</div>` +
-                        `<button onclick="buyUpgrade('coins','${up.id}')" style="padding:8px 14px;margin-right:6px;border:none;border-radius:8px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;font-size:11px;font-weight:700;cursor:pointer;${!isOwner()&&state.coins<up.coins?'opacity:0.5;':''}">${isOwner() ? '∞ Бесплатно' : '🪙 ' + up.coins + ' монет'}</button>` +
-                        `<button onclick="buyUpgrade('lesh','${up.id}')" style="padding:8px 14px;margin-right:6px;border:none;border-radius:8px;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;font-size:11px;font-weight:700;cursor:pointer;${!isOwner()&&(state.leshinksy||0)<up.lesh?'opacity:0.5;':''}">${isOwner() ? '∞ Бесплатно' : '💠 ' + up.lesh + ' Леш'}</button>` +
+                        `<button onclick="buyUpgrade('coins','${up.id}')" style="padding:8px 14px;margin-right:6px;border:none;border-radius:8px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;font-size:11px;font-weight:700;cursor:pointer;${!isOwner()&&state.coins<up.coins?'opacity:0.5;':''}">${isOwner() ? '∞ Бесплатно' : '💰 ' + up.coins + ' монет'}</button>` +
+                        `<button onclick="buyUpgrade('lesh','${up.id}')" style="padding:8px 14px;margin-right:6px;border:none;border-radius:8px;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;font-size:11px;font-weight:700;cursor:pointer;${!isOwner()&&(state.leshinksy||0)<up.lesh?'opacity:0.5;':''}">${isOwner() ? '∞ Бесплатно' : '💎 ' + up.lesh + ' Леш'}</button>` +
                         `<button onclick="buyUpgrade('card','${up.id}')" style="padding:8px 14px;border:none;border-radius:8px;background:linear-gradient(135deg,#22d3ee,#0ea5e9);color:#000;font-size:11px;font-weight:700;cursor:pointer;">${isOwner() ? '∞ Бесплатно' : '💳 ' + up.card + ' ₽'}</button>`;
                 }
                 c.appendChild(div);
@@ -3970,12 +3970,12 @@ function unmuteAd(video) {
             const up = UPGRADES.find(u => u.id === upId);
             if (!up) return;
             if (method === 'coins') {
-                if (!isOwner() && state.coins < up.coins) { notify(`Нужно ${up.coins} 🪙`, 'error'); return; }
+                if (!isOwner() && state.coins < up.coins) { notify(`Нужно ${up.coins} 💰`, 'error'); return; }
                 if (!isOwner()) state.coins -= up.coins;
                 saveState(true);
                 applyUpgrade(up);
             } else if (method === 'lesh') {
-                if (!isOwner() && (state.leshinksy || 0) < up.lesh) { notify(`Нужно ${up.lesh} 💠`, 'error'); return; }
+                if (!isOwner() && (state.leshinksy || 0) < up.lesh) { notify(`Нужно ${up.lesh} 💎`, 'error'); return; }
                 if (!isOwner()) state.leshinksy -= up.lesh;
                 saveState(true); updateLeshinksyUI();
                 applyUpgrade(up);
@@ -4058,6 +4058,8 @@ function unmuteAd(video) {
             TAXI_MAZE.grid[m.rows - 2][m.cols - 2] = 0;
             const ov = document.getElementById('taxiMaze');
             if (ov) { ov.style.display = 'block'; }
+            const par = document.getElementById('gameOverlay');
+            if (par) par.classList.add('active');
             const st = document.getElementById('mazeStatus');
             if (st) st.textContent = `Доведи пассажира до выхода ➜ (пассажир №${(state.taxiPassengers || 0) + 1})`;
             const btn = document.getElementById('taxiBtn');
@@ -4075,6 +4077,8 @@ function unmuteAd(video) {
             window.removeEventListener('keyup', mzKeyUp);
             const ov = document.getElementById('taxiMaze');
             if (ov) ov.style.display = 'none';
+            const par = document.getElementById('gameOverlay');
+            if (par) par.classList.remove('active');
             const btn = document.getElementById('taxiBtn');
             if (btn) { btn.disabled = false; btn.textContent = '🚕 Принять пассажира'; }
             const st = document.getElementById('taxiStatus');
@@ -4177,16 +4181,18 @@ function unmuteAd(video) {
             window.removeEventListener('keyup', mzKeyUp);
             const ov = document.getElementById('taxiMaze');
             if (ov) ov.style.display = 'none';
+            const par = document.getElementById('gameOverlay');
+            if (par) par.classList.remove('active');
             state.taxiPassengers = (state.taxiPassengers || 0) + 1;
             state.taxiEarned = (state.taxiEarned || 0) + 10;
             addCoins(10);
             const st = document.getElementById('taxiStatus');
-            if (st) st.textContent = `✅ Пассажир доставлен! +10 🪙 (всего ${state.taxiEarned} 🪙)`;
+            if (st) st.textContent = `✅ Пассажир доставлен! +10 💰 (всего ${state.taxiEarned} 💰)`;
             const e = document.getElementById('taxiEarned');
             if (e) e.textContent = state.taxiEarned;
             const btn = document.getElementById('taxiBtn');
             if (btn) { btn.disabled = false; btn.textContent = '🚕 Принять пассажира'; }
-            notify('🚕 Пассажир доставлен через лабиринт! +10 🪙', 'success');
+            notify('🚕 Пассажир доставлен через лабиринт! +10 💰', 'success');
         }
         function taxiAction() {
             const st = document.getElementById('taxiStatus');
@@ -4287,8 +4293,8 @@ function unmuteAd(video) {
                 } else {
                     btnHtml =
                         `<button class="role-shop-buy" onclick="roleShopBuy('${role.id}')" style="background:linear-gradient(135deg,${role.colors[0]},${role.colors[1]});color:#000;">💳 ${role.price} ₽/мес</button>` +
-                        `<button class="role-shop-buy" onclick="coinOwnRole('${role.id}')" style="margin-left:6px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;">🪙 ${(COIN_PRICE[role.id] || 0).toLocaleString('ru-RU')}</button>` +
-                        `<button class="role-shop-buy" onclick="leshOwnRole('${role.id}')" style="margin-left:6px;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;">💠 ${(LESH_PRICE[role.id] || 0).toLocaleString('ru-RU')} Леш</button>`;
+                        `<button class="role-shop-buy" onclick="coinOwnRole('${role.id}')" style="margin-left:6px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;">💰 ${(COIN_PRICE[role.id] || 0).toLocaleString('ru-RU')}</button>` +
+                        `<button class="role-shop-buy" onclick="leshOwnRole('${role.id}')" style="margin-left:6px;background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff;">💎 ${(LESH_PRICE[role.id] || 0).toLocaleString('ru-RU')} Леш</button>`;
                 }
 
                 const ability = ROLE_ABILITIES[role.id] || '';
@@ -4825,7 +4831,7 @@ function unmuteAd(video) {
             __ttReplay = replay || null;
             updateStats('game');
             addCoins(1);
-            if (!isOwner() && Math.random() < 0.03) { addLeshinksy(1); notify('💠 Джекпот! +1 Лешинкс за игру', 'success'); }
+            if (!isOwner() && Math.random() < 0.03) { addLeshinksy(1); notify('💎 Джекпот! +1 Лешинкс за игру', 'success'); }
             let gBase = Math.max(0, xp);
             const gB = { veteran:1.2, ultra:1.5, immortal:1.6, avatar:1.4, phoenix:1.25, pharaoh:1.7, colossus:2.0, chaos:3.0, god:4.0 }[state.role];
             if (gB) gBase = Math.round(gBase * gB);
@@ -6198,7 +6204,7 @@ function unmuteAd(video) {
             <div class="trailer-particles" id="trailerParticles"></div>
             <div class="trailer-scene" data-t="0" data-sp="true"><div class="t-badge">РЕКЛАМА • ТУК-ТУК</div><div class="t-emoji">🏎️</div><div class="t-title">ТУК-ТУК<br>из будущего</div><div class="t-text">Мессенджер, который обгоняет время</div></div>
             <div class="trailer-scene" data-t="5" data-sp="true"><div class="t-badge">ЧАТЫ ПО НОМЕРУ</div><div class="t-emoji">📱</div><div class="t-text">Переписывайся с водителями по номеру машины — без телефонов и лишнего</div></div>
-            <div class="trailer-scene" data-t="12" data-sp="true"><div class="t-badge">ГАРАЖ И ВАЛЮТА</div><div class="t-emoji">🏎️💠</div><div class="t-text">Собирай гараж, зарабатывай монеты и редчайшие Лешинксы — валюту, названную в честь владельца Алексея</div></div>
+            <div class="trailer-scene" data-t="12" data-sp="true"><div class="t-badge">ГАРАЖ И ВАЛЮТА</div><div class="t-emoji">🏎️💎</div><div class="t-text">Собирай гараж, зарабатывай монеты и редчайшие Лешинксы — валюту, названную в честь владельца Алексея</div></div>
             <div class="trailer-scene" data-t="19" data-sp="true"><div class="t-badge">РОЛИ И БОТ</div><div class="t-emoji">👑🤖</div><div class="t-text">Прокачивай роль до самого Владельца и спрашивай всё у ИИ-бота Алёши</div></div>
             <div class="trailer-scene" data-t="26" data-sp="true"><div class="t-badge">ИГРЫ • КЛИПЫ • ТАКСИ</div><div class="t-emoji">🎮🎬🚕</div><div class="t-text">Игры, клипы, такси-зарплата — развлечений хватит на всю дорогу</div></div>
             <div class="trailer-scene" data-t="34" data-sp="false"><div class="t-badge">ТУК-ТУК</div><div class="trailer-logo">Скачивай<br>и заводи двигатель!</div><div class="t-emoji">🚀</div></div>
