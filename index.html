@@ -970,7 +970,7 @@
 
                     <div style="margin-top:5px;margin-bottom:20px;border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;">
                         <h3 style="font-family:'Orbitron';font-size:16px;margin-bottom:5px;color:var(--warning);">🚕 Такси</h3>
-                        <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">Будь водителем такси — подвези пассажира и получи +10 🪙 и +10 💠 за каждого. Заработанные монеты: <b id="taxiEarned">0</b></p>
+                        <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">Будь водителем такси — подвези пассажира и получи +10 🪙 за каждого. Заработанные монеты: <b id="taxiEarned">0</b></p>
                         <div id="taxiStatus" style="font-size:12px;color:var(--text-muted);margin-bottom:10px;min-height:16px;">Готов к работе. Принимай заказ!</div>
                         <button id="taxiBtn" onclick="taxiAction()" style="width:100%;padding:14px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:12px;color:#000;font-weight:700;font-size:14px;cursor:pointer;">🚕 Принять пассажира</button>
                     </div>
@@ -4180,14 +4180,13 @@ function unmuteAd(video) {
             state.taxiPassengers = (state.taxiPassengers || 0) + 1;
             state.taxiEarned = (state.taxiEarned || 0) + 10;
             addCoins(10);
-            addLeshinksy(10);
             const st = document.getElementById('taxiStatus');
-            if (st) st.textContent = `✅ Пассажир доставлен! +10 🪙 и +10 💠 (всего ${state.taxiEarned} 🪙)`;
+            if (st) st.textContent = `✅ Пассажир доставлен! +10 🪙 (всего ${state.taxiEarned} 🪙)`;
             const e = document.getElementById('taxiEarned');
             if (e) e.textContent = state.taxiEarned;
             const btn = document.getElementById('taxiBtn');
             if (btn) { btn.disabled = false; btn.textContent = '🚕 Принять пассажира'; }
-            notify('🚕 Пассажир доставлен через лабиринт! +10 🪙 и +10 💠', 'success');
+            notify('🚕 Пассажир доставлен через лабиринт! +10 🪙', 'success');
         }
         function taxiAction() {
             const st = document.getElementById('taxiStatus');
