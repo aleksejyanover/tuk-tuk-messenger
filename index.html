@@ -968,13 +968,6 @@
                         <div id="upgradeShopList"></div>
                     </div>
 
-                    <div style="margin-top:5px;margin-bottom:20px;border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;">
-                        <h3 style="font-family:'Orbitron';font-size:16px;margin-bottom:5px;color:var(--warning);">🚕 Такси</h3>
-                        <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">Будь водителем такси — подвези пассажира и получи +10 🪙 и +10 💠 за каждого. Заработанные монеты: <b id="taxiEarned">0</b></p>
-                        <div id="taxiStatus" style="font-size:12px;color:var(--text-muted);margin-bottom:10px;min-height:16px;">Готов к работе. Принимай заказ!</div>
-                        <button id="taxiBtn" onclick="taxiAction()" style="width:100%;padding:14px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:12px;color:#000;font-weight:700;font-size:14px;cursor:pointer;">🚕 Принять пассажира</button>
-                    </div>
-
                     <div style="margin-top:25px;margin-bottom:20px;border-top:1px solid rgba(255,255,255,0.08);padding-top:20px;">
                         <h3 style="font-family:'Orbitron';font-size:16px;margin-bottom:5px;color:var(--warning);">💳 Подписки</h3>
                         <p style="font-size:11px;color:var(--text-muted);margin-bottom:15px;">Купи роль (демо-оплата картой, деньги не списываются)</p>
@@ -1207,19 +1200,7 @@
             <div id="gameArea"></div>
         </div>
 
-        <div id="taxiMaze" style="display:none;position:fixed;inset:0;z-index:2000;background:#05070f;">
-            <canvas id="mazeCanvas" width="640" height="400" style="position:absolute;inset:0;width:100%;height:100%;display:block;"></canvas>
-            <div style="position:absolute;top:14px;left:50%;transform:translateX(-50%);text-align:center;z-index:5;">
-                <div style="font-family:'Orbitron';font-weight:700;color:#22d3ee;font-size:16px;text-shadow:0 0 12px rgba(34,211,238,0.6);">🚕 Такси-лабиринт</div>
-                <div id="mazeStatus" style="color:#e2e8f0;font-size:12px;margin-top:4px;">Доведи пассажира до выхода ➜</div>
-            </div>
-            <canvas id="mazeMinimap" width="130" height="130" style="position:absolute;bottom:14px;right:14px;z-index:5;background:rgba(10,14,26,0.85);border:1px solid rgba(34,211,238,0.4);border-radius:10px;"></canvas>
-            <div style="position:absolute;bottom:14px;left:14px;z-index:5;display:flex;gap:8px;">
-                <button onclick="mzQuit()" style="padding:10px 16px;border:none;border-radius:10px;background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;font-weight:700;font-size:13px;cursor:pointer;">✕ Выйти</button>
-                <button onclick="mzRestart()" style="padding:10px 16px;border:none;border-radius:10px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;font-weight:700;font-size:13px;cursor:pointer;">🔄 Заново</button>
-            </div>
-            <div style="position:absolute;top:12px;right:14px;z-index:5;color:#64748b;font-size:11px;text-align:right;">WASD / стрелки — движение<br>◀ ▶ (A/D) — поворот</div>
-        </div>
+        
     </div>
 
     <div class="save-indicator" id="saveIndicator">
@@ -2841,8 +2822,6 @@ function unmuteAd(video) {
             renderUpgradeShop();
             updateCoinsUI();
             updateLeshinksyUI();
-            const taxiEarned = document.getElementById('taxiEarned');
-            if (taxiEarned) taxiEarned.textContent = state.taxiEarned || 0;
             updateProfile();
             updateXP();
             updateRegBtn();
@@ -4022,177 +4001,6 @@ function unmuteAd(video) {
             const old = document.querySelector('.payment-overlay');
             if (old) old.remove();
             applyUpgrade(up);
-        }
-
-        // ---------- 3D Такси-лабиринт (first-person raycasting) ----------
-        const TAXI_MAZE = {
-            grid: null, rows: 0, cols: 0,
-            pos: { x: 0, y: 0 }, dir: { x: 1, y: 0 }, plane: { x: 0, y: 0.66 },
-            exit: { x: 0, y: 0 },
-            keys: {}, active: false, raf: null, done: false
-        };
-        const MZ_FLAT = '#101a30', MZ_WALL = '#22d3ee', MZ_WALLSIDE = '#0e7490', MZ_EXIT = '#fde047';
-        function mzBuildGrid(w, h) {
-            const R = 2 * h + 1, C = 2 * w + 1;
-            const g = Array.from({ length: R }, () => Array(C).fill(1));
-            const dirs = [[1,0],[-1,0],[0,1],[0,-1]];
-            function carve(r, c) {
-                const d = dirs.slice().sort(() => Math.random() - 0.5);
-                for (const [dr, dc] of d) {
-                    const nr = r + dr * 2, nc = c + dc * 2;
-                    if (nr > 0 && nr < R - 1 && nc > 0 && nc < C - 1 && g[nr][nc] === 1) {
-                        g[r + dr][c + dc] = 0; g[nr][nc] = 0; carve(nr, nc);
-                    }
-                }
-            }
-            g[1][1] = 0; carve(1, 1);
-            return { grid: g, rows: R, cols: C };
-        }
-        function mzStart() {
-            const m = mzBuildGrid(6, 6);
-            TAXI_MAZE.grid = m.grid; TAXI_MAZE.rows = m.rows; TAXI_MAZE.cols = m.cols;
-            TAXI_MAZE.pos = { x: 1.5, y: 1.5 };
-            TAXI_MAZE.dir = { x: 1, y: 0 }; TAXI_MAZE.plane = { x: 0, y: 0.66 };
-            TAXI_MAZE.exit = { x: m.cols - 2, y: m.rows - 2 };
-            TAXI_MAZE.keys = {}; TAXI_MAZE.done = false; TAXI_MAZE.active = true;
-            TAXI_MAZE.grid[m.rows - 2][m.cols - 2] = 0;
-            const ov = document.getElementById('taxiMaze');
-            if (ov) { ov.style.display = 'block'; }
-            const st = document.getElementById('mazeStatus');
-            if (st) st.textContent = `Доведи пассажира до выхода ➜ (пассажир №${(state.taxiPassengers || 0) + 1})`;
-            const btn = document.getElementById('taxiBtn');
-            if (btn) { btn.disabled = true; btn.textContent = '🚕 В лабиринте...'; }
-            window.addEventListener('keydown', mzKeyDown);
-            window.addEventListener('keyup', mzKeyUp);
-            if (TAXI_MAZE.raf) cancelAnimationFrame(TAXI_MAZE.raf);
-            mzLoop();
-        }
-        function mzRestart() { mzStart(); }
-        function mzQuit() {
-            TAXI_MAZE.active = false;
-            if (TAXI_MAZE.raf) cancelAnimationFrame(TAXI_MAZE.raf);
-            window.removeEventListener('keydown', mzKeyDown);
-            window.removeEventListener('keyup', mzKeyUp);
-            const ov = document.getElementById('taxiMaze');
-            if (ov) ov.style.display = 'none';
-            const btn = document.getElementById('taxiBtn');
-            if (btn) { btn.disabled = false; btn.textContent = '🚕 Принять пассажира'; }
-            const st = document.getElementById('taxiStatus');
-            if (st) st.textContent = 'Пассажир вышел. Принимай новый заказ!';
-        }
-        function mzKeyDown(e) {
-            if (!TAXI_MAZE.active) return;
-            const k = (e.key || '').toLowerCase();
-            if (['arrowup','arrowdown','arrowleft','arrowright',' ','w','a','s','d'].includes(k)) e.preventDefault();
-            TAXI_MAZE.keys[k] = true;
-        }
-        function mzKeyUp(e) {
-            const k = (e.key || '').toLowerCase();
-            TAXI_MAZE.keys[k] = false;
-        }
-        function mzLoop() {
-            if (!TAXI_MAZE.active) return;
-            const t = TAXI_MAZE, sp = 0.055, rs = 0.05;
-            const pr = t.pos;
-            let nx = pr.x, ny = pr.y;
-            if (t.keys['w'] || t.keys['arrowup']) { nx += t.dir.x * sp; ny += t.dir.y * sp; }
-            if (t.keys['s'] || t.keys['arrowdown']) { nx -= t.dir.x * sp; ny -= t.dir.y * sp; }
-            if (t.keys['a'] || t.keys['arrowleft']) {
-                const odx = t.dir.x, ody = t.dir.y, opx = t.plane.x, opy = t.plane.y;
-                const c = Math.cos(-rs), s = Math.sin(-rs);
-                t.dir.x = odx * c - ody * s; t.dir.y = odx * s + ody * c;
-                t.plane.x = opx * c - opy * s; t.plane.y = opx * s + opy * c;
-            }
-            if (t.keys['d'] || t.keys['arrowright']) {
-                const odx = t.dir.x, ody = t.dir.y, opx = t.plane.x, opy = t.plane.y;
-                const c = Math.cos(rs), s = Math.sin(rs);
-                t.dir.x = odx * c - ody * s; t.dir.y = odx * s + ody * c;
-                t.plane.x = opx * c - opy * s; t.plane.y = opx * s + opy * c;
-            }
-            if (!t.grid[Math.floor(ny)][Math.floor(nx)]) { pr.y = ny; pr.x = nx; }
-            else if (!t.grid[Math.floor(ny)][Math.floor(pr.x)]) { pr.y = ny; }
-            else if (!t.grid[Math.floor(pr.y)][Math.floor(nx)]) { pr.x = nx; }
-            if (Math.floor(pr.x) === t.exit.x && Math.floor(pr.y) === t.exit.y) { mzWin(); return; }
-            mzRender();
-            t.raf = requestAnimationFrame(mzLoop);
-        }
-        function mzRender() {
-            const cv = document.getElementById('mazeCanvas');
-            if (!cv) return;
-            const ctx = cv.getContext('2d');
-            const W2 = cv.width, H2 = cv.height, t = TAXI_MAZE, g = t.grid, C = t.cols, R = t.rows;
-            ctx.fillStyle = '#060a16'; ctx.fillRect(0, 0, W2, H2 / 2);
-            ctx.fillStyle = '#0a0d1a'; ctx.fillRect(0, H2 / 2, W2, H2 / 2);
-            const pos = t.pos, dir = t.dir, plane = t.plane;
-            for (let x = 0; x < W2; x++) {
-                const cam = 2 * x / W2 - 1;
-                const rdx = dir.x + plane.x * cam, rdy = dir.y + plane.y * cam;
-                let mapX = Math.floor(pos.x), mapY = Math.floor(pos.y);
-                const ddX = Math.abs(1 / (rdx || 1e-9)), ddY = Math.abs(1 / (rdy || 1e-9));
-                let stepX, stepY, sideX, sideY;
-                if (rdx < 0) { stepX = -1; sideX = (pos.x - mapX) * ddX; } else { stepX = 1; sideX = (mapX + 1 - pos.x) * ddX; }
-                if (rdy < 0) { stepY = -1; sideY = (pos.y - mapY) * ddY; } else { stepY = 1; sideY = (mapY + 1 - pos.y) * ddY; }
-                let hit = 0, side = 0;
-                while (!hit && mapX >= 0 && mapX < C && mapY >= 0 && mapY < R) {
-                    if (sideX < sideY) { sideX += ddX; mapX += stepX; side = 0; } else { sideY += ddY; mapY += stepY; side = 1; }
-                    if (mapX < 0 || mapX >= C || mapY < 0 || mapY >= R) break;
-                    if (g[mapY][mapX] === 1) hit = 1;
-                }
-                let d = side ? (sideY - ddY) : (sideX - ddX);
-                if (d < 0.01) d = 0.01; if (d > 40) d = 40;
-                const lineH = parseInt(H2 / d);
-                const drawStart = -lineH / 2 + H2 / 2;
-                const shade = Math.max(0.25, Math.min(1, 1.3 - d / 20));
-                const base = side ? [14, 116, 144] : [34, 211, 238];
-                ctx.fillStyle = `rgb(${(base[0] * shade) | 0},${(base[1] * shade) | 0},${(base[2] * shade) | 0})`;
-                ctx.fillRect(x, Math.max(0, drawStart), 1, Math.min(lineH, H2));
-            }
-            mzMini(ctx);
-            ctx.fillStyle = 'rgba(253,224,71,0.9)';
-            ctx.beginPath();
-            ctx.arc(W2 / 2, H2 / 2, 3, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        function mzMini(ctx) {
-            const mm = document.getElementById('mazeMinimap');
-            if (!mm) return;
-            const mctx = mm.getContext('2d');
-            const mw = mm.width, mh = mm.height, t = TAXI_MAZE, g = t.grid;
-            mctx.clearRect(0, 0, mw, mh);
-            const s = Math.min(mw / t.cols, mh / t.rows);
-            for (let y = 0; y < t.rows; y++) for (let x = 0; x < t.cols; x++) {
-                if (g[y][x]) { mctx.fillStyle = 'rgba(34,211,238,0.7)'; mctx.fillRect(x * s, y * s, s, s); }
-            }
-            mctx.fillStyle = t.exit.x === undefined ? '#fff' : 'rgba(253,224,71,0.95)';
-            mctx.fillRect(t.exit.x * s + s * 0.25, t.exit.y * s + s * 0.25, s * 0.5, s * 0.5);
-            mctx.fillStyle = '#fbbf24';
-            mctx.beginPath();
-            mctx.arc((t.pos.x) * s, (t.pos.y) * s, Math.max(2, s * 0.28), 0, Math.PI * 2);
-            mctx.fill();
-        }
-        function mzWin() {
-            TAXI_MAZE.active = false;
-            if (TAXI_MAZE.raf) cancelAnimationFrame(TAXI_MAZE.raf);
-            window.removeEventListener('keydown', mzKeyDown);
-            window.removeEventListener('keyup', mzKeyUp);
-            const ov = document.getElementById('taxiMaze');
-            if (ov) ov.style.display = 'none';
-            state.taxiPassengers = (state.taxiPassengers || 0) + 1;
-            state.taxiEarned = (state.taxiEarned || 0) + 10;
-            addCoins(10);
-            addLeshinksy(10);
-            const st = document.getElementById('taxiStatus');
-            if (st) st.textContent = `✅ Пассажир доставлен! +10 🪙 и +10 💠 (всего ${state.taxiEarned} 🪙)`;
-            const e = document.getElementById('taxiEarned');
-            if (e) e.textContent = state.taxiEarned;
-            const btn = document.getElementById('taxiBtn');
-            if (btn) { btn.disabled = false; btn.textContent = '🚕 Принять пассажира'; }
-            notify('🚕 Пассажир доставлен через лабиринт! +10 🪙 и +10 💠', 'success');
-        }
-        function taxiAction() {
-            const st = document.getElementById('taxiStatus');
-            if (st) st.textContent = `🚦 Принят пассажир №${(state.taxiPassengers || 0) + 1}! Веди его через лабиринт...`;
-            mzStart();
         }
 
         function applyBestRole(silent) {
