@@ -2238,6 +2238,9 @@ function setTheme(mode) {
         function showApp() {
             loadState();
             if (checkBan()) return;
+            state.role = _subBestActive();
+            if (state.role === 'user' && state.level === 9999) { state.level = 1; state.xp = 0; state.stats.totalXP = 0; }
+            saveState();
             document.getElementById('app').classList.add('active');
             initApp();
             setTimeout(showStartupAd, 600);
@@ -3158,15 +3161,6 @@ function setTheme(mode) {
             return n;
         }
         function addXP(amount) {
-            if (isOwner()) {
-                state.xp = 1e15;
-                state.level = 9999;
-                state.stats.totalXP = 1e15;
-                checkCarUnlocks();
-                updateXP();
-                saveState();
-                return Math.max(1, Math.floor(amount));
-            }
             const multiplier = (state.xpMult || 1) * getRoleMult() * abilityCritMult() * (state.role === 'infinity' ? 2 : 1);
             const finalAmount = Math.floor(amount * multiplier);
             state.xp += finalAmount;
@@ -5250,7 +5244,7 @@ function setTheme(mode) {
             const users = getRegUsers();
             const u = users[state.myPlate];
             if (f) f.textContent = state.friends.length;
-            if (l) l.textContent = state.level;
+            if (l) l.textContent = isOwner() ? '∞' : state.level;
             if (x) x.textContent = state.xp;
             if (n) n.textContent = state.myName;
             if (mn) mn.textContent = state.myName;
