@@ -1,10 +1,11 @@
-const CACHE = 'brum-brum-v5';
+const CACHE = 'brum-brum-v6';
 const ASSETS = [
   './',
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png',
-  './maskable-512.png'
+  './maskable-512.png',
+  './ad_novoice.mp4'
 ];
 
 self.addEventListener('install', (e) => {
@@ -18,10 +19,10 @@ self.addEventListener('activate', (e) => {
         .filter((k) => k !== CACHE)
         .map((k) => caches.delete(k))
     )).then(() => {
-      // на всякий случай вычищаем старые рекламные ролики из всех кэшей
+      // на всякий случай вычищаем из всех кэшей старые рекламные ролики СО звуком (озвучка не нужна)
       return caches.keys().then((keys) => Promise.all(
         keys.map((k) => caches.open(k).then((c) => c.keys().then((reqs) => Promise.all(
-          reqs.filter((r) => /ad.*\.mp4$/i.test(new URL(r.url).pathname)).map((r) => c.delete(r))
+          reqs.filter((r) => /ad\.mp4$/i.test(new URL(r.url).pathname)).map((r) => c.delete(r))
         ))))
       ));
     }).then(() => self.clients.claim())
