@@ -562,6 +562,9 @@
         .gbtn.primary { background: var(--gp); color: #fff; }
         .gbtn.secondary { background: var(--bg-input); color: var(--text); border: 1px solid rgba(0,240,255,0.15); }
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+        @supports (height: 100dvh) {
+            .app { height: 100dvh; }
+        }
         @media (max-width: 768px) {
             .app.active { flex-direction: column; }
             .sidebar { width: 100%; height: auto; max-height: 45vh; border-right: none; border-bottom: 1px solid rgba(0,240,255,0.1); }
@@ -569,22 +572,86 @@
             .main-area { flex: 1; min-height: 0; }
             .chat-header { padding: 10px 12px; }
             .nav-tabs { padding: 6px; gap: 2px; }
-            .nav-tab { min-width: 40px; padding: 6px 2px; font-size: 15px; }
-            .nav-tab span { font-size: 7px; }
+            .nav-tab { min-width: 40px; padding: 7px 2px; font-size: 20px; min-height: 46px; }
+            .nav-tab span { font-size: 8px; }
             .clips-tabs-bar { gap: 0; }
             .clips-tab { padding: 8px 12px; font-size: 12px; }
             .panel { min-height: 0; }
-            .msg-input-area { padding: 8px; }
+            .msg-input-area { padding: 8px; padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+            .msg-input { font-size: 16px; min-height: 42px; }
+            .send-btn, .action-btn, .header-btn { min-width: 44px; min-height: 44px; }
             .sb-header { padding: 10px 14px; }
             .user-status { padding: 8px 14px; }
-            .msg { max-width: 85% !important; }
+            .msg, .message { max-width: 85% !important; }
             #chatBackBtn { display: flex !important; }
+            .messages-area { padding: 10px 10px; }
         }
+        @media (min-width: 769px) and (max-width: 1024px) and (hover: none) and (pointer: coarse) {
+            .app.active { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; max-height: 45vh; border-right: none; border-bottom: 1px solid rgba(0,240,255,0.1); }
+            .sidebar.chat-open { display: none; }
+            .main-area { flex: 1; min-height: 0; }
+            .chat-header { padding: 10px 12px; }
+            .nav-tabs { padding: 6px; gap: 2px; }
+            .nav-tab { min-width: 40px; padding: 7px 2px; font-size: 20px; min-height: 46px; }
+            .nav-tab span { font-size: 8px; }
+            .clips-tabs-bar { gap: 0; }
+            .clips-tab { padding: 8px 12px; font-size: 12px; }
+            .panel { min-height: 0; }
+            .msg-input-area { padding: 8px; padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+            .msg-input { font-size: 16px; min-height: 42px; }
+            .send-btn, .action-btn, .header-btn { min-width: 44px; min-height: 44px; }
+            .sb-header { padding: 10px 14px; }
+            .user-status { padding: 8px 14px; }
+            .msg, .message { max-width: 85% !important; }
+            #chatBackBtn { display: flex !important; }
+            .messages-area { padding: 10px 10px; }
+        }
+        html.device-mobile .app.active { flex-direction: column; }
+        html.device-mobile .sidebar { width: 100%; height: auto; max-height: 45vh; border-right: none; border-bottom: 1px solid rgba(0,240,255,0.1); }
+        html.device-mobile .sidebar.chat-open { display: none; }
+        html.device-mobile .main-area { flex: 1; min-height: 0; }
+        html.device-mobile .chat-header { padding: 10px 12px; }
+        html.device-mobile .nav-tabs { padding: 6px; gap: 2px; }
+        html.device-mobile .nav-tab { min-width: 40px; padding: 7px 2px; font-size: 20px; min-height: 46px; }
+        html.device-mobile .nav-tab span { font-size: 8px; }
+        html.device-mobile .clips-tabs-bar { gap: 0; }
+        html.device-mobile .clips-tab { padding: 8px 12px; font-size: 12px; }
+        html.device-mobile .panel { min-height: 0; }
+        html.device-mobile .msg-input-area { padding: 8px; padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+        html.device-mobile .msg-input { font-size: 16px; min-height: 42px; }
+        html.device-mobile .send-btn, html.device-mobile .action-btn, html.device-mobile .header-btn { min-width: 44px; min-height: 44px; }
+        html.device-mobile .sb-header { padding: 10px 14px; }
+        html.device-mobile .user-status { padding: 8px 14px; }
+        html.device-mobile .msg, html.device-mobile .message { max-width: 85% !important; }
+        html.device-mobile #chatBackBtn { display: flex !important; }
+        html.device-mobile .messages-area { padding: 10px 10px; }
+        html.device-mobile .login { padding: 24px 16px; }
+        html.device-mobile .password-box, html.device-mobile .watch-modal, html.device-mobile .payment-modal, html.device-mobile .game-modal, html.device-mobile .media-modal { width: 96%; max-width: 96%; }
+        html.device-mobile .notification-stack { right: 10px; left: 10px; align-items: stretch; }
+        html.device-mobile .notification { max-width: 100%; }
+        html.device-mobile .date-separator { max-width: 100%; }
         @media (max-width: 400px) {
             .sidebar { max-height: 40vh; }
             .clips-tab { padding: 8px 8px; font-size: 11px; }
             .clips-tab-icon { display: none; }
         }
+        html.device-mobile .clips-tab-icon { display: none; }
+        html.device-mobile .splash-logo { font-size: 40px; }
+        html.device-mobile .splash-car { font-size: 60px; }
+        html.device-mobile .splash-bar { width: 240px; }
+        html.device-mobile .nav-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+        html.device-mobile .nav-tabs::-webkit-scrollbar { display: none; }
+        html.device-mobile .nav-tab { flex: 0 0 auto; min-width: 56px; }
+        html.device-mobile .user-status .media-btn { display: none; }
+        @media (max-width: 768px) {
+            .nav-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+            .nav-tabs::-webkit-scrollbar { display: none; }
+            .nav-tab { flex: 0 0 auto; min-width: 56px; }
+            .user-status .media-btn { display: none; }
+        }
+        html.device-mobile .login-logo { font-size: 36px; }
+        html.device-mobile .msg-context-menu { min-width: 0; width: min(240px, calc(100vw - 24px)); }
         .chat-item, .nav-tab, .clips-tab, .game-card, .role-option, .garage-car, .theme-btn, .gbtn { -webkit-tap-highlight-color: transparent; }
         .panel { will-change: contents; }
         .msg { transition: opacity 0.2s ease; }
@@ -1237,6 +1304,37 @@
     </div>
 
     <script>
+        function _detectDevice() {
+            var root = document.documentElement;
+            try {
+                var ua = (navigator.userAgent || '') + ' ' + (navigator.vendor || '');
+                var uaMobile = navigator.userAgentData ? !!navigator.userAgentData.mobile : false;
+                var hasTouch = ('ontouchstart' in window) || ((navigator.maxTouchPoints || 0) > 0);
+                var coarse = window.matchMedia ? window.matchMedia('(pointer: coarse)').matches : false;
+                var smallScreen = window.innerWidth <= 1100;
+                var mobileUA = /android|iphone|ipad|ipod|mobile|opera mini|iemobile|phone|blackberry/i.test(ua);
+                var isMobile = mobileUA || uaMobile || ((hasTouch || coarse) && smallScreen);
+                root.classList[isMobile ? 'add' : 'remove']('device-mobile');
+                root.classList[isMobile ? 'remove' : 'add']('device-desktop');
+                if (hasTouch || coarse) root.classList.add('device-touch'); else root.classList.remove('device-touch');
+                return isMobile;
+            } catch (e) {
+                root.classList.remove('device-mobile');
+                root.classList.add('device-desktop');
+                return false;
+            }
+        }
+        var IS_MOBILE = _detectDevice();
+        var _devResizeTimer = null;
+        window.addEventListener('resize', function() {
+            clearTimeout(_devResizeTimer);
+            _devResizeTimer = setTimeout(function() {
+                var old = IS_MOBILE;
+                IS_MOBILE = _detectDevice();
+                if (old !== IS_MOBILE) window.dispatchEvent(new Event('tt-deviceswitch'));
+            }, 150);
+        });
+
         let state = {
             myPlate: 'А123БВ 77', myName: 'Водитель', loginMethod: '',
             myPhone: '', myTelegram: '', registeredAt: null,
@@ -3318,7 +3416,7 @@ function setTheme(mode) {
             document.getElementById('chatStatus').textContent = 'В сети';
             document.getElementById('chatAvatar').style.background = `linear-gradient(135deg, ${user.color||'#666'}, ${user.color||'#333'})`;
             document.getElementById('chatAvatar').textContent = user.avatar || '';
-            if (window.innerWidth <= 768) {
+            if (IS_MOBILE || window.innerWidth <= 768) {
                 document.querySelector('.sidebar').classList.add('chat-open');
             }
             renderMessages(); renderChatList(); switchTab('chats');
