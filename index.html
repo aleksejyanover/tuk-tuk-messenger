@@ -2,13 +2,19 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description" content="Брум-Брум — мессенджер для машин: чаты по номеру авто, гараж, игры, роли и бот Алёша.">
     <meta name="theme-color" content="#0a0e1a">
     <meta name="color-scheme" content="dark">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Брум-Брум">
     <title>Брум-Брум — мессенджер для машин</title>
     <link rel="manifest" href="manifest.webmanifest">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-180.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚗</text></svg>">
     <meta property="og:title" content="Брум-Брум — мессенджер для машин">
     <meta property="og:description" content="Чаты по номеру авто, гараж, игры, роли и бот Алёша.">
@@ -567,12 +573,14 @@
         }
         @media (max-width: 768px) {
             .app.active { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; max-height: 45vh; border-right: none; border-bottom: 1px solid rgba(0,240,255,0.1); }
+            .app { overflow: hidden; }
+            .sidebar { width: 100%; height: auto; min-height: 0; border-right: none; border-bottom: 1px solid rgba(0,240,255,0.1); }
             .sidebar.chat-open { display: none; }
             .main-area { flex: 1; min-height: 0; }
             .chat-header { padding: 10px 12px; }
-            .nav-tabs { padding: 6px; gap: 2px; }
-            .nav-tab { min-width: 40px; padding: 7px 2px; font-size: 20px; min-height: 46px; }
+            .nav-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+            .nav-tabs::-webkit-scrollbar { display: none; }
+            .nav-tab { flex: 0 0 auto; min-width: 56px; padding: 7px 2px; font-size: 20px; min-height: 46px; }
             .nav-tab span { font-size: 8px; }
             .clips-tabs-bar { gap: 0; }
             .clips-tab { padding: 8px 12px; font-size: 12px; }
@@ -582,18 +590,21 @@
             .send-btn, .action-btn, .header-btn { min-width: 44px; min-height: 44px; }
             .sb-header { padding: 10px 14px; }
             .user-status { padding: 8px 14px; }
+            .user-status .media-btn { display: none; }
             .msg, .message { max-width: 85% !important; }
             #chatBackBtn { display: flex !important; }
             .messages-area { padding: 10px 10px; }
         }
         @media (min-width: 769px) and (max-width: 1024px) and (hover: none) and (pointer: coarse) {
             .app.active { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; max-height: 45vh; border-right: none; border-bottom: 1px solid rgba(0,240,255,0.1); }
+            .app { overflow: hidden; }
+            .sidebar { width: 100%; height: auto; min-height: 0; border-right: none; border-bottom: 1px solid rgba(0,240,255,0.1); }
             .sidebar.chat-open { display: none; }
             .main-area { flex: 1; min-height: 0; }
             .chat-header { padding: 10px 12px; }
-            .nav-tabs { padding: 6px; gap: 2px; }
-            .nav-tab { min-width: 40px; padding: 7px 2px; font-size: 20px; min-height: 46px; }
+            .nav-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+            .nav-tabs::-webkit-scrollbar { display: none; }
+            .nav-tab { flex: 0 0 auto; min-width: 56px; padding: 7px 2px; font-size: 20px; min-height: 46px; }
             .nav-tab span { font-size: 8px; }
             .clips-tabs-bar { gap: 0; }
             .clips-tab { padding: 8px 12px; font-size: 12px; }
@@ -603,17 +614,27 @@
             .send-btn, .action-btn, .header-btn { min-width: 44px; min-height: 44px; }
             .sb-header { padding: 10px 14px; }
             .user-status { padding: 8px 14px; }
+            .user-status .media-btn { display: none; }
             .msg, .message { max-width: 85% !important; }
             #chatBackBtn { display: flex !important; }
             .messages-area { padding: 10px 10px; }
         }
         html.device-mobile .app.active { flex-direction: column; }
-        html.device-mobile .sidebar { width: 100%; height: auto; max-height: 45vh; border-right: none; border-bottom: 1px solid rgba(0,240,255,0.1); }
+        html.device-mobile .app { overflow: hidden; }
+        html.device-mobile .sidebar { width: 100%; height: auto; min-height: 0; border-right: none; border-bottom: 1px solid rgba(0,240,255,0.1); flex: 1 1 auto; }
         html.device-mobile .sidebar.chat-open { display: none; }
-        html.device-mobile .main-area { flex: 1; min-height: 0; }
-        html.device-mobile .chat-header { padding: 10px 12px; }
-        html.device-mobile .nav-tabs { padding: 6px; gap: 2px; }
-        html.device-mobile .nav-tab { min-width: 40px; padding: 7px 2px; font-size: 20px; min-height: 46px; }
+        html.device-mobile .main-area { flex: 1 1 auto; min-height: 0; }
+        html.device-mobile .app.mobile-list .sidebar { display: flex; max-height: none; }
+        html.device-mobile .app.mobile-list .main-area { display: none; }
+        html.device-mobile .app.mobile-main .sidebar { display: none; }
+        html.device-mobile .app.mobile-main .main-area { display: flex; }
+        html.device-mobile .app.mobile-chat .sidebar { display: none; }
+        html.device-mobile .app.mobile-chat .main-area { display: flex; }
+        html.device-mobile .chat-header { padding: 10px 12px; padding-top: calc(10px + env(safe-area-inset-top)); }
+        html.device-mobile .sb-header { padding: 10px 14px; padding-top: calc(10px + env(safe-area-inset-top)); }
+        html.device-mobile .nav-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; flex: 0 0 auto; background: var(--bg-card); border-top: 1px solid rgba(0,240,255,0.12); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); box-shadow: 0 -4px 18px rgba(0,0,0,0.35); position: relative; z-index: 30; }
+        html.device-mobile .nav-tabs::-webkit-scrollbar { display: none; }
+        html.device-mobile .nav-tab { flex: 0 0 auto; min-width: 56px; padding: 8px 2px; font-size: 20px; min-height: 50px; }
         html.device-mobile .nav-tab span { font-size: 8px; }
         html.device-mobile .clips-tabs-bar { gap: 0; }
         html.device-mobile .clips-tab { padding: 8px 12px; font-size: 12px; }
@@ -621,37 +642,28 @@
         html.device-mobile .msg-input-area { padding: 8px; padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
         html.device-mobile .msg-input { font-size: 16px; min-height: 42px; }
         html.device-mobile .send-btn, html.device-mobile .action-btn, html.device-mobile .header-btn { min-width: 44px; min-height: 44px; }
-        html.device-mobile .sb-header { padding: 10px 14px; }
         html.device-mobile .user-status { padding: 8px 14px; }
+        html.device-mobile .user-status .media-btn { display: none; }
         html.device-mobile .msg, html.device-mobile .message { max-width: 85% !important; }
         html.device-mobile #chatBackBtn { display: flex !important; }
-        html.device-mobile .messages-area { padding: 10px 10px; }
+        html.device-mobile .messages-area { padding: 10px 10px; -webkit-overflow-scrolling: touch; }
+        html.device-mobile #chatList { -webkit-overflow-scrolling: touch; }
         html.device-mobile .login { padding: 24px 16px; }
         html.device-mobile .password-box, html.device-mobile .watch-modal, html.device-mobile .payment-modal, html.device-mobile .game-modal, html.device-mobile .media-modal { width: 96%; max-width: 96%; }
         html.device-mobile .notification-stack { right: 10px; left: 10px; align-items: stretch; }
         html.device-mobile .notification { max-width: 100%; }
         html.device-mobile .date-separator { max-width: 100%; }
-        @media (max-width: 400px) {
-            .sidebar { max-height: 40vh; }
-            .clips-tab { padding: 8px 8px; font-size: 11px; }
-            .clips-tab-icon { display: none; }
-        }
         html.device-mobile .clips-tab-icon { display: none; }
         html.device-mobile .splash-logo { font-size: 40px; }
         html.device-mobile .splash-car { font-size: 60px; }
         html.device-mobile .splash-bar { width: 240px; }
-        html.device-mobile .nav-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-        html.device-mobile .nav-tabs::-webkit-scrollbar { display: none; }
-        html.device-mobile .nav-tab { flex: 0 0 auto; min-width: 56px; }
-        html.device-mobile .user-status .media-btn { display: none; }
-        @media (max-width: 768px) {
-            .nav-tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-            .nav-tabs::-webkit-scrollbar { display: none; }
-            .nav-tab { flex: 0 0 auto; min-width: 56px; }
-            .user-status .media-btn { display: none; }
-        }
         html.device-mobile .login-logo { font-size: 36px; }
         html.device-mobile .msg-context-menu { min-width: 0; width: min(240px, calc(100vw - 24px)); }
+        html.device-mobile button, html.device-mobile .chat-item, html.device-mobile .nav-tab, html.device-mobile .clips-tab, html.device-mobile input, html.device-mobile textarea, html.device-mobile [contenteditable="true"] { touch-action: manipulation; }
+        @media (max-width: 400px) {
+            .clips-tab { padding: 8px 8px; font-size: 11px; }
+            .clips-tab-icon { display: none; }
+        }
         .chat-item, .nav-tab, .clips-tab, .game-card, .role-option, .garage-car, .theme-btn, .gbtn { -webkit-tap-highlight-color: transparent; }
         .panel { will-change: contents; }
         .msg { transition: opacity 0.2s ease; }
@@ -939,7 +951,7 @@
                 </div>
                 <div id="chatView" style="display:none;flex-direction:column;height:100%;">
                     <div class="chat-header">
-                        <button class="header-btn" onclick="state.currentChat=null;document.querySelector('.sidebar').classList.remove('chat-open');renderChatList()" aria-label="Назад" style="display:none;font-size:18px;" id="chatBackBtn">←</button>
+                        <button class="header-btn" onclick="closeChat()" aria-label="Назад" style="display:none;font-size:18px;" id="chatBackBtn">←</button>
                         <div class="chat-avatar" id="chatAvatar" style="background:linear-gradient(135deg,#10b981,#059669);">🚙</div>
                         <div class="chat-header-info">
                             <h3 id="chatName">Имя</h3>
@@ -1324,7 +1336,7 @@
                 return false;
             }
         }
-        var IS_MOBILE = _detectDevice();
+let IS_MOBILE = _detectDevice();
         var _devResizeTimer = null;
         window.addEventListener('resize', function() {
             clearTimeout(_devResizeTimer);
@@ -1332,9 +1344,53 @@
                 var old = IS_MOBILE;
                 IS_MOBILE = _detectDevice();
                 if (old !== IS_MOBILE) window.dispatchEvent(new Event('tt-deviceswitch'));
+                syncMobileView();
             }, 150);
         });
+        window.addEventListener('orientationchange', function() { setTimeout(syncMobileView, 250); });
 
+        function _positionBottomNav() {
+            var nav = document.querySelector('.nav-tabs');
+            var app = document.getElementById('app');
+            var sidebar = document.querySelector('.sidebar');
+            if (!nav || !app || !sidebar) return;
+            if (IS_MOBILE) {
+                if (nav.parentNode !== app) app.appendChild(nav);
+            } else if (nav.parentNode !== sidebar) {
+                sidebar.appendChild(nav);
+            }
+        }
+
+        function syncMobileView() {
+            var app = document.getElementById('app');
+            var sidebar = document.querySelector('.sidebar');
+            if (!app || !sidebar) return;
+            app.classList.remove('mobile-list', 'mobile-main', 'mobile-chat');
+            _positionBottomNav();
+            if (!IS_MOBILE) return;
+            var chatView = document.getElementById('chatView');
+            var chatOpen = sidebar.classList.contains('chat-open');
+            var chatActive = chatView && chatView.style.display !== 'none';
+            var activeTabEl = document.querySelector('.nav-tab.active');
+            var tab = activeTabEl ? (activeTabEl.getAttribute('data-tab') || 'chats') : 'chats';
+            if (chatOpen || chatActive) app.classList.add('mobile-chat');
+            else if (tab === 'chats') app.classList.add('mobile-list');
+            else app.classList.add('mobile-main');
+        }
+
+        function closeChat() {
+            state.currentChat = null;
+            var side = document.querySelector('.sidebar');
+            if (side) side.classList.remove('chat-open');
+            var w = document.getElementById('welcomeScreen');
+            if (w) w.style.display = 'flex';
+            var cv = document.getElementById('chatView');
+            if (cv) cv.style.display = 'none';
+            renderChatList();
+            syncMobileView();
+        }
+
+        
         let state = {
             myPlate: 'А123БВ 77', myName: 'Водитель', loginMethod: '',
             myPhone: '', myTelegram: '', registeredAt: null,
@@ -2341,6 +2397,7 @@ function setTheme(mode) {
             saveState();
             document.getElementById('app').classList.add('active');
             initApp();
+            syncMobileView();
             setTimeout(showStartupAd, 600);
         }
 
@@ -2997,6 +3054,7 @@ function setTheme(mode) {
             if (tab === 'dev') renderDevPanel();
             if (tab === 'profile') { updateProfile(); updatePassStatus(); updateRoleSelector(); renderStats(); renderDailyQuests(); }
             if (tab === 'chats') renderChatList();
+            syncMobileView();
         }
 
         let lastSave = 0;
@@ -6090,7 +6148,7 @@ function setTheme(mode) {
                 var tgM = document.getElementById('tgModal'); if (tgM) tgM.style.display = 'none';
                 var regM = document.getElementById('regModal'); if (regM) regM.style.display = 'none';
                 var spk = document.getElementById('stickerPicker'); if (spk) spk.style.display = 'none';
-                if (state.currentChat) { state.currentChat = null; document.querySelector('.sidebar').classList.remove('chat-open'); renderChatList(); }
+                if (state.currentChat) { closeChat(); }
                 return;
             }
             if (e.ctrlKey && e.key === 'k') { e.preventDefault(); switchTab('add'); var pi = document.getElementById('plateInput'); if (pi) pi.focus(); return; }

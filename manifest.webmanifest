@@ -1,15 +1,18 @@
 {
+  "id": "/",
   "name": "Брум-Брум Messenger",
   "short_name": "Брум-Брум",
   "description": "Мессенджер для машин: чаты по номеру авто, гараж, игры, роли, такси и бот Алёша.",
-  "start_url": "https://aleksejyanover.github.io/tuk-tuk-messenger/",
+  "start_url": ".",
+  "scope": ".",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "background_color": "#0a0e1a",
   "theme_color": "#0a0e1a",
-  "orientation": "portrait",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
