@@ -3,21 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Тук-Тук — мессенджер для машин: чаты по номеру авто, гараж, игры, роли и бот Алёша.">
+    <meta name="description" content="Тук-Тук (ранее Брум-Брум) Messenger — мессенджер для машин: чаты по номеру авто, гараж, игры, роли и бот Алёша.">
+    <meta name="keywords" content="Брум-Брум Messenger, Тук-Тук, Брум-Брум, мессенджер для машин, чаты по номеру авто, гараж, игры, роли, бот Алёша, скачать бесплатно">
+    <meta name="author" content="Алексей Янковер">
+    <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#0a0e1a">
     <meta name="color-scheme" content="dark">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Тук-Тук">
-    <title>Тук-Тук — мессенджер для машин</title>
+    <title>Тук-Тук (Брум-Брум) Messenger — мессенджер для машин</title>
     <link rel="manifest" href="manifest.webmanifest">
+    <link rel="canonical" href="https://aleksejyanover.github.io/tuk-tuk-messenger/">
     <link rel="apple-touch-icon" href="icon-180.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
     <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚗</text></svg>">
-    <meta property="og:title" content="Тук-Тук — мессенджер для машин">
-    <meta property="og:description" content="Чаты по номеру авто, гараж, игры, роли и бот Алёша.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Тук-Тук (Брум-Брум) Messenger">
+    <meta property="og:title" content="Тук-Тук (Брум-Брум) Messenger — мессенджер для машин">
+    <meta property="og:description" content="Тук-Тук (Брум-Брум) — мессенджер для машин: чаты по номеру авто, гараж, игры, роли и бот Алёша. Работает прямо в браузере.">
+    <meta property="og:url" content="https://aleksejyanover.github.io/tuk-tuk-messenger/">
+    <meta property="og:image" content="https://aleksejyanover.github.io/tuk-tuk-messenger/icon-512.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Тук-Тук (Брум-Брум) Messenger — мессенджер для машин">
+    <meta name="twitter:description" content="Чаты по номеру авто, гараж, игры, роли и бот Алёша.">
+    <meta name="twitter:image" content="https://aleksejyanover.github.io/tuk-tuk-messenger/icon-512.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
@@ -261,53 +273,7 @@
         .vk-clip-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 15; display: flex; flex-direction: column; align-items: center; gap: 10px; color: rgba(255,255,255,0.6); font-size: 13px; }
         .vk-clip-loading-spinner { width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.15); border-top-color: var(--primary); border-radius: 50%; animation: clipSpin 0.8s linear infinite; }
         @keyframes clipSpin { to { transform: rotate(360deg); } }
-        .vk-clip-ad { background: radial-gradient(120% 120% at 20% 0%, #1a0b3a 0%, #050510 60%, #000 100%); position: relative; overflow: hidden; }
-        .vk-clip-ad::before { content: ''; position: absolute; inset: 0; background: linear-gradient(120deg, rgba(168,85,247,0.25), rgba(0,240,255,0.15) 40%, rgba(255,0,102,0.2)); mix-blend-mode: screen; animation: adGlow 6s ease-in-out infinite; }
-        @keyframes adGlow { 0%,100% { opacity: .5; } 50% { opacity: .9; } }
-        .vk-clip-ad .ad-orb { position: absolute; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(0,240,255,.6), rgba(168,85,247,.25) 60%, transparent 70%); filter: blur(40px); animation: adOrb 8s ease-in-out infinite; }
-        @keyframes adOrb { 0%,100% { transform: translate(20%, 40%); } 50% { transform: translate(-10%, 10%) scale(1.15); } }
-        .vk-clip-ad .ad-content { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 28px; gap: 16px; }
-        .vk-clip-ad .ad-badge { font-family:'Orbitron',sans-serif; font-size: 11px; letter-spacing: 3px; color: #00f0ff; border: 1px solid rgba(0,240,255,.5); padding: 5px 14px; border-radius: 999px; background: rgba(0,240,255,.08); }
-        .vk-clip-ad .ad-title { font-family:'Orbitron',sans-serif; font-size: 34px; font-weight: 700; line-height: 1.1; background: linear-gradient(90deg,#fff,#00f0ff,#a855f7); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .vk-clip-ad .ad-sub { font-size: 14px; color: rgba(255,255,255,.75); max-width: 260px; }
-        .vk-clip-ad .ad-cta { display:inline-flex; align-items:center; gap:8px; padding: 13px 26px; border: none; border-radius: 999px; font-family:'Orbitron',sans-serif; font-size: 14px; font-weight: 700; color:#050510; cursor:pointer; background: linear-gradient(90deg,#00f0ff,#a855f7); box-shadow: 0 0 30px rgba(0,240,255,.5); }
-        .vk-clip-ad .ad-hint { font-size: 11px; color: rgba(255,255,255,.35); }
-
-        .ad-overlay { position: fixed; inset: 0; background: #000; z-index: 200010; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        .ad-overlay.active { display: flex; }
-        .ad-overlay video { width: 100%; height: 100%; object-fit: contain; background: #000; }
-        .ad-skip { position: absolute; top: 16px; right: 16px; padding: 8px 16px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; z-index: 5; }
-        .ad-skip:hover { background: rgba(255,255,255,0.2); }
-        .ad-overlay-loading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: #fff; z-index: 2; }
-        .ad-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 18px; padding: 30px; background: radial-gradient(120% 120% at 20% 0%, #1a0b3a 0%, #050510 60%, #000 100%); }
-        .ad-placeholder .ap-badge { font-family: 'Orbitron', sans-serif; font-size: 12px; letter-spacing: 3px; color: #00f0ff; border: 1px solid rgba(0,240,255,0.5); padding: 5px 14px; border-radius: 999px; background: rgba(0,240,255,0.08); }
-        .ad-placeholder .ap-title { font-family: 'Orbitron', sans-serif; font-size: 40px; font-weight: 900; line-height: 1.1; background: linear-gradient(90deg, #fff, #00f0ff, #a855f7); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .ad-placeholder .ap-sub { font-size: 15px; color: rgba(255,255,255,0.7); max-width: 420px; }
-        .ad-placeholder .ap-note { font-size: 12px; color: rgba(255,255,255,0.4); }
-        .ad-placeholder .ap-play { margin-top: 8px; padding: 14px 30px; border: none; border-radius: 999px; font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700; color: #050510; cursor: pointer; background: linear-gradient(90deg, #00f0ff, #a855f7); box-shadow: 0 0 30px rgba(0,240,255,0.5); }
-        .ad-subtitles { position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 760px; text-align: center; z-index: 6; pointer-events: none; }
-        .ad-subtitles .sub-caption { display: inline-block; background: rgba(0,0,0,0.72); border: 1px solid rgba(0,240,255,0.35); border-radius: 14px; padding: 10px 18px; font-size: 20px; font-weight: 700; color: #fff; line-height: 1.4; text-shadow: 0 1px 4px rgba(0,0,0,0.8); transition: opacity 0.25s; opacity: 0; }
-        .ad-subtitles .sub-caption.show { opacity: 1; }
-        .ad-clip-subtitles { position: absolute; bottom: 90px; left: 16px; right: 16px; text-align: center; z-index: 6; pointer-events: none; }
-        .ad-clip-subtitles .sub-caption { display: inline-block; background: rgba(0,0,0,0.72); border: 1px solid rgba(0,240,255,0.35); border-radius: 12px; padding: 8px 14px; font-size: 15px; font-weight: 700; color: #fff; line-height: 1.4; transition: opacity 0.2s; opacity: 0; }
-        .ad-clip-subtitles .sub-caption.show { opacity: 1; }
-
-        .ad-trailer { position: absolute; inset: 0; display: none; z-index: 3; overflow: hidden; background: radial-gradient(120% 120% at 20% 0%, #1a0b3a 0%, #050510 60%, #000 100%); }
-        .ad-trailer.active { display: block; }
-        .trailer-scene { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; }
-        .trailer-scene.active { display: flex; animation: sceneIn 0.8s ease forwards; }
-        @keyframes sceneIn { from { opacity: 0; transform: scale(1.12); filter: blur(6px); } to { opacity: 1; transform: scale(1); filter: blur(0); } }
-        .trailer-scene .t-badge { font-family:'Orbitron',sans-serif; font-size: 12px; letter-spacing: 3px; color:#00f0ff; border:1px solid rgba(0,240,255,0.5); padding:5px 14px; border-radius:999px; background:rgba(0,240,255,0.08); margin-bottom: 18px; }
-        .trailer-scene .t-emoji { font-size: 84px; margin-bottom: 16px; animation: tFloat 2.6s ease-in-out infinite; filter: drop-shadow(0 0 18px rgba(0,240,255,0.45)); }
-        @keyframes tFloat { 0%,100%{transform:translateY(0) } 50%{transform:translateY(-14px)} }
-        .trailer-scene .t-title { font-family:'Orbitron',sans-serif; font-size: clamp(24px,6vw,42px); font-weight:900; line-height:1.1; margin-bottom: 12px; background:linear-gradient(90deg,#fff,#00f0ff,#a855f7); -webkit-background-clip:text; background-clip:text; color:transparent; }
-        .trailer-scene .t-text { font-size: 15px; color: rgba(255,255,255,0.8); max-width: 460px; line-height: 1.5; }
-        .trailer-caption { position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 720px; text-align: center; z-index: 5; pointer-events: none; }
-        .trailer-caption .sub-caption { display:inline-block; background: rgba(0,0,0,0.72); border:1px solid rgba(0,240,255,0.35); border-radius:14px; padding:10px 18px; font-size:19px; font-weight:700; color:#fff; line-height:1.4; }
-        .trailer-particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-        .trailer-particle { position: absolute; bottom: -20px; width: 5px; height: 5px; border-radius: 50%; background: #00f0ff; opacity: 0.7; animation: partUp linear infinite; }
-        @keyframes partUp { 0%{ transform: translateY(0); opacity: 0; } 10%{ opacity: 0.8; } 100%{ transform: translateY(-105vh); opacity: 0; } }
-        .trailer-logo { font-family:'Orbitron',sans-serif; font-size: 40px; font-weight:900; background:linear-gradient(90deg,#00f0ff,#a855f7); -webkit-background-clip:text; background-clip:text; color:transparent; }
+color:transparent; }
 
         @keyframes msgPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(0,240,255,0); } 20% { box-shadow: 0 0 0 4px rgba(0,240,255,0.45); } 80% { box-shadow: 0 0 0 0 rgba(0,240,255,0); } }
         .vk-clip-source-switch { animation: clipFadeIn 0.3s ease; }
@@ -2386,133 +2352,6 @@ function setTheme(mode) {
             if (checkBan()) return;
             document.getElementById('app').classList.add('active');
             initApp();
-            setTimeout(showStartupAd, 600);
-        }
-
-        var AD_VIDEO_URL = ''; /* онлайн-запасной: прямая ссылка на mp4-видео, напр. 'https://example.com/ad.mp4' */
-        var AD_SUBTITLES = [
-            { t: 0.2,  text: 'ТУК-ТУК — мессенджер для машин.' },
-            { t: 2.5,  text: 'Связь без телефона — по номеру машины.' },
-            { t: 5.6,  text: 'Монеты 💰 и редкие Лешинксы 💎.' },
-            { t: 8.0,  text: 'Секретная роль ВЛАДЕЛЕЦ 🔒.' },
-            { t: 11.1, text: 'Роль ВЛАДЕЛЕЦ активирована!' },
-            { t: 13.4, text: 'Владелец: баны, реклама, полный доступ.' },
-            { t: 15.9, text: 'Бот Алёша 🤖 всегда на связи.' },
-            { t: 18.4, text: 'Гараж: собирай коллекцию машин.' },
-            { t: 20.9, text: 'Игры: зарабатывай монеты.' },
-            { t: 23.2, text: 'Такси: зарплата на дороге 🚕.' },
-            { t: 25.5, text: 'Сканируй QR и скачивай Тук-Тук!' }
-        ];
-        function _startAdSubtitles(vid, capEl) {
-            if (!vid || !capEl || !AD_SUBTITLES.length) return;
-            function tick() {
-                var time = vid.currentTime || 0;
-                var show = '';
-                for (var i = AD_SUBTITLES.length - 1; i >= 0; i--) {
-                    if (time >= AD_SUBTITLES[i].t) { show = AD_SUBTITLES[i].text; break; }
-                }
-                if (capEl.textContent !== show) { capEl.textContent = show; }
-                capEl.classList.toggle('show', !!show);
-                requestAnimationFrame(tick);
-            }
-            requestAnimationFrame(tick);
-        }
-        function _tryAdSources(vid, index, callbacks) {
-            var sources = ['ad.mp4'];
-            if (AD_VIDEO_URL) sources.push(AD_VIDEO_URL);
-            if (index >= sources.length) { if (callbacks.onError) callbacks.onError(); return; }
-            var settled = false;
-            function fail() { if (settled) return; settled = true; vid.onerror = null; vid.oncanplay = null; vid.onplaying = null; _tryAdSources(vid, index + 1, callbacks); }
-            function succeed() { if (settled) return; settled = true; vid.onerror = null; vid.oncanplay = null; vid.onplaying = null; if (callbacks.onPlay) callbacks.onPlay(); }
-            vid.src = sources[index];
-            vid.load();
-            vid.muted = true;
-            var guard = setTimeout(fail, 4000);
-            vid.onerror = function() { clearTimeout(guard); fail(); };
-            vid.oncanplay = function() {
-                clearTimeout(guard);
-                var p = vid.play();
-                if (p && p.catch) p.catch(function(){});
-            };
-            vid.onplaying = function() { succeed(); };
-
-            vid.addEventListener('timeupdate', function onTU() {
-                if (vid.duration && (vid.currentTime >= vid.duration - 3)) {
-                    var sk = document.getElementById('adSkipBtn');
-                    if (sk) sk.style.display = 'block';
-                }
-            });
-            var p = vid.play();
-            if (p && p.catch) p.catch(function(){});
-        }
-        function showStartupAd() {
-            var ov = document.getElementById('adOverlay');
-            if (!ov) return;
-            var vid = document.getElementById('adVideo');
-            var place = document.getElementById('adPlaceholder');
-            var load = document.getElementById('adLoading');
-            var skip = document.getElementById('adSkipBtn');
-            ov.classList.add('active');
-            load.style.display = 'flex';
-            place.style.display = 'none';
-            vid.style.display = 'none';
-            skip.style.display = 'none';
-            vid.muted = true;
-            vid.onended = function() { closeStartupAd(); };
-            _tryAdSources(vid, 0, {
-                onPlay: function() {
-                    load.style.display = 'none';
-                    vid.style.display = 'block';
-                    _startAdSubtitles(vid, document.getElementById('adSubCaption'));
-                    setTimeout(function() { try { unmuteAd(vid); } catch(e){} }, 400);
-                },
-                onError: function() {
-                    load.style.display = 'none';
-                    place.style.display = 'flex';
-                    skip.style.display = 'block';
-                }
-            });
-        }
-
-        
-function unmuteAd(video) {
-            var muted = video.muted;
-            if (muted) {
-                video.muted = false;
-                video.play().catch(function(){});
-            }
-        }
-
-        function openPromoVideo() {
-            var vid = document.getElementById('adVideo');
-            var place = document.getElementById('adPlaceholder');
-            var load = document.getElementById('adLoading');
-            var skip = document.getElementById('adSkipBtn');
-            place.style.display = 'none';
-            load.style.display = 'flex';
-            vid.style.display = 'block';
-            skip.style.display = 'block';
-            vid.muted = true;
-            vid.onended = function() { closeStartupAd(); };
-            _tryAdSources(vid, 0, {
-                onPlay: function() {
-                    load.style.display = 'none';
-                    _startAdSubtitles(vid, document.getElementById('adSubCaption'));
-                    setTimeout(function() { try { unmuteAd(vid); } catch(e){} }, 300);
-                },
-                onError: function() {
-                    load.style.display = 'none';
-                    place.style.display = 'flex';
-                }
-            });
-        }
-
-        function closeStartupAd() {
-            var ov = document.getElementById('adOverlay');
-            var vid = document.getElementById('adVideo');
-            if (!ov) return;
-            ov.classList.remove('active');
-            if (vid) { try { vid.pause(); } catch(e){} }
         }
 
         function checkBan() {
@@ -9575,45 +9414,6 @@ const ClipMusic = (() => {
             progressHTML;
     }
 
-    function _buildAdSlideHTML() {
-        return '<div class="ad-orb"></div>' +
-            '<video class="vk-clip-video" id="ad-clip-video" src="ad.mp4" muted playsinline preload="auto" loop></video>' +
-            '<div class="vk-clip-unmute" id="ad-clip-unmute" onclick="event.stopPropagation();adClipToggleSound()">' +
-                '<span class="unmute-icon">🔊</span>' +
-                '<span class="unmute-text">Звук</span>' +
-            '</div>' +
-            '<div class="vk-clip-gradient"></div>' +
-            '<div class="vk-clip-poster" id="ad-clip-poster" style="font-size:90px;">🎬</div>' +
-            '<div class="ad-clip-subtitles"><span class="sub-caption" id="ad-clip-caption"></span></div>' +
-            '<div class="vk-clip-top">' +
-                '<div class="vk-clip-top-logo">🎬 Реклама • Тук-Тук</div>' +
-                '<button class="vk-clip-close" onclick="switchTab(\'chats\')">&times;</button>' +
-            '</div>' +
-            '<div class="vk-clip-info">' +
-                '<div class="vk-clip-author-row">' +
-                    '<div class="vk-clip-avatar">🎬</div>' +
-                    '<div class="vk-clip-author-name">Фильм о Тук-Тук</div>' +
-                '</div>' +
-                '<div class="vk-clip-desc">Обгони время в мессенджере будущего ТУК-ТУК: чаты по номеру авто, гараж, роли, игры и бот Алёша!</div>' +
-            '</div>' +
-            '<div class="vk-clip-actions" style="display:none;"></div>' +
-            '<div class="ad-content">' +
-                '<div class="ad-badge">РЕКЛАМА • ad.mp4</div>' +
-                '<div class="ad-title">ТУК-ТУК<br>из будущего</div>' +
-                '<div class="ad-hint">Нажми звук 🔊 и посмотри ролик. Положи готовое видео как <b>ad.mp4</b> рядом.</div>' +
-            '</div>';
-    }
-
-    function adClipToggleSound() {
-        var v = document.getElementById('ad-clip-video');
-        var b = document.getElementById('ad-clip-unmute');
-        if (!v) return;
-        v.muted = !v.muted;
-        if (!v.muted) { var p = v.play(); if (p && p.catch) p.catch(function(){}); }
-        _startAdSubtitles(v, document.getElementById('ad-clip-caption'));
-        if (b) { var t = b.querySelector('.unmute-text'); var i = b.querySelector('.unmute-icon'); if (t) t.textContent = v.muted ? 'Звук' : 'Выкл'; if (i) i.textContent = v.muted ? '🔇' : '🔊'; }
-    }
-
     function renderClips() {
         var feed = document.getElementById('vkClipsFeed');
         if (!feed) return;
@@ -9647,24 +9447,6 @@ const ClipMusic = (() => {
 
             feed.appendChild(slide);
         });
-
-        if (vkClips.source === 'local') {
-            var adIdx = pool.length;
-            var adSlide = document.createElement('div');
-            adSlide.className = 'vk-clip vk-clip-ad';
-            adSlide.setAttribute('data-clip-idx', adIdx);
-            adSlide.setAttribute('data-pool-idx', -1);
-            adSlide.innerHTML = _buildAdSlideHTML();
-            var adTap = 0;
-            adSlide.addEventListener('click', function(e) {
-                if (e.target.closest('.vk-clip-top') || e.target.closest('.ad-cta') || e.target.closest('.vk-clip-actions')) return;
-                var now = Date.now();
-                if (now - adTap < 300) { adTap = 0; return; }
-                adTap = now;
-                setTimeout(function() { if (adTap !== 0) { adTap = 0; } }, 400);
-            });
-            feed.appendChild(adSlide);
-        }
 
         vkClips.idx = 0;
         _initClipsScroll(feed);
@@ -9914,31 +9696,5 @@ const ClipMusic = (() => {
         setTimeout(function() { t.remove(); }, 2000);
     }
     </script>
-    <div class="ad-overlay" id="adOverlay">
-        <div class="ad-skip" id="adSkipBtn" style="display:none;" onclick="closeStartupAd()">Пропустить ➔</div>
-        <div class="ad-overlay-loading" id="adLoading">
-            <div class="ap-badge">РЕКЛАМА • ТУК-ТУК</div>
-            <div style="font-size:15px;color:rgba(255,255,255,0.6);">Загружаем рекламный ролик...</div>
-        </div>
-        <div id="adPlaceholder" class="ad-placeholder" style="display:none;">
-            <div class="ap-badge">РЕКЛАМА • ФИЛЬМ О ТУК-ТУК</div>
-            <div class="ap-title">ТУК-ТУК<br>из будущего</div>
-            <div class="ap-sub">Положи рядом с этим файлом видео <b>ad.mp4</b> (или укажи онлайн-ссылку в константе <b>AD_VIDEO_URL</b> в коде) — и здесь будет крутиться рекламный ролик с озвучкой и субтитрами.</div>
-            <button class="ap-play" onclick="openPromoVideo()">▶ Смотреть превью</button>
-            <div class="ap-note">Сценарий для генерации — в сценарии проекта</div>
-        </div>
-        <video id="adVideo" style="display:none;" playsinline muted></video>
-        <div class="ad-subtitles" id="adSubtitles"><span class="sub-caption" id="adSubCaption"></span></div>
-        <div class="ad-trailer" id="adTrailer">
-            <div class="trailer-particles" id="trailerParticles"></div>
-            <div class="trailer-scene" data-t="0" data-sp="true"><div class="t-badge">РЕКЛАМА • ТУК-ТУК</div><div class="t-emoji">🏎️</div><div class="t-title">ТУК-ТУК<br>из будущего</div><div class="t-text">Мессенджер, который обгоняет время</div></div>
-            <div class="trailer-scene" data-t="5" data-sp="true"><div class="t-badge">ЧАТЫ ПО НОМЕРУ</div><div class="t-emoji">📱</div><div class="t-text">Переписывайся с водителями по номеру машины — без телефонов и лишнего</div></div>
-            <div class="trailer-scene" data-t="12" data-sp="true"><div class="t-badge">ГАРАЖ И ВАЛЮТА</div><div class="t-emoji">🏎️💎</div><div class="t-text">Собирай гараж, зарабатывай монеты и редчайшие Лешинксы — валюту, названную в честь владельца Алексея</div></div>
-            <div class="trailer-scene" data-t="19" data-sp="true"><div class="t-badge">РОЛИ И БОТ</div><div class="t-emoji">👑🤖</div><div class="t-text">Прокачивай роль до самого Владельца и спрашивай всё у ИИ-бота Алёши</div></div>
-            <div class="trailer-scene" data-t="26" data-sp="true"><div class="t-badge">ИГРЫ • КЛИПЫ • ТАКСИ</div><div class="t-emoji">🎮🎬🚕</div><div class="t-text">Игры, клипы, такси-зарплата — развлечений хватит на всю дорогу</div></div>
-            <div class="trailer-scene" data-t="34" data-sp="false"><div class="t-badge">ТУК-ТУК</div><div class="trailer-logo">Скачивай<br>и заводи двигатель!</div><div class="t-emoji">🚀</div></div>
-            <div class="trailer-caption"><span class="sub-caption" id="trailerCaption"></span></div>
-        </div>
-    </div>
 </body>
 </html>

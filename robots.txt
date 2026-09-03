@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://aleksejyanover.github.io/tuk-tuk-messenger/sitemap.xml

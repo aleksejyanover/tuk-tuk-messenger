@@ -1,11 +1,10 @@
-const CACHE = 'tuk-tuk-v7';
+const CACHE = 'tuk-tuk-v8';
 const ASSETS = [
   './',
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png',
-  './maskable-512.png',
-  './ad_novoice.mp4'
+  './maskable-512.png'
 ];
 
 self.addEventListener('install', (e) => {
