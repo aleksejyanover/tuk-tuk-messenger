@@ -7286,6 +7286,11 @@ function setTheme(mode) {
         var text = input.value.trim();
         if (!text) return;
 
+        if (!MS.serverOnline || !MS.ws || MS.ws.readyState !== WebSocket.OPEN) {
+            if (typeof window.sendMessage === 'function') { window.sendMessage(); } else if (typeof sendMessage === 'function') { sendMessage(); }
+            return;
+        }
+
         var now = Date.now();
         if (now - _lastSendTime < 400) {
             if (typeof notify === 'function') notify('Слишком быстро! Подождите секунду.', 'warning');
