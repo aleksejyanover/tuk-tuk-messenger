@@ -88,6 +88,13 @@
         body.matrix-mode { background: #000 !important; color: #0f0 !important; font-family: monospace !important; }
         body.horror-mode { --bg-dark: #0a0000; --bg-card: #1a0000; --bg-input: #2a0000; --primary: #f00; --text: #faa; }
         body.neon-mode { --bg-dark: #0a0118; --bg-card: #170b36; --bg-input: #231047; --primary: #00f0ff; --text: #e6f7ff; --warning: #ff44cc; box-shadow: inset 0 0 120px rgba(168,85,247,0.18); }
+        body.space-mode { --bg-dark: #030014; --bg-card: #0d0526; --bg-input: #170a38; --primary: #9d4dff; --text: #e6e0ff; --accent: #ff4dff; --warning: #ffd04d; }
+        body.space-mode::before { content: ''; position: fixed; inset: 0; pointer-events: none; background-image: radial-gradient(1px 1px at 20% 20%, #fff 50%, transparent 50%), radial-gradient(1px 1px at 60% 40%, #9d4dff 50%, transparent 50%), radial-gradient(2px 2px at 80% 60%, #fff 50%, transparent 50%), radial-gradient(1px 1px at 40% 70%, #ff4dff 50%, transparent 50%), radial-gradient(2px 2px at 90% 30%, #fff 50%, transparent 50%), radial-gradient(1px 1px at 10% 90%, #fff 50%, transparent 50%), radial-gradient(1px 1px at 50% 10%, #9d4dff 50%, transparent 50%), radial-gradient(2px 2px at 30% 50%, #fff 50%, transparent 50%); opacity: 0.6; }
+        body.snow-mode::after { content: ''; position: fixed; inset: -20px; pointer-events: none; background-image: radial-gradient(3px 3px at 10% 10%, #fff 50%, transparent 50%), radial-gradient(2px 2px at 30% 30%, #fff 50%, transparent 50%), radial-gradient(3px 3px at 50% 20%, #fff 50%, transparent 50%), radial-gradient(2px 2px at 70% 40%, #fff 50%, transparent 50%), radial-gradient(3px 3px at 90% 25%, #fff 50%, transparent 50%), radial-gradient(2px 2px at 20% 60%, #fff 50%, transparent 50%), radial-gradient(3px 3px at 60% 70%, #fff 50%, transparent 50%), radial-gradient(2px 2px at 80% 80%, #fff 50%, transparent 50%); animation: snowfall 8s linear infinite; }
+        @keyframes snowfall { 0%{ transform: translateY(0); } 100%{ transform: translateY(60vh); } }
+        body.tank-mode { filter: sepia(0.5) contrast(1.15); }
+        body.ghost-x { opacity: 0.85; filter: grayscale(1) brightness(1.1); }
+        body.ghost-x .app { opacity: 0.6; }
         body.vip-mode .sidebar { border-right: 2px solid #ffd700; }
         body.premium-mode .sidebar { border-right: 2px solid #a855f7; }
         body.veteran-mode .sidebar { border-right: 2px solid #10b981; }
@@ -1383,6 +1390,12 @@ color:transparent; }
             { id:'katya', name:'Катя', plate:'БОТ_КАТИЯ', avatar:'⚖️', color:'#06b6d4', chatId:'БОТ_КАТИЯ',
               personality:' автоюрист, знает все про штрафы, страховки, ДТП',
               knowledge:['штрафы','страховка','ДТП','права','закон','ОСАГО','эвакуация'] },
+            { id:'gaishnik', name:'ГАИшник', plate:'БОТ_ГАИ', avatar:'🚓', color:'#3b82f6', chatId:'БОТ_ГАИ',
+              personality:' строгий, но справедливый инспектор ГАИ, знает все правила ПДД, любит проверять документы и предупреждать о камерах',
+              knowledge:['ПДД','правила','камеры','штрафы','разметка','знаки','проверка','лишение'] },
+            { id:'elektrik', name:'Электра', plate:'БОТ_ЭЛЕКТРА', avatar:'🔋', color:'#22d3ee', chatId:'БОТ_ЭЛЕКТРА',
+              personality:' фанатка электромобилей, знает всё про зарядки, батареи и эко-езду',
+              knowledge:['электро','зарядка','батарея','тесла','эко','километраж','RX8','низковольт'] },
         ];
 
         const simPlayers = [
@@ -1403,6 +1416,15 @@ color:transparent; }
             'ПРИЗРАК':{name:'Призрак',avatar:'👻',color:'#888',msg:'+75 XP!'},
             'НИНДЗЯ':{name:'Ниндзя',avatar:'🥷',color:'#333',msg:'+80 XP!'},
             'КОСМОС':{name:'Космос',avatar:'🌌',color:'#4b0082',msg:'+100 XP!'},
+            'ГАИ':{name:'ГАИшник',avatar:'🚓',color:'#3b82f6',msg:'Ваши документы! 😄 +30 XP'},
+            'КОТ':{name:'Котофей',avatar:'🐱',color:'#f59e0b',msg:'Мур-мур! 🐱 +45 XP'},
+            'КЛАД':{name:'Клад',avatar:'💰',color:'#ffd700',msg:'Клад найден! 💰 +150 XP'},
+            'МОНЕТА':{name:'Монетка',avatar:'🪙',color:'#ffd700',msg:'Монетка! 🪙 +60 XP'},
+            'АЛЁША':{name:'Алёша',avatar:'🤖',color:'#00f0ff',msg:'Самый главный! +250 XP'},
+            'ТУРБО':{name:'Турбо',avatar:'⚡',color:'#22d3ee',msg:'+90 XP!'},
+            'ДРАКОН':{name:'Дракон',avatar:'🐉',color:'#ff6b35',msg:'+300 XP! 🐉'},
+            'РАДУГА':{name:'Радуга',avatar:'🌈',color:'#ec4899',msg:'+110 XP! 🌈'},
+            'НЛО':{name:'Пришелец',avatar:'👽',color:'#22c55e',msg:'Мы прилетели! 👽 +80 XP'},
         };
 
         const garageCars = [
@@ -1426,6 +1448,41 @@ color:transparent; }
             {emoji:'🧛',name:'Вампир',rarity:'mythic',xp:5000},
             {emoji:'🤖',name:'Робот',rarity:'mythic',xp:6000},
             {emoji:'🐉',name:'Дракон',rarity:'mythic',xp:7000},
+            {emoji:'🚌',name:'Автобус',rarity:'rare',xp:650},
+            {emoji:'🚃',name:'Трамвай',rarity:'epic',xp:1300},
+            {emoji:'🚂',name:'Паровоз',rarity:'epic',xp:1600},
+            {emoji:'🚈',name:'Электричка',rarity:'rare',xp:900},
+            {emoji:'🛵',name:'Скутер',rarity:'common',xp:150},
+            {emoji:'🚲',name:'Велосипед',rarity:'common',xp:30},
+            {emoji:'🛴',name:'Самокат',rarity:'common',xp:10},
+            {emoji:'🚲🚚',name:'Велик с прицепом',rarity:'rare',xp:320},
+            {emoji:'🏎️',name:'Формула-1',rarity:'legendary',xp:2600},
+            {emoji:'🛻',name:'Пикап',rarity:'rare',xp:450},
+            {emoji:'🚚',name:'Монстр-трак',rarity:'epic',xp:1400},
+            {emoji:'🏍️',name:'Кросс-мото',rarity:'epic',xp:1100},
+            {emoji:'🛺',name:'Тукт-тук',rarity:'rare',xp:350},
+            {emoji:'🚔',name:'Патруль',rarity:'epic',xp:1250},
+            {emoji:'🚨',name:'Сирена',rarity:'legendary',xp:2200},
+            {emoji:'🚒',name:'Мега-пожарная',rarity:'epic',xp:1550},
+            {emoji:'🚍',name:'Школьный автобус',rarity:'rare',xp:700},
+            {emoji:'🚎',name:'Троллейбус',rarity:'rare',xp:850},
+            {emoji:'🦖',name:'Динозавр',rarity:'mythic',xp:8000},
+            {emoji:'🐉',name:'Летучий дракон',rarity:'mythic',xp:9000},
+            {emoji:'🦄',name:'Единорог',rarity:'mythic',xp:10000},
+            {emoji:'🐊',name:'Аллигатор',rarity:'epic',xp:1700},
+            {emoji:'🐘',name:'Слон',rarity:'epic',xp:1900},
+            {emoji:'🦅',name:'Орёл',rarity:'legendary',xp:2800},
+            {emoji:'🐎',name:'Скакун',rarity:'rare',xp:500},
+            {emoji:'🏇',name:'Жокей',rarity:'epic',xp:1300},
+            {emoji:'🐫',name:'Верблюд',rarity:'epic',xp:1600},
+            {emoji:'🚀',name:'Орбитальный корабль',rarity:'mythic',xp:12000},
+            {emoji:'🛰️',name:'Спутник',rarity:'mythic',xp:11000},
+            {emoji:'🌈',name:'Радужная ракета',rarity:'mythic',xp:13000},
+            {emoji:'💫',name:'Комета',rarity:'mythic',xp:15000},
+            {emoji:'✨',name:'Звёздный болид',rarity:'mythic',xp:20000},
+            {emoji:'👑',name:'Королевская карета',rarity:'mythic',xp:25000},
+            {emoji:'🧙',name:'Ковёр-самолёт',rarity:'mythic',xp:22000},
+            {emoji:'⏳',name:'Машина времени',rarity:'mythic',xp:30000},
         ];
 
         const shopItems = [
@@ -1438,7 +1495,7 @@ color:transparent; }
             {id:'ghost',icon:'👻',name:'Призрак',desc:'Невидимость',price:6000},
         ];
 
-        const stickers = ['🚗💨','🏎️🔥','✅','⛽💪','🅿️👌','😂','🫡','👋','🎉','💯','❤️','🔥'];
+        const stickers = ['🚗💨','🏎️🔥','✅','⛽💪','🅿️👌','😂','🫡','👋','🎉','💯','❤️','🔥','🚀','👻','🌚','🤡','💀','😎','🥶','🤯','🙈','🐱','🐶','🦄','🍀','🚓🚨','🛑','🚧','⚡','💥','👑','🤑','😴','🤓','👀','👍','🙏','✌️','🤙','🖐️','🐌','🐢','🐇','🦊','🐻','🐼','🐸','🐔','🦚','🦂','🕷️','🐲','💎','💰','🎊','🧨','🎆','🪩'];
         const achievementsList = [
             {id:'friend',icon:'🤝',name:'Друг',desc:'Добавь друга'},
             {id:'horn',icon:'📯',name:'Би-би',desc:'5 гудков'},
@@ -1451,6 +1508,8 @@ color:transparent; }
             {id:'ufo',icon:'🛸',name:'Похищение',desc:'10 кликов'},
             {id:'horror',icon:'👻',name:'Хоррор',desc:'Хоррор-режим'},
             {id:'future',icon:'🛸',name:'Иномарка',desc:'Секрет будущего'},
+            {id:'easter4',icon:'🍀',name:'Фортуна',desc:'8 пасхалок'},
+            {id:'easter5',icon:'💎',name:'Легенда',desc:'12 пасхалок'},
         ];
 
         function sGet(k) { try { return localStorage.getItem(k); } catch(e) { return null; } }
@@ -1531,6 +1590,60 @@ color:transparent; }
             car.style.top = (20+Math.random()*60)+'%';
             document.body.appendChild(car);
             setTimeout(() => car.remove(), 4000);
+        }
+
+        function spawnCarRain() {
+            const cars = ['🚗','🏎️','🚙','🚕','🚓','🚒','🚑','🏍️','🛵','🚜','🚛','🚌','🚀'];
+            const frag = document.createDocumentFragment();
+            for (let i = 0; i < 25; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.textContent = cars[Math.floor(Math.random()*cars.length)];
+                c.style.left = Math.random()*100+'%';
+                c.style.top = '-20px';
+                c.style.fontSize = (18+Math.random()*18)+'px';
+                c.style.background = 'transparent';
+                c.style.animationDelay = (Math.random()*2)+'s';
+                frag.appendChild(c);
+                setTimeout(() => c.remove(), 4200);
+            }
+            document.body.appendChild(frag);
+        }
+
+        function spawnCats() {
+            const cats = ['😺','😸','😹','😻','😼','😽','🙀','😿','😾','🐱','🐈','🐈⬛'];
+            const frag = document.createDocumentFragment();
+            for (let i = 0; i < 14; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.textContent = cats[Math.floor(Math.random()*cats.length)];
+                c.style.left = Math.random()*100+'%';
+                c.style.top = '-20px';
+                c.style.fontSize = (20+Math.random()*16)+'px';
+                c.style.background = 'transparent';
+                c.style.animationDelay = (Math.random()*1.5)+'s';
+                frag.appendChild(c);
+                setTimeout(() => c.remove(), 4000);
+            }
+            document.body.appendChild(frag);
+        }
+
+        function spawnHearts() {
+            const hearts = ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','💞','💕','💘','💝'];
+            const frag = document.createDocumentFragment();
+            for (let i = 0; i < 18; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.textContent = hearts[Math.floor(Math.random()*hearts.length)];
+                c.style.left = Math.random()*100+'%';
+                c.style.top = '-20px';
+                c.style.fontSize = (16+Math.random()*16)+'px';
+                c.style.background = 'transparent';
+                c.style.animationDelay = (Math.random()*1.8)+'s';
+                frag.appendChild(c);
+                setTimeout(() => c.remove(), 4000);
+            }
+            document.body.appendChild(frag);
         }
 
         function getRoleMult() {
@@ -3036,7 +3149,23 @@ function setTheme(mode) {
                 if (!state.achievements.future) { state.achievements.future = true; state.easterEggsFound++; checkEasterAch(); }
                 return true;
             }
-            if (lower === 'секрет' || lower === 'secret') { notify('🤫 Секреты: неон, будущее, звезда, нитро... а ещё клавиши ↑↑↓↓←→←→BA', 'warning'); return true; }
+            if (lower === 'секрет' || lower === 'secret') { notify('🤫 Секреты: неон, будущее, звезда, нитро, дождь, лимонад, космос, танк...', 'warning'); return true; }
+            if (lower === 'дождь' || lower === 'rain') { spawnCarRain(); notify('🚗🚗🚗 Завеса из машин!', 'success'); spawnConfetti(); return true; }
+            if (lower === 'лимонад' || lower === 'limonad') { showSecret('🍋 Лимонад!', 'Настоящий тук-тук сделает тебе лимонада. +90 XP!'); addXP(90); if (!state.achievements.easterbox) { state.achievements.easterbox = true; state.easterEggsFound++; checkEasterAch(); } return true; }
+            if (lower === 'космос' || lower === 'space') {
+                document.body.classList.toggle('space-mode');
+                notify('🌌 Космический режим!', 'success');
+                if (document.body.classList.contains('space-mode')) { addXP(60); if (!state.achievements.easterbox2) { state.achievements.easterbox2 = true; state.easterEggsFound++; checkEasterAch(); } }
+                saveState(); return true;
+            }
+            if (lower === 'танк' || lower === 'tank') { document.body.classList.toggle('tank-mode'); notify('🛡️ Танк-режим!', 'success'); addXP(40); saveState(); return true; }
+            if (lower === 'котик' || lower === 'кошка' || lower === 'cat') { spawnCats(); notify('😺 🐱 Мур-мур!', 'success'); return true; }
+            if (lower === 'романтика' || lower === 'love') { spawnHearts(); notify('🥰 💞', 'success'); return true; }
+            if (lower === 'бесконечность' || lower === 'infinity') { spawnConfetti(); showSecret('♾️ Бесконечность', 'Ничто не вечно, кроме дорог. +120 XP!'); addXP(120); if (!state.achievements.easterbox3) { state.achievements.easterbox3 = true; state.easterEggsFound++; checkEasterAch(); } return true; }
+            if (lower === 'снег' || lower === 'snow') { document.body.classList.toggle('snow-mode'); notify('❄️ Снегопад!', 'success'); saveState(); return true; }
+            if (lower === 'золото' || lower === 'gold') { addXP(100); notify('🪙 +100 XP', 'success'); spawnConfetti(); return true; }
+            if (lower === 'палево' || lower === 'спрятаться') { document.body.classList.toggle('ghost-x'); notify(state.role === 'ghost' ? '👻 Ты уже призрак!' : '🙈 Палевно, но весело!', 'warning'); return true; }
+            if (lower === 'вирус' || lower === 'virus') { notify('🦠 Вирус найден!... шутка! Никто не заразился 😄', 'warning'); return true; }
             return false;
         }
 
@@ -3058,6 +3187,8 @@ function setTheme(mode) {
         function checkEasterAch() {
             if (state.easterEggsFound >= 3 && !state.shopUnlocked) { state.shopUnlocked = true; setTimeout(() => notify('🛒 Магазин открыт!', 'success'), 2000); }
             if (state.easterEggsFound >= 5 && !state.achievements.easter3) { state.achievements.easter3 = true; notify('🥚🥚🥚 Мастер!', 'success'); }
+            if (state.easterEggsFound >= 8 && !state.achievements.easter4) { state.achievements.easter4 = true; notify('🍀 Фортуна!', 'success'); addXP(150); }
+            if (state.easterEggsFound >= 12 && !state.achievements.easter5) { state.achievements.easter5 = true; notify('💎 Легенда!', 'success'); spawnConfetti(); addXP(300); }
             renderAchievements(); saveState();
         }
 
@@ -3113,8 +3244,22 @@ function setTheme(mode) {
                 state.messages['БОТ_ОЛЯ'] = [{ text: 'Приветик! Я Оля, навигатор. Помогу с маршрутом!', type: 'received', time: '14:32' }];
                 state.messages['БОТ_ИГОРЬ'] = [{ text: 'Здарова! Я Игорь — механик. Спрашивай про железо!', type: 'received', time: '14:33' }];
                 state.messages['БОТ_КАТИЯ'] = [{ text: 'Привет! Я Катя, автоюрист. Помогу с штрафами!', type: 'received', time: '14:34' }];
+                state.messages['БОТ_ГАИ'] = [{ text: '🚓 Так-так, водитель. Ваши документы... Шутка. Я ГАИшник, подскажу по ПДД!', type: 'received', time: '14:35' }];
+                state.messages['БОТ_ЭЛЕКТРА'] = [{ text: '🔋 Привет! Я Электра, всё про электромобили и зарядки!', type: 'received', time: '14:36' }];
                 saveState();
                 renderChatList();
+            } else {
+                var knownBots = {};
+                state.friends.forEach(function(f) { knownBots[f.plate] = true; });
+                var addedAny = false;
+                AI_BOTS.forEach(function(bot) {
+                    if (!knownBots[bot.plate]) {
+                        state.friends.push({ plate: bot.plate, name: bot.name, avatar: bot.avatar, color: bot.color, isBot: true });
+                        state.messages[bot.plate] = [{ text: bot.id === 'gaishnik' ? '🚓 Так-так, водитель. Ваши документы... Шутка. Я ГАИшник, подскажу по ПДД!' : '🔋 Привет! Я Электра, всё про электромобили и зарядки!', type: 'received', time: '14:35' }];
+                        addedAny = true;
+                    }
+                });
+                if (addedAny) { saveState(); renderChatList(); notify('👋 Новые друзья в контактах: ГАИшник, Электра!', 'success'); }
             }
             
             let profileClicks = 0;
@@ -7418,6 +7563,24 @@ function setTheme(mode) {
         '❤️ Спасибо',
         '😂',
         '🤔',
+        '🚨 Вся полиция на хвосте!',
+        '📯 Би-би!',
+        '💨 Прибавил газу',
+        '🍀 Ни пуха ни пера',
+        '🤩 Кто на свете всех круче? Я!',
+        '😎 Круто тачка прокачена',
+        '🥶 Дело в подвале (шутка)',
+        '🙈 Я тут ни при чём',
+        '💰 Только заработал Лешинксы',
+        '🎵 Красим в "цвет гэнгстера"',
+        '🛞 Резину сменил налету',
+        '⚡ Турбо зажигание!',
+        '👑 Владелец в деле',
+        '🤖 Алёша, что там по дорогам?',
+        '🗺️ Гоу по навигатору',
+        '🏎️ Кто быстрее до следующего светофора?',
+        '🧊 Свистать всех наверх!',
+        '🫡 Слушаюсь, шеф!',
     ];
     MS.showQuickPhrases = function() {
         var existing = document.getElementById('quickPhrasesModal');
