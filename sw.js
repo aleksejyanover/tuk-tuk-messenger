@@ -1,4 +1,4 @@
-const CACHE = 'tuk-tuk-v8';
+const CACHE = 'tuk-tuk-v9';
 const ASSETS = [
   './',
   './manifest.webmanifest',
