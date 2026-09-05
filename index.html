@@ -373,6 +373,7 @@ color:transparent; }
         @keyframes tb { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
         .panel { display: none; flex-direction: column; height: 100%; overflow: hidden; }
         .panel.active { display: flex; }
+        .rating-panel, .dev-panel-content, .shop-panel, .garage-panel, .stats-panel, .profile-panel { flex: 1 1 auto; min-height: 0; overflow-y: auto; width: 100%; box-sizing: border-box; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
         .role-badge-top { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 8px 20px; border-radius: 20px; font-size: 12px; font-weight: 700; z-index: 1001; display: none; }
         .role-badge-top.active { display: block; }
         .role-badge-top.owner { background: linear-gradient(135deg,#ff0066,#ff00aa); color: white; }
@@ -688,7 +689,6 @@ color:transparent; }
             .msg, .message { max-width: 88% !important; }
         }
         .chat-item, .nav-tab, .clips-tab, .game-card, .role-option, .garage-car, .theme-btn, .gbtn { -webkit-tap-highlight-color: transparent; }
-        .panel { will-change: contents; }
         .msg { transition: opacity 0.2s ease; }
         .chat-item { transition: background 0.15s ease, transform 0.1s ease; }
         .chat-item:active { transform: scale(0.98); }
@@ -1244,7 +1244,7 @@ color:transparent; }
                 </div>
             </div>
             <div class="panel" id="panel-rating">
-                <div class="rating-panel" style="padding:20px;max-width:620px;margin:0 auto;">
+                <div class="rating-panel" style="flex:1;min-height:0;overflow-y:auto;padding:20px;max-width:620px;margin:0 auto;width:100%;box-sizing:border-box;scroll-behavior:smooth;">
                     <div style="text-align:center;margin-bottom:16px;">
                         <div style="font-size:40px;">🏁</div>
                         <h2 style="margin:4px 0 2px;">Рейтинг водителей</h2>
