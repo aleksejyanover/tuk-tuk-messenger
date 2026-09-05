@@ -960,6 +960,7 @@ color:transparent; }
                 <button class="nav-tab" data-tab="garage" onclick="switchTab('garage')">🏎️<span>Гараж</span></button>
                 <button class="nav-tab" data-tab="shop" onclick="switchTab('shop')">🛒<span>Магазин</span></button>
                 <button class="nav-tab" data-tab="bot" onclick="switchTab('bot')">🤖<span>Бот</span></button>
+                <button class="nav-tab" data-tab="rating" onclick="switchTab('rating')">🏁<span>Рейтинг</span></button>
                 <button class="nav-tab" data-tab="dev" onclick="switchTab('dev')">⚙️<span>Разработка</span><span id="devNavBadge" style="display:none;margin-left:4px;background:var(--danger);color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;"></span></button>
                 <button class="nav-tab" data-tab="profile" onclick="switchTab('profile')">👤<span>Профиль</span></button>
                 <button class="nav-tab" data-tab="mod" onclick="switchTab('mod')" id="modTab" style="display:none;">🛡️<span>Мод</span></button>
@@ -1212,6 +1213,7 @@ color:transparent; }
                     </div>
                     <h3 style="margin-top:20px;font-size:15px;">📊 Статистика</h3>
                     <div id="statsContainer"></div>
+                    <div id="loginStreakBox" style="margin-top:12px;width:100%;max-width:380px;"></div>
                     <h3 style="margin-top:20px;font-size:15px;">📋 Ежедневные задания</h3>
                     <div id="dailyQuestsContainer"></div>
                     <h3 style="margin-top:20px;font-size:15px;">🏆 Достижения</h3>
@@ -1239,6 +1241,19 @@ color:transparent; }
                     <h2>👁️ Владелец</h2>
                     <div id="ownerPlayersList"></div>
                     <div class="admin-controls" id="ownerControls"></div>
+                </div>
+            </div>
+            <div class="panel" id="panel-rating">
+                <div class="rating-panel" style="padding:20px;max-width:620px;margin:0 auto;">
+                    <div style="text-align:center;margin-bottom:16px;">
+                        <div style="font-size:40px;">🏁</div>
+                        <h2 style="margin:4px 0 2px;">Рейтинг водителей</h2>
+                        <div style="font-size:12px;color:var(--text-muted);">Лучшие гонщики Брум-Брум Messenger</div>
+                    </div>
+                    <div id="ratingList"></div>
+                    <div style="margin-top:16px;padding:12px 14px;background:var(--bg-card);border:1px solid rgba(0,240,255,0.1);border-radius:12px;font-size:12px;color:var(--text-muted);text-align:center;">
+                        🔥 Каждый день заходи в Брум-Брум — и получай бонус за стрик! Смотри свой стрик в профиле.
+                    </div>
                 </div>
             </div>
             <div class="panel" id="panel-dev">
@@ -1395,6 +1410,7 @@ color:transparent; }
             lastQuestReset: null,
             lastDailyClaim: null,
             dailyStreak: { count: 0, lastDate: null, allCompletedToday: false },
+            loginStreak: { count: 0, lastDate: null, totalLogins: 0 },
             stats: { totalXP: 0, totalMessages: 0, totalHorns: 0, totalGames: 0, joinDate: null }
         };
 
@@ -1461,6 +1477,10 @@ color:transparent; }
             'ДРАКОН':{name:'Дракон',avatar:'🐉',color:'#ff6b35',msg:'+300 XP! 🐉'},
             'РАДУГА':{name:'Радуга',avatar:'🌈',color:'#ec4899',msg:'+110 XP! 🌈'},
             'НЛО':{name:'Пришелец',avatar:'👽',color:'#22c55e',msg:'Мы прилетели! 👽 +80 XP'},
+            'БРУМ':{name:'Брум-Брум',avatar:'🚗',color:'#00f0ff',msg:'Брум-брум! 🚗 +120 XP'},
+            'ОБНОВЛЕНИЕ':{name:'Новинка',avatar:'🎉',color:'#22d3ee',msg:'Ты нашёл обновление! 🎉 +130 XP'},
+            'РЕЙТИНГ':{name:'Чемпион',avatar:'🏆',color:'#fbbf24',msg:'Топ-1! 🏆 +140 XP'},
+            'СТРИК':{name:'Огонёк',avatar:'🔥',color:'#f97316',msg:'Стрик горит! 🔥 +60 XP'},
         };
 
         const garageCars = [
@@ -2030,6 +2050,55 @@ color:transparent; }
             if (streak >= 5) return base * 2;
             if (streak >= 3) return Math.floor(base * 1.5);
             return base;
+        }
+
+        function _getLoginBonus(streak) {
+            var base = 30;
+            if (streak >= 7) return base * 4;
+            if (streak >= 5) return base * 3;
+            if (streak >= 3) return base * 2;
+            return base;
+        }
+        function grantLoginBonus() {
+            var ls = state.loginStreak;
+            var today = new Date().toDateString();
+            if (ls.lastDate === today) { renderLoginStreak(); return; }
+            var firstEver = !ls.lastDate;
+            if (!firstEver) {
+                var last = new Date(ls.lastDate);
+                var diffDays = Math.floor((Date.now() - last) / (1000 * 60 * 60 * 24));
+                if (diffDays > 1) ls.count = 0;
+            }
+            ls.count = (ls.count || 0) + 1;
+            ls.lastDate = today;
+            ls.totalLogins = (ls.totalLogins || 0) + 1;
+            var bonus = _getLoginBonus(ls.count);
+            addXP(bonus);
+            state.stats.totalXP = (state.stats.totalXP || 0) + bonus;
+            saveState();
+            renderLoginStreak();
+            setTimeout(function() {
+                showRewardPopup('🔥', 'Ежедневный бонус!', bonus, 'Стрик уже ' + ls.count + ' ' + (ls.count % 10 === 1 && ls.count % 100 !== 11 ? 'день' : (ls.count % 10 >= 2 && ls.count % 10 <= 4 && (ls.count % 100 < 10 || ls.count % 100 >= 20) ? 'дня' : 'дней')) + ' подряд! Заходи завтра — будет ещё больше!');
+            }, 900);
+        }
+        function renderLoginStreak() {
+            var box = document.getElementById('loginStreakBox');
+            if (!box) return;
+            var ls = state.loginStreak || { count: 0, lastDate: null };
+            var n = ls.count || 0;
+            var next = _getLoginBonus(n + 1);
+            box.innerHTML =
+                '<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:linear-gradient(135deg,rgba(255,120,0,0.12),rgba(255,0,100,0.12));border:1px solid rgba(255,120,0,0.35);border-radius:12px;">' +
+                    '<div style="font-size:30px;">🔥</div>' +
+                    '<div style="flex:1;">' +
+                        '<div style="font-size:13px;font-weight:700;">Стрик: ' + n + ' ' + (n % 10 === 1 && n % 100 !== 11 ? 'день' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'дня' : 'дней')) + '</div>' +
+                        '<div style="font-size:11px;color:var(--text-muted);">Заходи каждый день — бонус растёт! Завтра: +' + next + ' XP</div>' +
+                    '</div>' +
+                    '<div style="text-align:right;">' +
+                        '<div style="font-family:\'Orbitron\';font-size:16px;color:var(--warning);">+' + _getLoginBonus(Math.max(n,1)) + ' XP</div>' +
+                        '<div style="font-size:10px;color:var(--text-muted);">за сегодня</div>' +
+                    '</div>' +
+                '</div>';
         }
 
         function claimQuestReward(questType) {
@@ -3034,7 +3103,8 @@ function setTheme(mode) {
             if (tab === 'clips') { renderClips(); renderApprovedSections(); }
             if (tab === 'games') renderApprovedSections();
             if (tab === 'dev') renderDevPanel();
-            if (tab === 'profile') { updateProfile(); updatePassStatus(); updateRoleSelector(); renderStats(); renderDailyQuests(); }
+            if (tab === 'rating') renderRating();
+            if (tab === 'profile') { updateProfile(); updatePassStatus(); updateRoleSelector(); renderStats(); renderDailyQuests(); renderLoginStreak(); }
             if (tab === 'chats') renderChatList();
             if (typeof syncMobileView === 'function') syncMobileView();
         }
@@ -3136,6 +3206,8 @@ function setTheme(mode) {
                         if (!state.stats) state.stats = { totalXP: 0, totalMessages: 0, totalHorns: 0, totalGames: 0, joinDate: null };
                         if (!state.dailyQuests) state.dailyQuests = { messages: { current: 0, target: 10, reward: 50, completed: false, claimed: false }, horns: { current: 0, target: 5, reward: 30, completed: false, claimed: false }, games: { current: 0, target: 3, reward: 40, completed: false, claimed: false } };
                         if (!state.dailyStreak) state.dailyStreak = { count: 0, lastDate: null, allCompletedToday: false };
+                        if (!state.loginStreak) state.loginStreak = { count: 0, lastDate: null, totalLogins: 0 };
+                        if (typeof state.loginStreak.count !== 'number' || state.loginStreak.count < 0) state.loginStreak.count = 0;
                         if (!state.subs || typeof state.subs !== 'object' || Array.isArray(state.subs)) state.subs = {};
                         if (!state.roleBonuses || typeof state.roleBonuses !== 'object' || Array.isArray(state.roleBonuses)) state.roleBonuses = {};
                         if (typeof state.coins !== 'number') state.coins = 0;
@@ -3327,6 +3399,10 @@ function setTheme(mode) {
             if (lower === 'зеркало' || lower === 'отражение') { document.body.style.transform = document.body.style.transform === 'scaleX(-1)' ? 'scaleX(1)' : 'scaleX(-1)'; notify('🪩 Зеркало!', 'success'); return true; }
             if (lower === 'нитро' || lower === 'turbo') { addXP(50); notify('🚀 +50 XP', 'success'); return true; }
             if (lower === 'чит' || lower === 'cheat') { addXP(200); notify('🎮 +200 XP', 'success'); return true; }
+            if (lower === 'брум' || lower === 'brum') { spawnFlyingCar(); spawnConfetti(); addXP(70); notify('Брум-брум! 🚗 +70 XP', 'success'); return true; }
+            if (lower === 'обновление' || lower === 'update') { spawnConfetti(); addXP(90); notify('🎉 Новое обновление: Рейтинг, стрик и секреты! +90 XP', 'success'); return true; }
+            if (lower === 'рейтинг' || lower === 'rating') { switchTab('rating'); addXP(40); notify('🏁 Ты в рейтинге! +40 XP', 'success'); spawnConfetti(); return true; }
+            if (lower === 'стрик' || lower === 'streak') { addXP(35); var _ls = state.loginStreak || { count: 0 }; notify('🔥 Стрик: ' + (_ls.count || 0) + ' дней подряд! +35 XP', 'success'); spawnConfetti(); return true; }
             if (lower === 'неон' || lower === 'neon') {
                 document.body.classList.toggle('neon-mode');
                 notify('💎 Неоновое будущее!', 'success');
@@ -3447,8 +3523,10 @@ function setTheme(mode) {
             updateOnlineCount();
             renderStats();
             renderDailyQuests();
+            renderLoginStreak();
             
             checkPaymentComplete();
+            grantLoginBonus();
 
             if (typeof syncMobileView === 'function') syncMobileView();
 
@@ -4485,6 +4563,10 @@ function setTheme(mode) {
             if (plate === 'ПРИЗРАК') addXP(75);
             if (plate === 'НИНДЗЯ') addXP(80);
             if (plate === 'КОСМОС') addXP(100);
+            if (plate === 'БРУМ') addXP(120);
+            if (plate === 'ОБНОВЛЕНИЕ') addXP(130);
+            if (plate === 'РЕЙТИНГ') addXP(140);
+            if (plate === 'СТРИК') addXP(60);
         }
 
         function askBot(q) { const i = document.getElementById('botInput'); if (i) i.value = q; sendBotMessage(); }
@@ -4507,7 +4589,7 @@ function setTheme(mode) {
                 let reply;
                 const alesha = AI_BOTS[0]; // Василич = Алёша
                 if (l.includes('секрет')) {
-                    reply = 'Секреты: ТУТТУК, ТУК-ТУК, МАСКОТ, 777777, ИЛОН, БОСС, 666666, ПРИЗРАК, НИНДЗЯ, КОСМОС. Команды: огонь, скорость, удача, бонус, сюрприз, магия, конфетти, туктук, ночь, радуга, матрица, хоррор, зеркало, нитро, чит';
+                    reply = 'Секреты: ТУТТУК, ТУК-ТУК, МАСКОТ, 777777, ИЛОН, БОСС, 666666, ПРИЗРАК, НИНДЗЯ, КОСМОС, БРУМ, ОБНОВЛЕНИЕ, РЕЙТИНГ, СТРИК. Команды: огонь, скорость, удача, бонус, сюрприз, магия, конфетти, туктук, ночь, радуга, матрица, хоррор, зеркало, нитро, чит';
                 } else if (l.includes('анекдот') || l.includes('шутк') || l.includes('насмеш')) {
                     reply = AI_Humor(alesha);
                 } else if (l.includes('помощь') || l.includes('help') || l.includes('что умеешь')) {
@@ -5753,6 +5835,91 @@ function setTheme(mode) {
                 const stored = localStorage.getItem(roleKey);
                 if (stored) showPaymentSuccess(stored);
             }
+        }
+
+        function _hashStr(s) {
+            var h = 0;
+            for (var i = 0; i < (s || '').length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+            return h;
+        }
+        function _pseudoLevel(o) {
+            if (o && typeof o.level === 'number' && o.level > 0) return o.level;
+            return 2 + (_hashStr((o && (o.plate || o.name)) || '') % 38);
+        }
+        function _pseudoXp(o, lvl) {
+            if (o && typeof o.xp === 'number' && o.xp > 0) return o.xp;
+            return (lvl - 1) * 100 + (_hashStr((o && (o.plate || o.name)) || '') % 100);
+        }
+        function renderRating() {
+            const list = document.getElementById('ratingList');
+            if (!list) return;
+            const players = [];
+            const users = getRegUsers();
+            const seen = {};
+
+            players.push({
+                name: state.myName || 'Водитель',
+                plate: state.myPlate,
+                avatar: (garageCars[state.selectedCar] || {}).emoji || '🏎️',
+                level: state.level, xp: state.xp, role: state.role, isMe: true
+            });
+
+            Object.keys(users).forEach(function(k) {
+                const u = users[k];
+                if (!u || seen[k]) return;
+                seen[k] = true;
+                const lvl = _pseudoLevel(u);
+                players.push({ name: u.name || 'Водитель', plate: u.plate || k, avatar: u.avatar || '🚗', level: lvl, xp: _pseudoXp(u, lvl), role: u.role || 'user' });
+            });
+            (state.friends || []).forEach(function(f) {
+                if (f.isBot || seen[f.plate]) return;
+                seen[f.plate] = true;
+                const lvl = _pseudoLevel(f);
+                players.push({ name: f.name || 'Водитель', plate: f.plate, avatar: f.avatar || '🚗', level: lvl, xp: _pseudoXp(f, lvl), role: 'user' });
+            });
+            simPlayers.forEach(function(p) {
+                players.push({ name: p.name, plate: p.plate, avatar: p.avatar || '🚗', level: _pseudoLevel(p), xp: _pseudoXp(p, _pseudoLevel(p)), role: p.suspicious ? '🚨 Подозрительный' : 'user' });
+            });
+            AI_BOTS.forEach(function(b) {
+                const lvl = _pseudoLevel(b);
+                players.push({ name: b.name, plate: b.plate, avatar: b.avatar || '🤖', level: lvl, xp: _pseudoXp(b, lvl), isBot: true });
+            });
+
+            players.sort(function(a, b) { return (b.level - a.level) || (b.xp - a.xp); });
+
+            players.slice(0, 20).forEach(function(pl, idx) {
+                const row = document.createElement('div');
+                row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;background:' + (pl.isMe ? 'linear-gradient(135deg,rgba(0,240,255,0.15),rgba(167,139,250,0.1))' : 'var(--bg-card)') + ';border:1px solid ' + (pl.isMe ? 'rgba(0,240,255,0.35)' : 'rgba(255,255,255,0.06)') + ';border-radius:12px;margin-bottom:8px;';
+                const place = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '<span style="font-weight:700;color:var(--text-muted);font-size:13px;">' + (idx + 1) + '</span>';
+                const placeEl = document.createElement('div');
+                placeEl.style.cssText = 'min-width:30px;text-align:center;font-size:17px;';
+                placeEl.innerHTML = place;
+                const av = document.createElement('div');
+                av.style.cssText = 'width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#00f0ff,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;';
+                av.textContent = pl.avatar;
+                const wr = document.createElement('div');
+                wr.style.cssText = 'flex:1;min-width:0;';
+                const nm = document.createElement('div');
+                nm.style.cssText = 'font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:' + (pl.isMe ? 'var(--primary)' : 'var(--text)') + ';';
+                nm.textContent = pl.name + (pl.isMe ? ' (ты)' : '');
+                const pl2 = document.createElement('div');
+                pl2.style.cssText = 'font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+                const roleName = ROLE_NAMES[pl.role] || '';
+                pl2.textContent = (pl.isBot ? '🤖 Бот • ' : '') + (roleName || '👤 Игрок') + ' • ' + pl.plate;
+                wr.appendChild(nm); wr.appendChild(pl2);
+                const rt = document.createElement('div');
+                rt.style.cssText = 'text-align:right;flex-shrink:0;';
+                const lv = document.createElement('div');
+                lv.style.cssText = 'font-family:\'Orbitron\';font-size:14px;color:var(--primary);';
+                lv.textContent = 'Ур. ' + pl.level;
+                const xpEl = document.createElement('div');
+                xpEl.style.cssText = 'font-size:10px;color:var(--text-muted);';
+                xpEl.textContent = pl.xp + ' XP';
+                rt.appendChild(lv); rt.appendChild(xpEl);
+                row.appendChild(placeEl); row.appendChild(av); row.appendChild(wr); row.appendChild(rt);
+                list.appendChild(row);
+            });
+            if (!players.length) list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;">Пока нет водителей 🏁</div>';
         }
 
         function renderAchievements() {
