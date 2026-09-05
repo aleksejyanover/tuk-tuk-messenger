@@ -963,7 +963,7 @@ color:transparent; }
                 <button class="nav-tab" data-tab="dev" onclick="switchTab('dev')">⚙️<span>Разработка</span><span id="devNavBadge" style="display:none;margin-left:4px;background:var(--danger);color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;"></span></button>
                 <button class="nav-tab" data-tab="profile" onclick="switchTab('profile')">👤<span>Профиль</span></button>
                 <button class="nav-tab" data-tab="mod" onclick="switchTab('mod')" id="modTab" style="display:none;">🛡️<span>Мод</span></button>
-                <button class="nav-tab" data-tab="owner" onclick="switchTab('owner')" id="ownerTab" style="display:none;">👁️<span>Владелец</span></button>
+                <button class="nav-tab" data-tab="owner" onclick="switchTab('owner')" id="ownerTab" style="display:none;">👁️<span>Владелец</span><span class="nav-badge" id="ownerNavBadge" style="display:none;"></span></button>
             </div>
         </div>
 
@@ -976,7 +976,7 @@ color:transparent; }
                 </div>
                 <div id="chatView" style="display:none;flex-direction:column;height:100%;">
                     <div class="chat-header">
-                        <button class="header-btn" onclick="state.currentChat=null;document.querySelector('.sidebar').classList.remove('chat-open');renderChatList();if(typeof syncMobileView==='function')syncMobileView()" aria-label="Назад" style="display:none;font-size:18px;" id="chatBackBtn">←</button>
+                        <button class="header-btn" onclick="state.currentChat=null;resetSelectMode();document.querySelector('.sidebar').classList.remove('chat-open');renderChatList();if(typeof syncMobileView==='function')syncMobileView()" aria-label="Назад" style="display:none;font-size:18px;" id="chatBackBtn">←</button>
                         <div class="chat-avatar" id="chatAvatar" style="background:linear-gradient(135deg,#10b981,#059669);">🚙</div>
                         <div class="chat-header-info">
                             <h3 id="chatName">Имя</h3>
@@ -984,9 +984,21 @@ color:transparent; }
                         </div>
                         <div class="chat-header-actions">
                             <button class="header-btn" id="chatSearchBtn" onclick="toggleChatSearch()" aria-label="Поиск" style="font-size:14px;">🔍</button>
+                            <button class="header-btn" id="chatSelectBtn" onclick="toggleSelectMode()" aria-label="Выделить" style="font-size:14px;">☑️</button>
                             <button class="header-btn" onclick="sendHorn()" aria-label="Гудок">📯</button>
                             <button class="header-btn" onclick="sendFlash()" aria-label="Мигнуть фарами">💡</button>
                             <button class="header-btn" onclick="clearCurrentChat()" aria-label="Очистить чат" style="font-size:14px;">🗑️</button>
+                        </div>
+                    </div>
+                    <div id="selectBar" style="display:none;padding:8px 20px;border-bottom:1px solid rgba(0,240,255,0.1);background:var(--bg-card);display:none;">
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                            <span id="selectCount" style="font-size:12px;color:var(--text-muted);">0 выбрано</span>
+                            <button onclick="selectAllMessages()" style="padding:4px 10px;background:var(--bg-input);border:1px solid rgba(0,240,255,0.2);border-radius:6px;color:var(--text);font-size:11px;cursor:pointer;">Все</button>
+                            <button onclick="deselectAllMessages()" style="padding:4px 10px;background:var(--bg-input);border:1px solid rgba(0,240,255,0.2);border-radius:6px;color:var(--text);font-size:11px;cursor:pointer;">Снять</button>
+                            <button onclick="deleteSelectedMessages()" style="padding:4px 10px;background:linear-gradient(135deg,#ef4444,#b91c1c);border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">🗑️ Удалить</button>
+                            <button onclick="forwardSelectedMessages()" style="padding:4px 10px;background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">↪️ Переслать</button>
+                            <button onclick="starSelectedMessages()" style="padding:4px 10px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:6px;color:#000;font-size:11px;font-weight:700;cursor:pointer;">⭐ В избранное</button>
+                            <button onclick="toggleSelectMode()" style="padding:4px 10px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer;">✕ Отмена</button>
                         </div>
                     </div>
                     <div id="chatSearchBar" style="display:none;padding:8px 20px;border-bottom:1px solid rgba(0,240,255,0.1);background:var(--bg-card);">
@@ -1208,7 +1220,7 @@ color:transparent; }
                         <button onclick="exportProgress()" style="padding:8px 16px;background:var(--bg-input);border:1px solid rgba(0,240,255,0.2);border-radius:8px;color:var(--text);font-size:12px;cursor:pointer;">📤 Экспорт</button>
                         <button onclick="importProgress()" style="padding:8px 16px;background:var(--bg-input);border:1px solid rgba(0,240,255,0.2);border-radius:8px;color:var(--text);font-size:12px;cursor:pointer;">📥 Импорт</button>
                         <button onclick="setupPassword()" style="padding:8px 16px;background:var(--bg-input);border:1px solid rgba(0,240,255,0.2);border-radius:8px;color:var(--text);font-size:12px;cursor:pointer;">🔐 Пароль</button>
-                        <button onclick="resetProgress()" style="padding:8px 16px;background:linear-gradient(135deg,#ef4444,#dc2626);border:none;border-radius:8px;color:#fff;font-size:12px;cursor:pointer;font-weight:700;">🗑️ Сбросить ВСЁ</button>
+                        <button onclick="openResetDialog()" style="padding:8px 16px;background:linear-gradient(135deg,#ef4444,#dc2626);border:none;border-radius:8px;color:#fff;font-size:12px;cursor:pointer;font-weight:700;">🗑️ Сбросить</button>
                     </div>
                 </div>
             </div>
@@ -1259,6 +1271,28 @@ color:transparent; }
                                 <div style="font-size:11px;color:var(--text-muted);">Выпущено игр</div>
                                 <div id="devGamesCount" style="font-weight:700;font-size:15px;">0 / 5</div>
                             </div>
+                            <div style="flex:1;min-width:180px;background:var(--bg-card);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px;">
+                                <div style="font-size:11px;color:var(--text-muted);">Одобрено Основателем</div>
+                                <div id="devApprovedCount" style="font-weight:700;font-size:15px;color:#4ade80;">0</div>
+                            </div>
+                            <div style="flex:1;min-width:180px;background:var(--bg-card);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px;">
+                                <div style="font-size:11px;color:var(--text-muted);">На проверке</div>
+                                <div id="devPendingCount" style="font-weight:700;font-size:15px;color:#fbbf24;">0</div>
+                            </div>
+                            <div style="flex:1;min-width:180px;background:var(--bg-card);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px;">
+                                <div style="font-size:11px;color:var(--text-muted);">💎 Заработано Лешинксов</div>
+                                <div id="devRevenue" style="font-weight:700;font-size:15px;color:#a78bfa;">0</div>
+                            </div>
+                        </div>
+
+                        <div style="background:var(--bg-card);border:1px solid rgba(251,191,36,0.35);border-radius:14px;padding:14px;margin-bottom:14px;">
+                            <h3 style="margin:0 0 4px;">💬 Сообщение Основателю (Алёше)</h3>
+                            <p style="margin:0 0 8px;color:var(--text-muted);font-size:12px;">Отправь сообщение прямо владельцу — он увидит его во вкладке «Владелец».</p>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                <input type="text" id="devMsgInput" placeholder="Напишите Основателю..." style="flex:1;min-width:200px;padding:9px 12px;background:var(--bg-input);border:1px solid rgba(251,191,36,0.3);border-radius:10px;color:var(--text);font-size:13px;outline:none;">
+                                <button onclick="devSendMsgToFounder()" style="padding:9px 18px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:10px;color:#000;font-weight:700;font-size:13px;cursor:pointer;">📨 Отправить</button>
+                            </div>
+                            <div id="devMsgHistory" style="margin-top:10px;font-size:12px;color:var(--text-muted);display:flex;flex-direction:column;gap:6px;"></div>
                         </div>
 
                         <div id="devKnownBanner" style="display:none;background:linear-gradient(135deg,rgba(255,215,120,0.12),rgba(167,139,250,0.12));border:1px solid rgba(255,215,120,0.5);border-radius:14px;padding:12px;margin-bottom:14px;text-align:center;font-weight:700;">
@@ -1916,10 +1950,15 @@ color:transparent; }
         }
 
         function resetAll() {
-            if (confirm('Сбросить все данные?')) {
-                if (confirm('Точно?')) {
-                    sRem(SK); sRem(PK); sRem(UK); sRem(BK);
-                    location.reload();
+            if (confirm('Сбросить все данные (профиль, деньги, роли, чаты, гараж)?')) {
+                if (confirm('Это нельзя отменить. Уверен?')) {
+                    var code = prompt('Введи «СБРОС», чтобы подтвердить полный сброс:');
+                    if (code && code.trim().toUpperCase() === 'СБРОС') {
+                        sRem(SK); sRem(PK); sRem(UK); sRem(BK);
+                        location.reload();
+                    } else {
+                        alert('Сброс отменён — код не совпал.');
+                    }
                 }
             }
         }
@@ -2498,11 +2537,13 @@ function setTheme(mode) {
 
         // ============ РЕЖИМ РАЗРАБОТЧИКОВ ============
         function devSeed() {
-            if (!state.dev) state.dev = { registered:false, name:'', games:[], clips:[], versions:[], submitted:[], subActive:false };
+            if (!state.dev) state.dev = { registered:false, name:'', games:[], clips:[], versions:[], submitted:[], subActive:false, revenue:0 };
             if (!state.devRegistry) state.devRegistry = [];
             if (!state.devReviews) state.devReviews = [];
             if (!state.approvedItems) state.approvedItems = [];
             if (!state.auction) state.auction = [];
+            if (!state.devFounderMsgs) state.devFounderMsgs = [];
+            if (state.dev && !state.dev.revenue) state.dev.revenue = 0;
         }
         function devMe() { devSeed(); return state.dev; }
         function isFounder() { return (state.role === 'owner' || state.role === 'god'); }
@@ -2519,6 +2560,31 @@ function setTheme(mode) {
             document.getElementById('devStatusShown').textContent = sub ? '🛠️ РАЗРАБОТЧИК' : 'нет';
             document.getElementById('devStatusShown').style.color = sub ? '#7dd3fc' : 'var(--warning)';
             document.getElementById('devGamesCount').textContent = (state.dev.games||[]).length + ' / 5';
+            var myName = state.dev.name;
+            var myReviews = (state.devReviews||[]).filter(function(r){ return r.devU === myName; });
+            var approvedMine = myReviews.filter(function(r){ return r.status === 'approved'; }).length;
+            var pendingMine = myReviews.filter(function(r){ return r.status === 'pending'; }).length;
+            var gamesApproved = (state.dev.games||[]).filter(function(g){ return g.devU === myName && g.approved; }).length;
+            document.getElementById('devApprovedCount').textContent = (gamesApproved || approvedMine) + '';
+            document.getElementById('devPendingCount').textContent = pendingMine + '';
+            var rev = state.dev.revenue || 0;
+            document.getElementById('devRevenue').textContent = rev.toLocaleString ? rev.toLocaleString('ru-RU') : rev;
+            // история сообщений основателю
+            var mh = document.getElementById('devMsgHistory');
+            if (mh) {
+                mh.innerHTML = '';
+                var hist = state.devFounderMsgs || [];
+                var myMsgs = hist.filter(function(x){ return x.fromDev; });
+                if (!myMsgs.length) { mh.textContent = 'Сообщений пока нет. Напиши Алёше!'; }
+                else {
+                    myMsgs.slice(-5).forEach(function(x){
+                        var dd = document.createElement('div');
+                        dd.style.cssText = 'background:var(--bg-input);border-radius:8px;padding:6px 10px;border-left:3px solid #fbbf24;';
+                        dd.innerHTML = '<div style="font-size:10px;color:var(--text-muted);">' + x.time + ' · <b style="color:#fbbf24;">→ Алёше</b></div><div>' + x.text + '</div>' + (x.reply ? '<div style="font-size:11px;color:#4ade80;margin-top:4px;">💬 Ответ Алёши: «' + x.reply + '»</div>' : '');
+                        mh.appendChild(dd);
+                    });
+                }
+            }
             document.getElementById('devKnownBanner').style.display = sub ? 'block' : 'none';
             // игры
             var gl = document.getElementById('devGamesList'); gl.innerHTML='';
@@ -2688,10 +2754,21 @@ function setTheme(mode) {
         }
         function updateDevNavBadge() {
             var badge = document.getElementById('devNavBadge');
-            if (!badge) return;
-            var n = isFounder() ? (state.devReviews||[]).length : 0;
-            if (n > 0) { badge.style.display='inline-block'; badge.textContent = n; }
-            else badge.style.display='none';
+            var ownerBadge = document.getElementById('ownerNavBadge');
+            var n = 0;
+            var on = 0;
+            if (isFounder()) {
+                n += (state.devReviews||[]).length;
+                var unread = (state.devFounderMsgs || []).filter(function(m){ return m.fromDev && !m.readByFounder; }).length;
+                n += unread;
+                on = unread + (state.devReviews||[]).length;
+            } else {
+                n = (state.devReviews||[]).filter(function(r){ return r.status === 'pending' && r.devU === state.dev.name; }).length;
+            }
+            if (badge && n > 0) { badge.style.display='inline-block'; badge.textContent = n; }
+            else if (badge) badge.style.display='none';
+            if (ownerBadge && on > 0) { ownerBadge.style.display='inline-block'; ownerBadge.textContent = on; }
+            else if (ownerBadge) ownerBadge.style.display='none';
         }
         function openDevExternal(url) { window.open(url, '_blank'); }
 
@@ -2702,6 +2779,26 @@ function setTheme(mode) {
             state.dev.registered=true; state.dev.name=name;
             state.devRegistry.push({ name:name, games:0, subActive:false });
             saveState(); renderDevPanel(); notify('🚀 Ты теперь разработчик '+name+'!','ok');
+        }
+        function devSendMsgToFounder() {
+            var inp = document.getElementById('devMsgInput');
+            var text = inp ? inp.value.trim() : '';
+            if (!text) { notify('Введи текст сообщения!','error'); return; }
+            state.devFounderMsgs = state.devFounderMsgs || [];
+            state.devFounderMsgs.push({ fromDev: true, text: text, time: new Date().toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' }), readByFounder: false });
+            if (inp) inp.value = '';
+            saveState(); renderDevPanel();
+            notify('📨 Сообщение отправлено Алёше!','ok');
+        }
+        function founderReplyMsg(idx, text) {
+            state.devFounderMsgs = state.devFounderMsgs || [];
+            if (state.devFounderMsgs[idx]) {
+                state.devFounderMsgs[idx].reply = text;
+                state.devFounderMsgs[idx].replyTime = new Date().toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit' });
+                state.devFounderMsgs[idx].readByFounder = true;
+                saveState(); renderOwnerPanel();
+                notify('💬 Ответ отправлен разработчику!','ok');
+            }
         }
         function devAddGame() {
             devSeed();
@@ -2829,8 +2926,10 @@ function setTheme(mode) {
             if (g.published) { notify('Уже выложено','info'); return; }
             g.published=true; g.pubStatus='published';
             state.approvedItems.push({ type:'game', name:g.name, desc:g.desc, link:g.link, dev:g.devName||state.dev.name });
+            state.dev.revenue = (state.dev.revenue || 0) + 15;
+            addLeshinksy(15);
             saveState(); renderDevPanel(); renderApprovedSections();
-            notify('🎮 Игра «'+g.name+'» выложена!','ok');
+            notify('🎮 Игра «'+g.name+'» выложена! +15 💎','ok');
         }
         function devUnpublish(idx) {
             devSeed();
@@ -2857,8 +2956,10 @@ function setTheme(mode) {
             if (c.published) { notify('Уже выложено','info'); return; }
             c.published=true; c.pubStatus='published';
             state.approvedItems.push({ type:'clip', name:c.name, desc:'Клип', link:c.link, dev:state.dev.name });
+            state.dev.revenue = (state.dev.revenue || 0) + 8;
+            addLeshinksy(8);
             saveState(); renderDevPanel(); renderApprovedSections();
-            notify('🎬 Клип «'+c.name+'» выложен!','ok');
+            notify('🎬 Клип «'+c.name+'» выложен! +8 💎','ok');
         }
         function devDeleteClip(idx) {
             devSeed();
@@ -2893,8 +2994,10 @@ function setTheme(mode) {
             if (v.published) { notify('Уже выложено','info'); return; }
             v.published=true;
             state.approvedItems.push({ type:'version', name:v.name, desc:v.desc, link:v.link, dev:state.dev.name });
+            state.dev.revenue = (state.dev.revenue || 0) + 25;
+            addLeshinksy(25);
             saveState(); renderDevPanel(); renderApprovedSections();
-            notify('📦 Версия «'+v.name+'» выложена!','ok');
+            notify('📦 Версия «'+v.name+'» выложена! +25 💎','ok');
         }
         function devDeleteVersion(idx) {
             devSeed();
@@ -3105,6 +3208,90 @@ function setTheme(mode) {
                     location.reload();
                 }
             }
+        }
+
+        function openResetDialog() {
+            if (state._lastResetTime && (Date.now() - state._lastResetTime) < 3600000) {
+                var mins = Math.ceil((3600000 - (Date.now() - state._lastResetTime)) / 60000);
+                notify('⏳ Сброс доступен через ' + mins + ' мин. Кулдаун 1 час.', 'warning'); return;
+            }
+            var m = document.createElement('div');
+            m.id = 'resetModal';
+            m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:99999;display:flex;align-items:center;justify-content:center;';
+            var box = document.createElement('div');
+            box.style.cssText = 'background:#1a1f35;border:2px solid #ef4444;border-radius:16px;padding:20px;max-width:380px;width:90%;max-height:85vh;overflow-y:auto;';
+            var h = state.plate || 'нет номера';
+            box.innerHTML = '<div style="font-size:16px;font-weight:800;color:#ef4444;margin-bottom:12px;">🗑️ Диалог сброса</div>' +
+                '<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Выбери, что сбросить. Перед сбросом рекомендуется сделать экспорт.</div>' +
+                '<div style="background:var(--bg-input);border-radius:10px;padding:10px;margin-bottom:10px;">' +
+                '<label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;cursor:pointer;"><input type="checkbox" id="rst_coins" checked> 💰 Монеты и Лешинксы</label>' +
+                '<label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;cursor:pointer;"><input type="checkbox" id="rst_level" checked> 📊 Уровень и XP</label>' +
+                '<label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;cursor:pointer;"><input type="checkbox" id="rst_role" checked> 🎭 Роль и подписки</label>' +
+                '<label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;cursor:pointer;"><input type="checkbox" id="rst_garage" checked> 🚗 Гараж</label>' +
+                '<label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;cursor:pointer;"><input type="checkbox" id="rst_ach" checked> 🏆 Достижения</label>' +
+                '<label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;cursor:pointer;"><input type="checkbox" id="rst_chats" checked> 💬 Чаты и сообщения</label>' +
+                '<label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;cursor:pointer;"><input type="checkbox" id="rst_friends" checked> 👥 Друзья</label>' +
+                '<label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;cursor:pointer;"><input type="checkbox" id="rst_dev" checked> 🛠️ Разработчик (проекты)</label>' +
+                '<label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;cursor:pointer;"><input type="checkbox" id="rst_pass"> 🔐 Пароль</label>' +
+                '<label style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;cursor:pointer;"><input type="checkbox" id="rst_name"> 👤 Имя и номер</label>' +
+                '</div>' +
+                '<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">Номер для подтверждения: <b style="color:#fbbf24;">' + h + '</b></div>' +
+                '<input id="rstConfirmPlate" type="text" placeholder="Введи свой номер для подтверждения" style="width:100%;padding:10px;background:var(--bg-input);border:1px solid rgba(239,68,68,0.3);border-radius:10px;color:var(--text);font-size:13px;margin-bottom:10px;box-sizing:border-box;">' +
+                '<div style="display:flex;gap:8px;">' +
+                '<button onclick="exportProgress()" style="flex:1;padding:10px;background:linear-gradient(135deg,#3b82f6,#2563eb);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;">📤 Экспорт</button>' +
+                '<button onclick="_doSelectiveReset()" style="flex:1;padding:10px;background:linear-gradient(135deg,#ef4444,#b91c1c);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;">🗑️ Сбросить</button>' +
+                '</div>' +
+                '<button onclick="document.getElementById(\'resetModal\').remove()" style="width:100%;padding:8px;margin-top:8px;background:transparent;border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--text-muted);font-size:12px;cursor:pointer;">Отмена</button>';
+            m.appendChild(box);
+            document.body.appendChild(m);
+            m.addEventListener('click', function(e) { if (e.target === m) m.remove(); });
+        }
+
+        function _doSelectiveReset() {
+            var plateInput = document.getElementById('rstConfirmPlate');
+            var plate = plateInput ? plateInput.value.trim() : '';
+            if (plate !== (state.plate || '')) { notify('❌ Номер не совпадает!', 'error'); return; }
+            var doCoins = document.getElementById('rst_coins').checked;
+            var doLevel = document.getElementById('rst_level').checked;
+            var doRole = document.getElementById('rst_role').checked;
+            var doGarage = document.getElementById('rst_garage').checked;
+            var doAch = document.getElementById('rst_ach').checked;
+            var doChats = document.getElementById('rst_chats').checked;
+            var doFriends = document.getElementById('rst_friends').checked;
+            var doDev = document.getElementById('rst_dev').checked;
+            var doPass = document.getElementById('rst_pass').checked;
+            var doName = document.getElementById('rst_name').checked;
+            var nothingChecked = !doCoins && !doLevel && !doRole && !doGarage && !doAch && !doChats && !doFriends && !doDev && !doPass && !doName;
+            if (nothingChecked) { notify('Выбери хотя бы один пункт!', 'warning'); return; }
+            var summary = [];
+            if (doCoins) summary.push('монеты/лешинксы');
+            if (doLevel) summary.push('уровень/XP');
+            if (doRole) summary.push('роль');
+            if (doGarage) summary.push('гараж');
+            if (doAch) summary.push('достижения');
+            if (doChats) summary.push('чаты');
+            if (doFriends) summary.push('друзья');
+            if (doDev) summary.push('разработчик');
+            if (doPass) summary.push('пароль');
+            if (doName) summary.push('имя/номер');
+            if (!confirm('Сбросить: ' + summary.join(', ') + '? Это необратимо!')) return;
+            try {
+                if (doCoins) { state.coins = 0; state.leshinki = 0; state.taxiEarned = 0; }
+                if (doLevel) { state.level = 1; state.xp = 0; state.totalXp = 0; }
+                if (doRole) { state.role = 'user'; state.subs = {}; }
+                if (doGarage) { state.garage = []; state.ownedCars = []; }
+                if (doAch) { state.achievements = {}; state.easterEggsFound = 0; }
+                if (doChats) { state.messages = []; sRem('_tt_sms'); }
+                if (doFriends) { state.friends = []; }
+                if (doDev) { state.dev = { registered:false, name:'', games:[], clips:[], versions:[], subActive:false }; state.devReviews = []; state.devRegistry = []; }
+                if (doPass) { sRem(PK); sRem('_tt_pass_hash'); }
+                if (doName) { state.name = ''; state.plate = ''; sRem(UK); sRem(SK); }
+                state._lastResetTime = Date.now();
+                saveState(true);
+                document.getElementById('resetModal').remove();
+                notify('✅ Сброс выполнен: ' + summary.join(', '), 'success');
+                if (doName && doPass) { location.reload(); } else { updateProfile(); renderChatList(); renderGarage(); renderAchievements(); }
+            } catch(e) { notify('Ошибка сброса: ' + e.message, 'error'); }
         }
 
         window.addEventListener('beforeunload', () => saveState(true));
@@ -3501,10 +3688,14 @@ function setTheme(mode) {
             area.innerHTML = '';
             const msgs = state.messages[state.currentChat] || [];
             msgs.forEach((msg, idx) => {
+                if (!msg.id) msg.id = 'm' + Date.now().toString(36) + idx + Math.floor(Math.random() * 999);
                 const div = document.createElement('div');
+                div.style.cssText = 'position:relative;';
                 if (msg.type === 'horn') { div.className = 'message horn'; div.innerHTML = `📯 БИ-БИ! ${msg.time}`; }
                 else if (msg.type === 'sticker') { div.className = 'message sticker'; div.textContent = msg.text; }
-                else { div.className = `message ${msg.type}`; div.textContent = msg.text; const tm = document.createElement('div'); tm.style.cssText = 'font-size:9px;color:rgba(255,255,255,0.5);margin-top:4px;text-align:right;'; tm.textContent = msg.time; div.appendChild(tm); }
+                else { div.className = `message ${msg.type}`; div.textContent = msg.text; if (msg.starred) div.textContent = '⭐ ' + msg.text; const tm = document.createElement('div'); tm.style.cssText = 'font-size:9px;color:rgba(255,255,255,0.5);margin-top:4px;text-align:right;'; tm.textContent = msg.time + (msg.starred ? ' ⭐' : ''); div.appendChild(tm); }
+                if (msg.id) div.setAttribute('data-msg-id-attr', msg.id);
+                div.setAttribute('data-chat-id', state.currentChat || '');
                 div.addEventListener('contextmenu', function(e) {
                     e.preventDefault();
                     _showMsgContextMenu(e.clientX, e.clientY, msg, idx);
@@ -3515,18 +3706,23 @@ function setTheme(mode) {
                 }, { passive: true });
                 div.addEventListener('touchend', function() { if (longTimer) clearTimeout(longTimer); });
                 div.addEventListener('touchmove', function() { if (longTimer) clearTimeout(longTimer); });
+                div.addEventListener('click', function(e) {
+                    if (SEL && SEL.mode && msg.id) { _toggleMsgSelect(msg.id); return; }
+                });
+                if (SEL && SEL.mode && msg.id) div.style.cursor = 'pointer';
                 area.appendChild(div);
             });
             area.scrollTop = area.scrollHeight;
             _initMessagesScroll();
+            if (SEL && SEL.mode) _updateSelectUI();
         }
 
         function _showMsgContextMenu(x, y, msg, idx) {
             _closeMsgContextMenu();
             var menu = document.createElement('div');
             menu.className = 'msg-context-menu';
-            menu.style.left = Math.min(x, window.innerWidth - 200) + 'px';
-            menu.style.top = Math.min(y, window.innerHeight - 160) + 'px';
+            menu.style.left = Math.min(x, window.innerWidth - 220) + 'px';
+            menu.style.top = Math.min(y, window.innerHeight - 260) + 'px';
             var copyBtn = document.createElement('button');
             copyBtn.innerHTML = '📋 Копировать';
             copyBtn.addEventListener('click', function() {
@@ -3536,8 +3732,42 @@ function setTheme(mode) {
                 } else { _vkClipToast('⚠️ Буфер недоступен'); }
                 _closeMsgContextMenu();
             });
-            var divider = document.createElement('div');
-            divider.className = 'divider';
+            var replyBtn = document.createElement('button');
+            replyBtn.innerHTML = '↩️ Ответить';
+            replyBtn.addEventListener('click', function() {
+                _setReplyMsg(msg, idx);
+                _closeMsgContextMenu();
+            });
+            var fwdBtn = document.createElement('button');
+            fwdBtn.innerHTML = '➡️ Переслать';
+            fwdBtn.addEventListener('click', function() {
+                _forwardMsg(msg);
+                _closeMsgContextMenu();
+            });
+            var editBtn = document.createElement('button');
+            editBtn.innerHTML = '✏️ Изменить';
+            editBtn.addEventListener('click', function() {
+                _editMsg(idx);
+                _closeMsgContextMenu();
+            });
+            var pinBtn = document.createElement('button');
+            pinBtn.innerHTML = (msg.pinned ? '📌 Открепить' : '📌 Закрепить');
+            pinBtn.addEventListener('click', function() {
+                state.messages[state.currentChat][idx].pinned = !msg.pinned;
+                renderMessages();
+                notify(msg.pinned ? '📌 Сообщение закреплено' : '📌 Откреплено', 'info');
+                _closeMsgContextMenu();
+            });
+            var starBtn = document.createElement('button');
+            starBtn.innerHTML = (msg.starred ? '⭐ Убрать из избранного' : '⭐ В избранное');
+            starBtn.addEventListener('click', function() {
+                if (state.currentChat && state.messages[state.currentChat][idx]) {
+                    state.messages[state.currentChat][idx].starred = !msg.starred;
+                    renderMessages();
+                    notify(msg.starred ? '⭐ В избранном' : '💤 Убрано из избранного', msg.starred ? 'success' : 'info');
+                }
+                _closeMsgContextMenu();
+            });
             var delBtn = document.createElement('button');
             delBtn.className = 'danger';
             delBtn.innerHTML = '🗑️ Удалить';
@@ -3545,7 +3775,14 @@ function setTheme(mode) {
                 _deleteMsg(idx);
                 _closeMsgContextMenu();
             });
+            menu.appendChild(replyBtn);
+            menu.appendChild(fwdBtn);
+            if (msg.type === 'sent') menu.appendChild(editBtn);
             menu.appendChild(copyBtn);
+            menu.appendChild(pinBtn);
+            menu.appendChild(starBtn);
+            var divider = document.createElement('div');
+            divider.className = 'divider';
             menu.appendChild(divider);
             menu.appendChild(delBtn);
             document.body.appendChild(menu);
@@ -3628,6 +3865,117 @@ function setTheme(mode) {
             setTimeout(function() { el.style.animation = ''; }, 1300);
             var res = document.getElementById('chatSearchResult');
             if (res) res.textContent = '→ Сообщение #' + (idx + 1);
+        }
+
+        // ====== РЕЖИМ ВЫДЕЛЕНИЯ СООБЩЕНИЙ ======
+        var SEL = SEL || { mode: false, ids: [] };
+        function toggleSelectMode() {
+            SEL.mode = !SEL.mode;
+            SEL.ids = [];
+            var bar = document.getElementById('selectBar');
+            if (bar) bar.style.display = SEL.mode ? 'flex' : 'none';
+            var btn = document.getElementById('chatSelectBtn');
+            if (btn) { btn.style.opacity = SEL.mode ? '1' : ''; btn.style.background = SEL.mode ? 'var(--bg-input)' : ''; }
+            _updateSelectUI();
+            if (SEL.mode && state.currentChat) renderMessages();
+        }
+        function resetSelectMode() {
+            if (!SEL.mode) return;
+            SEL.mode = false; SEL.ids = [];
+            var bar = document.getElementById('selectBar');
+            if (bar) bar.style.display = 'none';
+            _updateSelectUI();
+            if (state.currentChat) renderMessages();
+        }
+        function _toggleMsgSelect(msgId) {
+            if (!SEL.mode) return;
+            var idx = SEL.ids.indexOf(msgId);
+            if (idx >= 0) SEL.ids.splice(idx, 1);
+            else SEL.ids.push(msgId);
+            _updateSelectUI();
+        }
+        function _isMsgSelected(msgId) { return SEL.ids.indexOf(msgId) >= 0; }
+        function _updateSelectUI() {
+            var bar = document.getElementById('selectBar');
+            var count = document.getElementById('selectCount');
+            if (!bar || !count) { if (bar) bar.style.display = 'none'; return; }
+            count.textContent = SEL.ids.length + ' выбрано';
+            var area = document.getElementById('messagesArea');
+            var selS = SEL.ids.slice();
+            if (area) {
+                Array.prototype.forEach.call(area.querySelectorAll('[data-msg-id-attr]'), function(el) {
+                    var id = el.getAttribute('data-msg-id-attr');
+                    var sels = selS.indexOf(id) >= 0;
+                    el.style.background = sels ? 'rgba(0,240,255,0.12)' : '';
+                    el.style.border = sels ? '1px solid var(--primary)' : '';
+                    el.style.cursor = SEL.mode ? 'pointer' : '';
+                    var stick = el.querySelector('.select-stick');
+                    if (stick) stick.remove();
+                    if (SEL.mode) {
+                        stick = document.createElement('div');
+                        stick.className = 'select-stick';
+                        stick.style.cssText = 'position:absolute;right:8px;top:8px;width:18px;height:18px;border-radius:50%;border:2px solid var(--primary);background:' + (sels ? 'var(--primary)' : 'transparent') + ';display:flex;align-items:center;justify-content:center;font-size:11px;color:#000;z-index:5;';
+                        stick.textContent = sels ? '✓' : '';
+                        el.appendChild(stick);
+                    }
+                });
+            }
+        }
+        function selectAllMessages() {
+            var msgs = state.messages[state.currentChat] || [];
+            SEL.ids = msgs.map(function(m) { return m.id; }).filter(Boolean);
+            _updateSelectUI();
+        }
+        function deselectAllMessages() { SEL.ids = []; _updateSelectUI(); }
+        function deleteSelectedMessages() {
+            if (!SEL.ids.length) { notify('Ничего не выбрано', 'warning'); return; }
+            if (!confirm('Удалить ' + SEL.ids.length + ' сообщений?')) return;
+            var msgs = state.messages[state.currentChat] || [];
+            state.messages[state.currentChat] = msgs.filter(function(m) { return SEL.ids.indexOf(m.id) === -1; });
+            saveState();
+            SEL.ids = [];
+            resetSelectMode();
+            renderMessages();
+            notify('🗑️ Удалено', 'success');
+        }
+        function forwardSelectedMessages() {
+            if (!SEL.ids.length) { notify('Ничего не выбрано', 'warning'); return; }
+            var msgs = (state.messages[state.currentChat] || []).filter(function(m) { return SEL.ids.indexOf(m.id) !== -1; });
+            var texts = msgs.map(function(m) { return m.text || ''; }).join('\n');
+            if (navigator.clipboard) { navigator.clipboard.writeText(texts); }
+            var chatId = prompt('▶️ Переслать ' + msgs.length + ' сообщений в чат. Введи номер получателя:\n(сообщения также скопированы в буфер)', '');
+            if (!chatId) { SEL.ids = []; resetSelectMode(); return; }
+            chatId = chatId.trim().toUpperCase();
+            if (!state.messages[chatId]) state.messages[chatId] = [];
+            var t = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+            msgs.forEach(function(m) {
+                state.messages[chatId].push({ id: 'm' + Date.now().toString(36) + Math.floor(Math.random() * 999), from: MS && MS.myId ? MS.myId : 'me', text: '[↪️ Переслано] ' + (m.text || ''), time: t, forward: true, origFrom: m.from });
+            });
+            saveState();
+            renderChatList();
+            SEL.ids = [];
+            resetSelectMode();
+            notify('✔️ Переслано в ' + chatId, 'success');
+        }
+        function starSelectedMessages() {
+            if (!SEL.ids.length) { notify('Ничего не выбрано', 'warning'); return; }
+            state.starredMsgs = state.starredMsgs || {};
+            var msgs = state.messages[state.currentChat] || [];
+            msgs.forEach(function(m) {
+                if (SEL.ids.indexOf(m.id) !== -1) m.starred = !m.starred;
+            });
+            saveState(); renderMessages();
+            SEL.ids = [];
+            resetSelectMode();
+            notify('⭐ Обновлено избранное', 'success');
+        }
+        function starSingleMsg(chatId, msgId) {
+            var msgs = state.messages[chatId] || [];
+            var m = msgs.find(function(x) { return x.id === msgId; });
+            if (!m) return;
+            m.starred = !m.starred;
+            saveState(); renderMessages();
+            notify(m.starred ? '⭐ В избранном' : '💤 Убрано из избранного', m.starred ? 'success' : 'info');
         }
 
         function sendMessage() {
@@ -6134,11 +6482,40 @@ function setTheme(mode) {
                     list.appendChild(row);
                 });
             }
-            const xpBtn = document.createElement('button');
-            xpBtn.className = 'admin-btn warning';
-            xpBtn.textContent = '⚡ +500 XP';
-            xpBtn.onclick = () => { addXP(500); notify('+500 XP!', 'success'); };
-            controls.appendChild(xpBtn);
+            const msgsHead = document.createElement('h3');
+            msgsHead.style.cssText = 'font-size:13px;margin:14px 0 8px;color:#fbbf24;';
+            msgsHead.textContent = '💬 Сообщения разработчиков (' + (state.devFounderMsgs || []).length + ')';
+            controls.appendChild(msgsHead);
+            const founderMsgs = (state.devFounderMsgs || []).slice().reverse();
+            if (!founderMsgs.length) {
+                const noMsgs = document.createElement('div');
+                noMsgs.style.cssText = 'font-size:12px;color:var(--text-muted);padding:8px;';
+                noMsgs.textContent = '🚫 Пока пусто. Разработчики тебе ещё не писали.';
+                controls.appendChild(noMsgs);
+            } else {
+                founderMsgs.forEach((fm, ri) => {
+                    const mi = state.devFounderMsgs.length - 1 - ri;
+                    const row = document.createElement('div');
+                    row.style.cssText = 'background:var(--bg-input);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:8px 12px;margin-bottom:8px;';
+                    const who = fm.fromDev ? '👨‍💻 Разработчик' : '🧠 Владелец';
+                    row.innerHTML = '<div style="font-size:10px;color:var(--text-muted);">' + fm.time + ' · <b>' + who + '</b></div>' +
+                        '<div style="font-size:13px;color:var(--text);">' + fm.text + '</div>' +
+                        (fm.reply ? '<div style="font-size:11px;color:#4ade80;margin-top:4px;">🧠 Ваш ответ: «' + fm.reply + '»</div>' : '');
+                    if (!fm.fromDev && !fm.reply) {
+                        const ib = document.createElement('input');
+                        ib.id = 'fmReply_' + mi;
+                        ib.placeholder = 'Ответить разработчику...';
+                        ib.style.cssText = 'width:100%;margin-top:6px;padding:6px 10px;background:var(--bg-card);border:1px solid rgba(251,191,36,0.3);border-radius:8px;color:var(--text);font-size:12px;';
+                        row.appendChild(ib);
+                        const sb = document.createElement('button');
+                        sb.textContent = '💬 Ответить';
+                        sb.style.cssText = 'margin-top:6px;width:100%;padding:6px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:8px;color:#000;font-weight:700;font-size:11px;cursor:pointer;';
+                        sb.onclick = () => { const v = document.getElementById('fmReply_' + mi); if (v && v.value.trim()) founderReplyMsg(mi, v.value.trim()); };
+                        row.appendChild(sb);
+                    }
+                    controls.appendChild(row);
+                });
+            }
             const unlockBtn = document.createElement('button');
             unlockBtn.className = 'admin-btn';
             unlockBtn.textContent = '🔓 Разблокировать всё';
