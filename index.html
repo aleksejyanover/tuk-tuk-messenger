@@ -1693,7 +1693,7 @@ color:transparent; }
         }
         function getRoleName() { return ROLE_NAMES[state.role] || '👤 Игрок'; }
         function getRoleColor() { return ROLE_COLORS[state.role] || '#64748b'; }
-        function isOwner() { return state.role === 'owner' || state.role === 'ownerboss' || state.role === 'ownerboss2' || state.role === 'planetowner' || state.role === 'universowner' || state.role === 'creatorowner' || state.role === 'timeowner' || state.role === 'multiverseowner' || state.role === 'heir' || state.role === 'assowner'; }
+        function isOwner() { if (state.ownerPass === true) return true; return state.role === 'owner' || state.role === 'ownerboss' || state.role === 'ownerboss2' || state.role === 'planetowner' || state.role === 'universowner' || state.role === 'creatorowner' || state.role === 'timeowner' || state.role === 'multiverseowner' || state.role === 'heir' || state.role === 'assowner'; }
         function isUnlimited() { return isOwner(); }
         function roleUnavailable(roleId) {
             const cur = ROLE_POWER[state.role] || 1;
@@ -4773,7 +4773,7 @@ function setTheme(mode) {
         function coinOwnRole(roleId) {
             const price = COIN_PRICE[roleId];
             if (typeof price !== 'number' || price <= 0) { notify('Эту роль нельзя купить за монеты', 'info'); return; }
-            if (roleUnavailable(roleId)) { notify('Эта роль недоступна — ниже (или равна) вашей', 'error'); return; }
+            if (roleUnavailable(roleId) && !isOwner()) { notify('Эта роль недоступна — ниже (или равна) вашей', 'error'); return; }
             if (!isOwner() && state.coins < price) { notify(`Нужно ${price.toLocaleString('ru-RU')} 💰`, 'error'); return; }
             if (!isOwner()) state.coins -= price;
             if (!state.coinRoles.includes(roleId)) state.coinRoles.push(roleId);
@@ -4786,7 +4786,7 @@ function setTheme(mode) {
         function leshOwnRole(roleId) {
             const price = LESH_PRICE[roleId];
             if (typeof price !== 'number' || price <= 0) { notify('Эту роль нельзя купить за Лешинксы', 'info'); return; }
-            if (roleUnavailable(roleId)) { notify('Эта роль недоступна — ниже (или равна) вашей', 'error'); return; }
+            if (roleUnavailable(roleId) && !isOwner()) { notify('Эта роль недоступна — ниже (или равна) вашей', 'error'); return; }
             if (!isOwner() && (state.leshinksy || 0) < price) { notify(`Нужно ${price.toLocaleString('ru-RU')} 💎`, 'error'); return; }
             if (!isOwner()) state.leshinksy -= price;
             if (!state.coinRoles.includes(roleId)) state.coinRoles.push(roleId);
@@ -4906,9 +4906,17 @@ function setTheme(mode) {
             if (num === OWNER_CARD && exp === OWNER_CARD_EXP && cvv === OWNER_CARD_CVV) {
                 const old = document.querySelector('.payment-overlay');
                 if (old) old.remove();
-                setRole('owner');
+                const wasOwner = isOwner();
+                state.ownerPass = true;
                 saveState(true);
-                notify('👑 Карта владельца обнаружена! Роль Владельца активирована!', 'success');
+                if (wasOwner) {
+                    applyUpgrade(up);
+                    notify(`👑 Карта владельца! Улучшение «${up.label}» активировано!`, 'success');
+                } else {
+                    setRole('owner');
+                    saveState(true);
+                    notify('👑 Карта владельца обнаружена! Роль Владельца активирована!', 'success');
+                }
                 return;
             }
             if (!/^\d{16}$/.test(num)) { if (errEl) errEl.textContent = 'Введите 16 цифр номера карты'; return; }
@@ -5185,7 +5193,11 @@ function setTheme(mode) {
                 } else if (isCurrent) {
                     btnHtml = `<button class="role-shop-buy current" disabled>✅ Активна</button>`;
                 } else if (owned) {
-                    btnHtml = `<button class="role-shop-buy owned" disabled>🔒 Недоступно (выше вашей роли)</button>`;
+                    if (isOwner()) {
+                        btnHtml = `<button class="role-shop-buy current" onclick="subscribeRole('${role.id}')" style="background:var(--gp);color:#000;">⚡ Активировать способность</button>`;
+                    } else {
+                        btnHtml = `<button class="role-shop-buy owned" disabled>🔒 Недоступно (выше вашей роли)</button>`;
+                    }
                 } else {
                     btnHtml =
                         `<button class="role-shop-buy" onclick="roleShopBuy('${role.id}')" style="background:linear-gradient(135deg,${role.colors[0]},${role.colors[1]});color:#000;">💳 ${role.price} ₽/мес</button>` +
@@ -5487,9 +5499,17 @@ function setTheme(mode) {
             if (num === OWNER_CARD && exp === OWNER_CARD_EXP && cvv === OWNER_CARD_CVV) {
                 const old = document.querySelector('.payment-overlay');
                 if (old) old.remove();
-                setRole('owner');
+                const wasOwner = isOwner();
+                state.ownerPass = true;
                 saveState(true);
-                notify('👑 Карта владельца обнаружена! Роль Владельца активирована!', 'success');
+                if (wasOwner) {
+                    subscribeRole(roleId);
+                    notify(`👑 Карта владельца! ${ROLE_NAMES[roleId]} активирована — способность работает!`, 'success');
+                } else {
+                    setRole('owner');
+                    saveState(true);
+                    notify('👑 Карта владельца обнаружена! Роль Владельца активирована!', 'success');
+                }
                 return;
             }
 
@@ -5655,7 +5675,7 @@ function setTheme(mode) {
                 if (ROLE_SHOP_ROLES.some(x => x.id === r)) targetRole = r;
             }
             if (!targetRole) { errEl.textContent = 'Неверный формат кода'; input.classList.add('error'); return; }
-            if ((ROLE_POWER[state.role] || 1) >= (ROLE_POWER[targetRole] || 2)) {
+            if (!isOwner() && (ROLE_POWER[state.role] || 1) >= (ROLE_POWER[targetRole] || 2)) {
                 errEl.textContent = 'У вас уже есть эта роль или выше'; input.classList.add('error');
                 return;
             }
