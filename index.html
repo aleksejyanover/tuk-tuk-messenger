@@ -5594,6 +5594,8 @@ function setTheme(mode) {
 
             setTimeout(() => {
                 const role = ctx.role;
+                subscribeRole(role.id);
+                notify(`🎉 Роль «${ROLE_NAMES[role.id] || role.name}» активирована сразу! Способность работает!`, 'success');
                 const code = (function() {
                     const chars = '0123456789ABCDEF';
                     let s = '';
@@ -5636,11 +5638,12 @@ function setTheme(mode) {
                         </div>`
                         : '') +
                     `<div class="payment-result">` +
-                        `<p style="font-size:12px;color:var(--text-muted);">Ваш код активации роли:</p>` +
+                        `<p style="font-size:12px;color:#22c55e;font-weight:700;">✅ Роль уже активирована! Способность работает!</p>` +
+                        `<p style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Код роли (на случай переустановки):</p>` +
                         `<div class="code-display">${esc(code)}</div>` +
-                        `<button onclick="copyRoleCode('${esc(code)}')" style="margin-top:10px;padding:8px 16px;background:var(--bg-input);border:none;border-radius:8px;color:var(--text);font-size:12px;cursor:pointer;">📋 Скопировать</button>` +
+                        `<button onclick="copyRoleCode('${esc(code)}')" style="margin-top:10px;padding:8px 16px;background:var(--bg-input);border:none;border-radius:8px;color:var(--text);font-size:12px;cursor:pointer;">📋 Скопировать код</button>` +
                     `</div>` +
-                    `<button onclick="document.querySelector('.payment-overlay').remove();activateRoleCodeByInput('${esc(code)}')" style="margin-top:15px;padding:12px 24px;background:var(--gp);border:none;border-radius:10px;color:#000;font-weight:700;cursor:pointer;">🔑 Активировать сейчас</button>` +
+                    `<button onclick="document.querySelector('.payment-overlay').remove();activateRoleCodeByInput('${esc(code)}')" style="margin-top:15px;padding:12px 24px;background:var(--gp);border:none;border-radius:10px;color:#000;font-weight:700;cursor:pointer;">👑 Открыть роль</button>` +
                     `<button onclick="document.querySelector('.payment-overlay').remove()" style="margin-top:8px;padding:8px;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;">Позже</button>` +
                 `</div>`;
             document.body.appendChild(overlay);
