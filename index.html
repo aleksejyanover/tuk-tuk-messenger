@@ -3570,7 +3570,9 @@ function setTheme(mode) {
             const grid = document.getElementById('garageGrid');
             if (!grid) return;
             grid.innerHTML = '';
-            garageCars.forEach((car, i) => {
+            const order = garageCars.map((c, i) => i).sort((a, b) => garageCars[a].xp - garageCars[b].xp);
+            order.forEach((i) => {
+                const car = garageCars[i];
                 const unlocked = state.unlockedCars.includes(i) || state.role === 'admin' || state.role === 'owner' || state.role === 'god';
                 const selected = state.selectedCar === i;
                 const div = document.createElement('div');
