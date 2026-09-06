@@ -2946,13 +2946,19 @@ function setTheme(mode) {
             var r2=state.devReviews[idx];
             if (!r2) return;
             state.devReviews.splice(idx,1);
-            // одобрить ССЫЛКУ — разрешить публикацию. Публикуется отдельно, когда разработчик захочет.
+            var autoPub = false;
             if (r2.type === 'version') {
-                (state.dev.versions||[]).forEach(function(v){ if (v.id===r2.id) v.status='approved'; }); // ссылка разрешена, но не опубликована
+                var vIdx = -1;
+                (state.dev.versions||[]).forEach(function(v, i){ if (v.id===r2.id){ v.status='approved'; vIdx=i; } });
+                if (vIdx >= 0) { devPublishVersion(vIdx); autoPub = true; }
             } else if (r2.type === 'game') {
-                (state.dev.games||[]).forEach(function(g){ if (g.id===r2.id){ g.approved = true; g.pubRejected=false; g.pubStatus = g.pubStatus==='pending' ? 'approved' : (g.pubStatus||'approved'); } });
+                var gIdx = -1;
+                (state.dev.games||[]).forEach(function(g, i){ if (g.id===r2.id){ g.approved = true; g.pubRejected=false; g.pubStatus = 'approved'; gIdx=i; } });
+                if (gIdx >= 0) { devPublish(gIdx); autoPub = true; }
             } else if (r2.type === 'clip') {
-                (state.dev.clips||[]).forEach(function(c){ if (c.id===r2.id){ c.approved = true; c.pubRejected=false; c.pubStatus = c.pubStatus==='pending' ? 'approved' : (c.pubStatus||'approved'); } });
+                var cIdx = -1;
+                (state.dev.clips||[]).forEach(function(c, i){ if (c.id===r2.id){ c.approved = true; c.pubRejected=false; c.pubStatus = 'approved'; cIdx=i; } });
+                if (cIdx >= 0) { devPublishClip(cIdx); autoPub = true; }
             }
             // стать разработчиком можно после 5 одобренных игр этого разработчика
             if (r2.type === 'game') {
@@ -2966,7 +2972,8 @@ function setTheme(mode) {
                     }
                 }
             }
-            notify('✅ Ссылка «'+r2.name+'» одобрена! Теперь её можно выложить.','ok');
+            if (autoPub) notify('✅ «'+r2.name+'» одобрена и сразу появилась в разделе (Игры или Клипы)! В неё уже можно играть/смотреть.','ok');
+            else notify('✅ Ссылка «'+r2.name+'» одобрена! Теперь её можно выложить.','ok');
             saveState(); renderDevPanel(); renderApprovedSections();
         }
         function devReject(idx) {
