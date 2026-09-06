@@ -6674,6 +6674,99 @@ function setTheme(mode) {
                     list.appendChild(row);
                 });
             }
+            const revHead = document.createElement('h3');
+            revHead.style.cssText = 'font-size:13px;margin:14px 0 8px;color:#4ade80;';
+            const _pendingReviews = (state.devReviews || []).filter(function(r){ return r.status === 'pending'; });
+            revHead.textContent = '📥 Разрешать / запрещать: игры, клипы и версии (' + _pendingReviews.length + ' на проверке)';
+            controls.appendChild(revHead);
+            if (!_pendingReviews.length) {
+                const noRev = document.createElement('div');
+                noRev.style.cssText = 'font-size:12px;color:var(--text-muted);padding:8px;';
+                noRev.textContent = '✅ Новых заявок нет. Разрешай и запрещай игры, клипы и версии прямо здесь.';
+                controls.appendChild(noRev);
+            } else {
+                const revList = document.createElement('div');
+                revList.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
+                (state.devReviews || []).forEach(function(r2, rx) {
+                    if (r2.status !== 'pending') return;
+                    const em = r2.type === 'game' ? '🎮' : (r2.type === 'clip' ? '🎬' : '📦');
+                    const tl = r2.type === 'game' ? 'игра' : (r2.type === 'clip' ? 'клип' : 'версия/раскладка');
+                    const row = document.createElement('div');
+                    row.style.cssText = 'background:var(--bg-input);border:1px solid rgba(74,222,128,0.35);border-radius:10px;padding:8px 12px;margin-bottom:6px;';
+                    row.innerHTML = '<div><b>' + em + ' ' + esc(r2.name) + '</b> <span style="font-size:11px;color:var(--text-muted);">от ' + esc(r2.devU || '?') + ' · ' + tl + '</span></div>' +
+                        '<div style="font-size:11px;color:var(--text-muted);">' + esc(r2.desc || '') + '</div>' +
+                        '<div style="font-size:10px;color:#7dd3fc;word-break:break-all;">📎 ' + esc(r2.link || ('dev_' + r2.id + '.html')) + '</div>';
+                    const btns = document.createElement('div');
+                    btns.style.cssText = 'display:flex;gap:6px;margin-top:8px;';
+                    const okB = document.createElement('button');
+                    okB.textContent = '✅ Разрешить';
+                    okB.style.cssText = 'flex:1;padding:7px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;';
+                    okB.onclick = function() { devApprove(rx); renderOwnerPanel(); };
+                    const noB = document.createElement('button');
+                    noB.textContent = '✕ Запретить';
+                    noB.style.cssText = 'flex:1;padding:7px;background:linear-gradient(135deg,#ef4444,#b91c1c);border:none;border-radius:8px;color:#fff;font-weight:700;font-size:11px;cursor:pointer;';
+                    noB.onclick = function() { devReject(rx); renderOwnerPanel(); };
+                    btns.appendChild(okB); btns.appendChild(noB);
+                    row.appendChild(btns);
+                    revList.appendChild(row);
+                });
+                controls.appendChild(revList);
+            }
+            const allHead = document.createElement('h3');
+            allHead.style.cssText = 'font-size:13px;margin:14px 0 8px;color:#fbbf24;';
+            allHead.textContent = '🧰 Все материалы разработчиков';
+            controls.appendChild(allHead);
+            const allBox = document.createElement('div');
+            allBox.style.cssText = 'display:flex;flex-direction:column;gap:6px;width:100%;';
+            const _sdev = state.dev || { games: [], clips: [], versions: [] };
+            const _devName = (state.dev && state.dev.name) || '?';
+            let _anyContent = false;
+            (_sdev.games || []).forEach(function(g, gi) {
+                if (!g) return; _anyContent = true;
+                const st = g.published ? '🟢 Опубликована' : (g.approved ? '🟡 Одобрена' : (g.pubRejected ? '🔴 Запрещена' : '⚪ На проверке'));
+                const d = document.createElement('div');
+                d.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--bg-input);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:8px 12px;font-size:12px;';
+                d.innerHTML = '<div>🎮 <b>' + esc(g.name) + '</b> <span style="font-size:10px;color:var(--text-muted);">от ' + esc(g.devU || g.devName || _devName) + '</span></div><div style="text-align:right;font-size:10px;">' + st + '</div>';
+                if (g.published) {
+                    const up = document.createElement('button');
+                    up.textContent = '🧹 Снять с публикации';
+                    up.onclick = function() { devUnpublish(gi); renderOwnerPanel(); };
+                    up.style.cssText = 'margin-left:auto;padding:4px 8px;background:linear-gradient(135deg,#f59e0b,#b45309);border:none;border-radius:6px;color:#fff;font-weight:700;font-size:10px;cursor:pointer;';
+                    d.appendChild(up);
+                }
+                allBox.appendChild(d);
+            });
+            (_sdev.clips || []).forEach(function(c, ci) {
+                if (!c) return; _anyContent = true;
+                const st = c.published ? '🟢 Опубликован' : (c.approved ? '🟡 Одобрен' : (c.pubRejected ? '🔴 Запрещён' : '⚪ На проверке'));
+                const d = document.createElement('div');
+                d.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--bg-input);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:8px 12px;font-size:12px;';
+                d.innerHTML = '<div>🎬 <b>' + esc(c.name) + '</b> <span style="font-size:10px;color:var(--text-muted);">от ' + esc(c.devU || c.devName || _devName) + '</span></div><div style="text-align:right;font-size:10px;">' + st + '</div>';
+                if (c.published) {
+                    const up = document.createElement('button');
+                    up.textContent = '🧹 Снять с публикации';
+                    up.onclick = function() { devUnpublishClip(ci); renderOwnerPanel(); };
+                    up.style.cssText = 'margin-left:auto;padding:4px 8px;background:linear-gradient(135deg,#f59e0b,#b45309);border:none;border-radius:6px;color:#fff;font-weight:700;font-size:10px;cursor:pointer;';
+                    d.appendChild(up);
+                }
+                allBox.appendChild(d);
+            });
+            (_sdev.versions || []).forEach(function(v) {
+                if (!v) return; _anyContent = true;
+                const st = v.published ? '🟢 Опубликована' : (v.status === 'approved' ? '🟡 Одобрена' : (v.status === 'pending' ? '⚪ На проверке' : '⛔ Черновик'));
+                const d = document.createElement('div');
+                d.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--bg-input);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:8px 12px;font-size:12px;';
+                d.innerHTML = '<div>📦 <b>' + esc(v.name) + '</b> <span style="font-size:10px;color:var(--text-muted);">от ' + esc(_devName) + '</span></div><div style="text-align:right;font-size:10px;">' + st + '</div>';
+                allBox.appendChild(d);
+            });
+            if (!_anyContent) {
+                const nc = document.createElement('div');
+                nc.style.cssText = 'font-size:12px;color:var(--text-muted);padding:8px;';
+                nc.textContent = '🚫 Разработчики ещё ничего не отправили.';
+                allBox.appendChild(nc);
+            }
+            controls.appendChild(allHead); controls.appendChild(allBox);
+
             const msgsHead = document.createElement('h3');
             msgsHead.style.cssText = 'font-size:13px;margin:14px 0 8px;color:#fbbf24;';
             msgsHead.textContent = '💬 Сообщения разработчиков (' + (state.devFounderMsgs || []).length + ')';
