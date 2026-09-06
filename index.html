@@ -374,6 +374,8 @@ color:transparent; }
         .panel { display: none; flex-direction: column; height: 100%; overflow: hidden; }
         .panel.active { display: flex; }
         .rating-panel, .dev-panel-content, .shop-panel, .garage-panel, .stats-panel, .profile-panel { flex: 1 1 auto; min-height: 0; overflow-y: auto; width: 100%; box-sizing: border-box; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+        .panel > div { min-height: 0; }
+        #panel-games > div:first-child, #panel-garage > div:first-child, #panel-shop > div:first-child, #panel-add > div:first-child, #panel-profile > div:first-child { flex: 1 1 auto; }
         .role-badge-top { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 8px 20px; border-radius: 20px; font-size: 12px; font-weight: 700; z-index: 1001; display: none; }
         .role-badge-top.active { display: block; }
         .role-badge-top.owner { background: linear-gradient(135deg,#ff0066,#ff00aa); color: white; }
@@ -1145,7 +1147,7 @@ color:transparent; }
                                 <div class="creator-avatar">👨‍💻</div>
                                 <div class="creator-info">
                                     <div class="creator-name">Алексей Яновер</div>
-                                    <div class="creator-role">Создатель и владелец мессенджера Тук-Тук</div>
+                                    <div class="creator-role">Создатель и владелец мессенджера Брум-Брум</div>
                                     <div class="creator-badge">👑 Владелец</div>
                                 </div>
                             </div>
@@ -1183,7 +1185,7 @@ color:transparent; }
                             
                             <div class="thanks-section">
                                 <h4>🙏 Благодарность</h4>
-                                <p>Спасибо всем, кто зашёл в игру и пользуется мессенджером Тук-Тук! Спасибо за вашу поддержку и участие!</p>
+                                <p>Спасибо всем, кто зашёл в игру и пользуется мессенджером Брум-Брум! Спасибо за вашу поддержку и участие!</p>
                             </div>
                         </div>
                     </div>
@@ -1259,12 +1261,12 @@ color:transparent; }
             <div class="panel" id="panel-dev">
                 <div class="dev-panel-content" style="padding:20px;max-width:760px;margin:0 auto;">
                     <h2 style="margin:0 0 4px;">⚙️ Режим разработчиков</h2>
-                    <p style="margin:0 0 16px;color:var(--text-muted);font-size:13px;">Создавай игры, клипы и свои версии Тук-Тук. Дождись одобрения Основателя. После <b>5 одобренных игр</b> — получишь подписку <b>«Разработчик»</b> (чуть слабее админа), и тебя узнает весь мессенджер! Купить её можно и в магазине.</p>
+                    <p style="margin:0 0 16px;color:var(--text-muted);font-size:13px;">Создавай игры, клипы и свои версии Брум-Брум. Дождись одобрения Основателя. После <b>5 одобренных игр</b> — получишь подписку <b>«Разработчик»</b> (чуть слабее админа), и тебя узнает весь мессенджер! Купить её можно и в магазине.</p>
 
                     <div id="devNotRegistered" style="display:none;">
                         <div style="background:linear-gradient(135deg,rgba(0,240,255,0.08),rgba(167,139,250,0.08));border:1px solid rgba(0,240,255,0.3);border-radius:16px;padding:20px;text-align:center;">
                             <div style="font-size:46px;">👨‍💻</div>
-                            <h3 style="margin:8px 0;">Стань разработчиком Тук-Тук</h3>
+                            <h3 style="margin:8px 0;">Стань разработчиком Брум-Брум</h3>
                             <p style="color:var(--text-muted);font-size:13px;">Разработчики — это те, кто уже умеет много что делать. Они делают игры, клипы и целые версии приложения. Когда твою версию одобрит Основатель — она станет доступна по твоей ссылке, а за 2 выпущенные игры ты получишь подписку «Разработчик».</p>
                             <input type="text" id="devNameInput" placeholder="Твоё имя разработчика" style="width:100%;max-width:320px;padding:11px 14px;margin:10px 0;background:var(--bg-input);border:1px solid rgba(0,240,255,0.3);border-radius:10px;color:var(--text);font-size:14px;text-align:center;outline:none;">
                             <br>
@@ -1311,7 +1313,7 @@ color:transparent; }
                         </div>
 
                         <div id="devKnownBanner" style="display:none;background:linear-gradient(135deg,rgba(255,215,120,0.12),rgba(167,139,250,0.12));border:1px solid rgba(255,215,120,0.5);border-radius:14px;padding:12px;margin-bottom:14px;text-align:center;font-weight:700;">
-                            🎉 Ты выпустил 5 игр, одобренных Основателем — получил подписку «Разработчик»! Тебя знает ВЕСЬ Тук-Тук.
+                            🎉 Ты выпустил 5 игр, одобренных Основателем — получил подписку «Разработчик»! Тебя знает ВЕСЬ Брум-Брум.
                         </div>
 
                         <div style="background:var(--bg-card);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:14px;">
@@ -1336,11 +1338,11 @@ color:transparent; }
                         </div>
 
                         <div style="background:var(--bg-card);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:14px;">
-                            <h3 style="margin:0 0 4px;">📦 Мои версии Тук-Тук</h3>
+                            <h3 style="margin:0 0 4px;">📦 Мои версии Брум-Брум</h3>
                             <p style="margin:0 0 10px;color:var(--text-muted);font-size:12px;">Собери свою версию и отправь её Основателю на проверку. Если понравится — версия встанет по твоей ссылке.</p>
                             <div id="devVersionsList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>
                             <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                                <input type="text" id="devVersionName" placeholder="Название версии (напр. Тук-Тук 2.0)" style="flex:1.2;min-width:140px;padding:9px 12px;background:var(--bg-input);border:1px solid rgba(0,240,255,0.25);border-radius:10px;color:var(--text);font-size:13px;outline:none;">
+                                <input type="text" id="devVersionName" placeholder="Название версии (напр. Брум-Брум 2.0)" style="flex:1.2;min-width:140px;padding:9px 12px;background:var(--bg-input);border:1px solid rgba(0,240,255,0.25);border-radius:10px;color:var(--text);font-size:13px;outline:none;">
                                 <input type="text" id="devVersionDesc" placeholder="Что нового" style="flex:2;min-width:160px;padding:9px 12px;background:var(--bg-input);border:1px solid rgba(0,240,255,0.25);border-radius:10px;color:var(--text);font-size:13px;outline:none;">
                                 <input type="text" id="devVersionLink" placeholder="Ссылка https://..." style="flex:2;min-width:180px;padding:9px 12px;background:var(--bg-input);border:1px solid rgba(52,211,153,0.4);border-radius:10px;color:var(--text);font-size:13px;outline:none;">
                                 <button onclick="devAddVersion()" style="padding:9px 16px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:10px;color:#000;font-weight:700;font-size:13px;cursor:pointer;">➕ Собрать</button>
@@ -1354,7 +1356,7 @@ color:transparent; }
                         </div>
 
                         <div style="background:var(--bg-card);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;">
-                            <h3 style="margin:0 0 10px;">👥 Кого уже знает Тук-Тук</h3>
+                            <h3 style="margin:0 0 10px;">👥 Кого уже знает Брум-Брум</h3>
                             <div id="devRegistryList" style="display:flex;flex-direction:column;gap:6px;"></div>
                         </div>
                     </div>
@@ -2245,31 +2247,31 @@ color:transparent; }
         function openMedia(type) {
             var title='', body='', footer='';
             if (type==='anthem') {
-                title='🎵 Гимн мессенджера Тук-Тук Алёши';
-                body='<div class="media-modal-symbol">🎵</div><p>Слушай гимн нашего мессенджера — про Тук-Тук, машины, монеты, Лешинксы и бота Алёшу. Голос и мелодия играют автоматически.</p>';
+                title='🎵 Гимн мессенджера Брум-Брум Алёши';
+                body='<div class="media-modal-symbol">🎵</div><p>Слушай гимн нашего мессенджера — про Брум-Брум, машины, монеты, Лешинксы и бота Алёшу. Голос и мелодия играют автоматически.</p>';
                 footer='<div style="margin-top:14px;display:flex;gap:8px"><button class="media-btn" onclick="playAnthem()">▶ Слушать</button><button class="media-btn" onclick="stopAnthem()">⏹ Стоп</button></div>'+
                     '<p style="font-size:11px;color:var(--text-muted);margin-top:10px;">'+
-                    'Тук-Тук, Тук-Тук — мессенджер для машин.<br>По номеру авто мы свяжемся в один миг.<br>Монеты и Лешинксы в кармане у тебя.<br>И бот Алёша рядом — поможет он всегда.'+
+                    'Брум-Брум, Брум-Брум — мессенджер для машин.<br>По номеру авто мы свяжемся в один миг.<br>Монеты и Лешинксы в кармане у тебя.<br>И бот Алёша рядом — поможет он всегда.'+
                     '</p>';
             } else if (type==='flag') {
-                title='🚩 Флаг мессенджера Тук-Тук Алёши';
+                title='🚩 Флаг мессенджера Брум-Брум Алёши';
                 body='<div class="media-modal-symbol">🚩</div>'+
                     '<div class="mflag">'+
                       '<div style="background:#005ac8"></div>'+
                       '<div style="background:#0a0c18"></div>'+
                       '<div style="background:#7828c8"></div>'+
                     '</div>'+
-                    '<p>Три неоновые полосы: синий — свобода дороги, чёрный — ночь на трассе, фиолетовый — магия будущего. В центре — знак Тук-Тук с машиной.</p>';
+                    '<p>Три неоновые полосы: синий — свобода дороги, чёрный — ночь на трассе, фиолетовый — магия будущего. В центре — знак Брум-Брум с машиной.</p>';
             } else if (type==='herb') {
-                title='🛡️ Герб мессенджера Тук-Тук Алёши';
+                title='🛡️ Герб мессенджера Брум-Брум Алёши';
                 body='<div class="media-modal-symbol">🛡️</div>'+
-                    '<p>Щит с короной Владельца, машиной в центре и знаками валют мессенджера — монетой 💰 и Лешинксом 💎. Внизу лента с названием «Тук-Тук».</p>'+
+                    '<p>Щит с короной Владельца, машиной в центре и знаками валют мессенджера — монетой 💰 и Лешинксом 💎. Внизу лента с названием «Брум-Брум».</p>'+
                     '<div style="display:flex;gap:10px;align-items:center;margin-top:10px">'+
                       '<span style="font-size:44px">👑</span><span style="color:#fbbf24;font-weight:700">ВЛАДЕЛЕЦ</span>'+
                       '<span style="margin-left:auto;font-size:30px">🚗 💰 💎</span>'+
                     '</div>';
             } else if (type==='promo') {
-                title='📢 Рекламные приколюхи Тук-Тук';
+                title='📢 Рекламные приколюхи Брум-Брум';
                 var items=[
                     ['promo/logo.png','Логотип'],['promo/qr_poster.png','QR-постер'],
                     ['promo/banner_square.png','Пост 1080×1080'],['promo/banner_wide.png','Баннер 1200×630'],
@@ -2820,6 +2822,10 @@ function setTheme(mode) {
             wrap.appendChild(bar);
             wrap.appendChild(f);
             wrap.id='devLinkWrap';
+            var hint = document.createElement('div');
+            hint.style.cssText = 'color:#7d8db0;font-family:sans-serif;font-size:12px;padding:6px 12px;';
+            hint.textContent = 'Если игра не открывается (или белый экран) — нажми «↗ Открыть отдельно» или «✕ Закрыть».';
+            wrap.insertBefore(hint, wrap.firstChild);
             document.body.appendChild(wrap);
         }
         function updateDevNavBadge() {
@@ -2897,7 +2903,7 @@ function setTheme(mode) {
             subs['dev'] = Date.now() + 30*24*60*60*1000;
             state.subs = subs;
             saveState();
-            notify('🛠️ Подписка «Разработчик» получена за '+(reason||'5 одобренных игр')+'! Тебя знает весь Тук-Тук.','ok');
+            notify('🛠️ Подписка «Разработчик» получена за '+(reason||'5 одобренных игр')+'! Тебя знает весь Брум-Брум.','ok');
         }
         function devAddClip() {
             devSeed();
@@ -3389,7 +3395,7 @@ function setTheme(mode) {
             if (lower === 'время' || lower === 'time') { notify(`🕐 ${new Date().toLocaleTimeString('ru-RU')}`, 'warning'); return true; }
             if (lower === 'погода' || lower === 'weather') { notify(`🌤️ ${['☀️','🌧️','❄️','🌫️'][Math.floor(Math.random()*4)]}`, 'warning'); return true; }
             if (lower === 'статус' || lower === 'status') { notify(`📊 Ур:${state.level} XP:${state.xp}`, 'warning'); return true; }
-            if (lower === 'помощь' || lower === 'help') { notify('💡 Команды: огонь, скорость, удача, бонус, сюрприз, магия, тишина, время, погода, статус', 'warning'); return true; }
+            if (lower === 'помощь' || lower === 'help') { notify('💡 Команды: огонь, скорость, удача, бонус, сюрприз, магия, тишина, время, погода, статус, брум, обновление, рейтинг, стрик. Секреты: ТУТТУК, МАСКОТ, ЛИМОНАД', 'warning'); return true; }
             if (lower === 'туктук' || lower === 'тук-тук') { spawnFlyingCar(); notify('🚗 Тук-тук!', 'success'); return false; }
             if (lower === 'конфетти') { spawnConfetti(); notify('🎉 Конфетти!', 'success'); return false; }
             if (lower === 'ночь') { document.body.classList.toggle('night-mode'); notify('🌙 Ночь', 'success'); saveState(); return true; }
@@ -4676,7 +4682,7 @@ function setTheme(mode) {
         // ====== ROLE SHOP / PAYMENTS ======
         const ROLE_SHOP_ROLES = [
             { id:'vip', name:'VIP', emoji:'⭐', price:99, period:'мес', xp:'x1.5 XP', desc:'Повышенный опыт на месяц', colors:['#ffd700','#ffaa00'] },
-            { id:'dev', name:'Разработчик', emoji:'🛠️', price:149, period:'мес', xp:'x1.9 XP', desc:'Мастерская игр: выпускай игры, клипы и версии Тук-Тук', colors:['#22d3ee','#7dd3fc'] },
+            { id:'dev', name:'Разработчик', emoji:'🛠️', price:149, period:'мес', xp:'x1.9 XP', desc:'Мастерская игр: выпускай игры, клипы и версии Брум-Брум', colors:['#22d3ee','#7dd3fc'] },
             { id:'premium', name:'Premium', emoji:'💎', price:199, period:'мес', xp:'x1.25 XP', desc:'Премиум-статус на месяц', colors:['#a855f7','#7c3aed'] },
             { id:'veteran', name:'Veteran', emoji:'🎖️', price:299, period:'мес', xp:'x1.3 XP', desc:'Статус ветерана на месяц', colors:['#10b981','#059669'] },
             { id:'gold', name:'Золотой', emoji:'🥇', price:499, period:'мес', xp:'x1.6 XP', desc:'Золотая подписка будущего', colors:['#eab308','#ca8a04'] },
@@ -4742,15 +4748,15 @@ function setTheme(mode) {
             { id:'owner', name:'Владелец', emoji:'👑👑', price:1000000, period:'мес', xp:'x99 XP', desc:'Верховный владелец — доступ ко всему, без исключений', colors:['#ff0066','#ff00aa'] },
             { id:'heir', name:'Наследник Владельца', emoji:'👑👶', price:1500000, period:'мес', xp:'x120 XP', desc:'Готовится стать новым владельцем', colors:['#fbbf24','#f59e0b'] },
             { id:'catowner', name:'Кот Владельца', emoji:'🐱👑', price:2000000, period:'мес', xp:'x150 XP', desc:'Кот, который считает себя владельцем', colors:['#fb923c','#ef4444'] },
-            { id:'ownerboss', name:'Владелец Владельца', emoji:'👑🔥', price:5000000, period:'мес', xp:'x200 XP', desc:'👑🔥 ВЛАДЕЛЕЦ НАД ВЛАДЕЛЬЦАМИ — абсолютная власть. САМАЯ ДОРОГАЯ РОЛЬ ТУК-ТУК', colors:['#ff2200','#ff0066'] },
+            { id:'ownerboss', name:'Владелец Владельца', emoji:'👑🔥', price:5000000, period:'мес', xp:'x200 XP', desc:'👑🔥 ВЛАДЕЛЕЦ НАД ВЛАДЕЛЬЦАМИ — абсолютная власть. САМАЯ ДОРОГАЯ РОЛЬ БРУМ-БРУМ', colors:['#ff2200','#ff0066'] },
             { id:'ownerboss2', name:'Владелец Владельца Владельца', emoji:'👑🚀', price:10000000, period:'мес', xp:'x250 XP', desc:'Босс всех владельцев — абсолют власти над владельцами', colors:['#ff6600','#ff2200'] },
             { id:'planetowner', name:'Владелец Планеты', emoji:'🌍', price:15000000, period:'мес', xp:'x300 XP', desc:'Владеет целой планетой и всеми владельцами на ней', colors:['#38bdf8','#0284c7'] },
             { id:'universowner', name:'Владелец Вселенной', emoji:'🌌', price:30000000, period:'мес', xp:'x400 XP', desc:'Владеет всей Вселенной и всем что в ней', colors:['#a855f7','#6b21a8'] },
             { id:'creatorowner', name:'Создатель Владельцев', emoji:'🧠', price:50000000, period:'мес', xp:'x500 XP', desc:'Тот, кто создал всех владельцев. Предел власти', colors:['#ffffff','#c4b5fd'] },
             { id:'timeowner', name:'Владелец Времени', emoji:'⏳', price:80000000, period:'мес', xp:'x600 XP', desc:'Владеет самой линией времени. Всё остановится по твоему слову', colors:['#fde047','#ca8a04'] },
             { id:'multiverseowner', name:'Владелец Мультивселенной', emoji:'🌌', price:100000000, period:'мес', xp:'x700 XP', desc:'Власть за пределами всех вселенных. Абсолютный предел всего', colors:['#00f0ff','#0ea5e9'] },
-            { id:'lesha_fan', name:'Фанат Создателя', emoji:'💚', price:150000000, period:'мес', xp:'x800 XP', desc:'Фанат Алёши — он знает все пасхалки и секреты Тук-Тук. Фанат видит будущее', colors:['#22c55e','#16a34a'] },
-            { id:'lesha_admin', name:'Админ Создателя', emoji:'🧠', price:200000000, period:'мес', xp:'x900 XP', desc:'Админ по приказу Алёши — он управляет реальностью Тук-Тук. Невозможно забанить', colors:['#fbbf24','#f59e0b'] },
+            { id:'lesha_fan', name:'Фанат Создателя', emoji:'💚', price:150000000, period:'мес', xp:'x800 XP', desc:'Фанат Алёши — он знает все пасхалки и секреты Брум-Брум. Фанат видит будущее', colors:['#22c55e','#16a34a'] },
+            { id:'lesha_admin', name:'Админ Создателя', emoji:'🧠', price:200000000, period:'мес', xp:'x900 XP', desc:'Админ по приказу Алёши — он управляет реальностью Брум-Брум. Невозможно забанить', colors:['#fbbf24','#f59e0b'] },
             { id:'lesha_boss', name:'Босс Создателя', emoji:'🔥', price:300000000, period:'мес', xp:'x1000 XP', desc:'Самая мощная роль в игре — Алёша лично выдал её тебе. Абсолютная власть над всем', colors:['#ff0066','#ff4444'] },
             { id:'road_king', name:'Король Дорог', emoji:'👑🛣️', price:9000000000, period:'мес', xp:'x1500 XP', desc:'Все дороги мира твои. Никто не обгонит Короля Дорог', colors:['#fbbf24','#f59e0b'] },
             { id:'turbo_king', name:'Турбо-Король', emoji:'⚡👑', price:20000000000, period:'мес', xp:'x2000 XP', desc:'Скорость света не предел — турбо-корону получает только Легенда Легенд', colors:['#00f0ff','#22d3ee'] },
@@ -4769,7 +4775,7 @@ function setTheme(mode) {
             mentor:    '🎓 Мудрость — секретные слова дают +50% XP',
             platinum:  '💎 Двойной гудок — гудок засчитывается дважды',
             moderator: '🛡️ Патруль — раз в день бесплатные +30 XP',
-            dev:       '🛠️ Мастерская — выпускай игры, клипы и версии Тук-Тук, минус 60% комиссии с продаж',
+            dev:       '🛠️ Мастерская — выпускай игры, клипы и версии Брум-Брум, минус 60% комиссии с продаж',
             legend:    '🏆 Легендарный гудок — гудок даёт конфетти и +3 XP',
             admin:     '👑 Админ-крит — 5% шанс на удвоенный XP',
             titan:     '🔮 Титан-крит — 25% шанс на x2 XP',
@@ -4836,7 +4842,7 @@ function setTheme(mode) {
             creatorowner:'🧠 СОЗДАТЕЛЬ ВЛАДЕЛЬЦЕВ — x500 XP, ты создал эту игру и всех в ней',
             timeowner:'⏳ ВЛАДЕЛЕЦ ВРЕМЕНИ — x600 XP, ты управляешь самой временной линией этой игры',
             multiverseowner:'🌌 ВЛАДЕЛЕЦ МУЛЬТИВСЕЛЕННОЙ — x700 XP, твоя власть простирается за пределы всех вселенных',
-            lesha_fan:'💚 ФАНАТ СОЗДАТЕЛЯ — x800 XP, знаешь все пасхалки Тук-Тук, видишь будущее',
+            lesha_fan:'💚 ФАНАТ СОЗДАТЕЛЯ — x800 XP, знаешь все пасхалки Брум-Брум, видишь будущее',
             lesha_admin:'🧠 АДМИН СОЗДАТЕЛЯ — x900 XP, управляем реальностью, невозможно забанить',
             lesha_boss:'🔥 БОСС СОЗДАТЕЛЯ — x1000 XP, самая мощная роль, Алёша выдал лично',
             road_king:'👑🛣️ КОРОЛЬ ДОРОГ — x1500 XP, все дороги твои, никто не обгонит',
@@ -5780,7 +5786,7 @@ function setTheme(mode) {
                     `<h2>Оплата успешна!</h2>` +
                     (roleInfo
                         ? `<div class="payment-receipt">
-                            <div class="receipt-row"><span>Магазин</span><span>Тук-Тук Авто</span></div>
+                            <div class="receipt-row"><span>Магазин</span><span>Брум-Брум Авто</span></div>
                             <div class="receipt-row"><span>Роль</span><span>${esc(roleInfo.name)}</span></div>
                             <div class="receipt-row"><span>Сумма</span><span>${roleInfo.price} ₽/мес</span></div>
                             <div class="receipt-row"><span>Период</span><span>раз в месяц</span></div>
@@ -10321,7 +10327,7 @@ const ClipMusic = (() => {
             playPauseHTML +
             '<div class="vk-clip-heart" id="heart-' + displayIdx + '">❤️</div>' +
             '<div class="vk-clip-top">' +
-                '<div class="vk-clip-top-logo">Тук Тук</div>' +
+                '<div class="vk-clip-top-logo">Брум Брум</div>' +
                 '<button class="vk-clip-close" onclick="switchTab(\'chats\')">&times;</button>' +
             '</div>' +
             '<div class="vk-clip-info">' +
@@ -10622,7 +10628,7 @@ const ClipMusic = (() => {
 
     function vkClipShare(displayIdx) {
         var url = window.location.origin || 'https://car-messenger.serveousercontent.com';
-        if (navigator.share) { navigator.share({ title: 'Тук Тук клип', url: url }).catch(function() {}); }
+        if (navigator.share) { navigator.share({ title: 'Брум Брум клип', url: url }).catch(function() {}); }
         else if (navigator.clipboard) { navigator.clipboard.writeText(url).then(function() { _vkClipToast('🔗 Ссылка скопирована!'); }); }
         else { _vkClipToast('↗️ Клип скопирован!'); }
     }
