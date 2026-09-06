@@ -2060,6 +2060,7 @@ color:transparent; }
             return base;
         }
         function grantLoginBonus() {
+            checkRent();
             var ls = state.loginStreak;
             var today = new Date().toDateString();
             if (ls.lastDate === today) { renderLoginStreak(); return; }
@@ -5411,9 +5412,72 @@ function setTheme(mode) {
         }
         function removeAuction(idx) {
             acSeed();
-            if (!state.auction[idx]) return;
-            state.auction.splice(idx,1);
-            saveState(); renderAuction(); notify('Подписка снята с аукциона','info');
+            var it = state.auction[idx];
+            if (!it) return;
+            var mine = state.myPlate || state.authToken || '?';
+            if (it.sellerId !== mine) { notify('Снять может только тот, кто выставил подписку','error'); return; }
+            var storeRole = ROLE_SHOP_ROLES.find(function(r){ return r.id === it.role; });
+            var halfStore = storeRole ? Math.max(1, Math.round(storeRole.price / 2)) : Math.max(1, Math.round(it.price / 2));
+            var wrap = document.createElement('div');
+            wrap.style.cssText = 'position:fixed;inset:0;z-index:250001;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;padding:20px;';
+            var f = document.createElement('div');
+            f.style.cssText = 'background:var(--bg-card);border:1px solid rgba(255,255,255,0.2);border-radius:16px;padding:20px;width:100%;max-width:380px;';
+            f.innerHTML = '<h3 style="font-family:Orbitron;margin:0 0 10px;color:var(--warning);">✕ Снять «' + esc(ROLE_NAMES[it.role] || it.role) + '»</h3>' +
+                '<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Что сделать с подпиской?</div>' +
+                '<button onclick="removeAuctionFull(' + idx + ')" style="width:100%;margin:4px 0;padding:11px;background:linear-gradient(135deg,#ef4444,#b91c1c);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;">🗑️ Убрать подписку совсем</button>' +
+                '<button onclick="removeAuctionKeep(' + idx + ')" style="width:100%;margin:4px 0;padding:11px;background:linear-gradient(135deg,#22c55e,#16a34a);border:none;border-radius:10px;color:#fff;font-weight:700;font-size:13px;cursor:pointer;">💳 Оставить, но платить ' + halfStore + ' 💰 каждый день</button>' +
+                '<button onclick="document.getElementById(\'auctionRemoveWrap\').remove()" style="width:100%;margin-top:8px;padding:10px;background:#334155;border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;">Отмена</button>';
+            wrap.appendChild(f); wrap.id = 'auctionRemoveWrap';
+            document.body.appendChild(wrap);
+        }
+        function removeAuctionFull(idx) {
+            acSeed();
+            var it = state.auction[idx]; if (!it) return;
+            var subs = subsGet();
+            if (subs[it.role]) delete subs[it.role];
+            state.subs = subs;
+            if (state.role === it.role) state.role = _subBestActive();
+            if (state.rent && state.rent.role === it.role) state.rent = null;
+            state.auction.splice(idx, 1);
+            saveState(); renderAuction(); renderRoleShop();
+            var w = document.getElementById('auctionRemoveWrap'); if (w) w.remove();
+            notify('🗑️ Подписка снята и удалена совсем', 'ok');
+        }
+        function removeAuctionKeep(idx) {
+            acSeed();
+            var it = state.auction[idx]; if (!it) return;
+            var subs = subsGet();
+            subs[it.role] = Math.max(subs[it.role] || 0, it.until || Date.now());
+            state.subs = subs;
+            if ((ROLE_POWER[it.role] || 0) > (ROLE_POWER[state.role] || 1)) state.role = it.role;
+            var storeRole = ROLE_SHOP_ROLES.find(function(r){ return r.id === it.role; });
+            var price = storeRole ? Math.max(1, Math.round(storeRole.price / 2)) : Math.max(1, Math.round(it.price / 2));
+            state.rent = { role: it.role, price: price, payday: Date.now() + 24 * 60 * 60 * 1000 };
+            state.auction.splice(idx, 1);
+            saveState(); renderAuction(); renderRoleShop();
+            var w = document.getElementById('auctionRemoveWrap'); if (w) w.remove();
+            notify('💳 Подписка осталась! Плати ' + price + ' 💰 каждый день (половина цены из магазина)', 'ok');
+        }
+        function checkRent() {
+            if (!state.rent) return;
+            var r = state.rent;
+            var subs = subsGet();
+            var have = subs[r.role] && subs[r.role] > Date.now();
+            if (!have) { state.rent = null; saveState(); return; }
+            if (Date.now() < r.payday) return;
+            if ((state.coins || 0) >= r.price) {
+                state.coins -= r.price;
+                r.payday = Date.now() + 24 * 60 * 60 * 1000;
+                saveState(); updateCoinsUI();
+                notify('💳 Оплачена подписка ' + (ROLE_NAMES[r.role] || r.role) + ' за сегодня: ' + r.price + ' 💰', 'success');
+            } else {
+                delete subs[r.role];
+                state.subs = subs;
+                if (state.role === r.role) state.role = _subBestActive();
+                state.rent = null;
+                saveState(); renderRoleShop();
+                notify('❌ Не хватило монет — подписка ' + (ROLE_NAMES[r.role] || r.role) + ' сгорела!', 'error');
+            }
         }
 
         let _serverDemo = null;
