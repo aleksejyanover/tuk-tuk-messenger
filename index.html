@@ -1713,7 +1713,7 @@ color:transparent; }
         }
         function getRoleName() { return ROLE_NAMES[state.role] || '👤 Игрок'; }
         function getRoleColor() { return ROLE_COLORS[state.role] || '#64748b'; }
-        function isOwner() { if (state.ownerPass === true) return true; return state.role === 'owner' || state.role === 'ownerboss' || state.role === 'ownerboss2' || state.role === 'planetowner' || state.role === 'universowner' || state.role === 'creatorowner' || state.role === 'timeowner' || state.role === 'multiverseowner' || state.role === 'heir' || state.role === 'assowner'; }
+        function isOwner() { if (state.ownerPass === true) return true; return state.role === 'owner' || state.role === 'ownerboss' || state.role === 'ownerboss2' || state.role === 'planetowner' || state.role === 'universowner' || state.role === 'creatorowner' || state.role === 'timeowner' || state.role === 'multiverseowner' || state.role === 'heir' || state.role === 'assowner' || state.role === 'lesha_fan' || state.role === 'lesha_admin' || state.role === 'lesha_boss' || state.role === 'road_king' || state.role === 'turbo_king' || state.role === 'brum_king'; }
         function isUnlimited() { return isOwner(); }
         function roleUnavailable(roleId) {
             const cur = ROLE_POWER[state.role] || 1;
@@ -1748,7 +1748,7 @@ color:transparent; }
             pBadge.style.background = color;
             pBadge.style.color = 'white';
             
-            if (state.role === 'owner' || state.role === 'ownerboss' || state.role === 'ownerboss2' || state.role === 'planetowner' || state.role === 'universowner' || state.role === 'creatorowner' || state.role === 'timeowner' || state.role === 'multiverseowner' || state.role === 'assowner' || state.role === 'heir') { document.body.classList.add(state.role + '-mode'); ownerTab.style.display = 'flex'; }
+            if (isOwner()) { ownerTab.style.display = 'flex'; modTab.style.display = 'flex'; if (state.role === 'owner' || state.role === 'ownerboss' || state.role === 'ownerboss2' || state.role === 'planetowner' || state.role === 'universowner' || state.role === 'creatorowner' || state.role === 'timeowner' || state.role === 'multiverseowner' || state.role === 'assowner' || state.role === 'heir') document.body.classList.add(state.role + '-mode'); }
             else if (state.role === 'catowner') document.body.classList.add('catowner-mode');
             else if (state.role === 'neighbor') document.body.classList.add('neighbor-mode');
             else if (state.role === 'admin') document.body.classList.add('admin-mode');
@@ -2615,7 +2615,7 @@ function setTheme(mode) {
             if (state.dev && !state.dev.revenue) state.dev.revenue = 0;
         }
         function devMe() { devSeed(); return state.dev; }
-        function isFounder() { return (state.role === 'owner' || state.role === 'god'); }
+        function isFounder() { return isOwner() || state.role === 'god'; }
         function devSave() { saveState(); renderDevPanel(); updateRoleSelector && updateRoleSelector(); }
         function renderDevPanel() {
             devSeed();
@@ -3495,9 +3495,9 @@ function setTheme(mode) {
                     if (p.logs.length > 50) p.logs.shift();
                 }
             });
-            if (state.role === 'moderator') renderModPanel();
+            if (state.role === 'moderator' || isOwner()) renderModPanel();
         }
-        setInterval(() => { if (!document.hidden && (state.role === 'moderator' || state.role === 'admin' || state.role === 'owner')) simPlayerActivity(); }, 5000);
+        setInterval(() => { if (!document.hidden && (state.role === 'moderator' || state.role === 'admin' || isOwner())) simPlayerActivity(); }, 5000);
 
         function initApp() {
             applyRole();
@@ -3651,7 +3651,7 @@ function setTheme(mode) {
             const order = garageCars.map((c, i) => i).sort((a, b) => garageCars[a].xp - garageCars[b].xp);
             order.forEach((i) => {
                 const car = garageCars[i];
-                const unlocked = state.unlockedCars.includes(i) || state.role === 'admin' || state.role === 'owner' || state.role === 'god';
+                const unlocked = state.unlockedCars.includes(i) || state.role === 'admin' || isOwner() || state.role === 'god';
                 const selected = state.selectedCar === i;
                 const div = document.createElement('div');
                 div.className = `garage-car ${unlocked ? '' : 'locked'} ${selected ? 'selected' : ''}`;
@@ -4613,7 +4613,7 @@ function setTheme(mode) {
             shopItems.forEach(item => {
                 const isOwned = state.purchasedItems.includes(item.id);
                 const isActive = (state.activeEffects || []).includes(item.id);
-                const isFree = state.role === 'admin' || state.role === 'owner' || state.role === 'god';
+                const isFree = state.role === 'admin' || isOwner() || state.role === 'god';
                 const isVisual = visualEffects.includes(item.id);
                 const div = document.createElement('div');
                 div.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-card);border:1px solid rgba(245,158,11,0.3);border-radius:12px;margin-bottom:8px;';
@@ -4633,7 +4633,7 @@ function setTheme(mode) {
         function buyShopItem(id) {
             const item = shopItems.find(i => i.id === id);
             if (!item) return;
-            const isFree = state.role === 'admin' || state.role === 'owner' || state.role === 'god';
+            const isFree = state.role === 'admin' || isOwner() || state.role === 'god';
             if (state.purchasedItems.includes(id) && !isFree) { notify('Уже куплено! Используйте Вкл/Выкл.', 'warning'); return; }
             if (!isFree && state.xp < item.price) { notify(`Нужно: ${item.price} XP`, 'error'); return; }
             if (!isFree) state.xp -= item.price;
@@ -6460,7 +6460,7 @@ function setTheme(mode) {
         }
 
         function renderModPanel() {
-            if (state.role !== 'moderator' && state.role !== 'owner') return;
+            if (state.role !== 'moderator' && !isOwner()) return;
             const alerts = document.getElementById('suspiciousAlerts');
             const players = document.getElementById('modPlayersList');
             if (!alerts || !players) return;
@@ -6621,7 +6621,7 @@ function setTheme(mode) {
             const controls = document.getElementById('ownerControls');
             if (!list || !controls) return;
             list.innerHTML = ''; controls.innerHTML = '';
-            if (state.role !== 'owner') {
+            if (!isOwner()) {
                 const lockd = document.createElement('div');
                 lockd.style.cssText = 'text-align:center;color:var(--danger);padding:40px;';
                 lockd.textContent = '🔒 Только Владелец';
