@@ -658,7 +658,7 @@ color:transparent; }
         html.device-mobile .messages-area { padding: 10px 10px; -webkit-overflow-scrolling: touch; }
         html.device-mobile #chatList { -webkit-overflow-scrolling: touch; }
         html.device-mobile .login { padding: 24px 16px; }
-        html.device-mobile .password-box, html.device-mobile .watch-modal, html.device-mobile .payment-modal, html.device-mobile .game-modal, html.device-mobile .media-modal { width: 96%; max-width: 96%; }
+        html.device-mobile .password-box, html.device-mobile .watch-modal, html.device-mobile .payment-modal, html.device-mobile .game-modal { width: 96%; max-width: 96%; }
         html.device-mobile .notification-stack { right: 10px; left: 10px; align-items: stretch; }
         html.device-mobile .notification { max-width: 100%; }
         html.device-mobile .date-separator { max-width: 100%; }
@@ -755,16 +755,6 @@ color:transparent; }
         :root.theme-light .role-code-input { border-color: #d1d5db; color: #111; }
         :root.theme-light .payment-modal { background: #fff; border-color: #e5e7eb; }
     
-.media-btn { background:var(--bg-input,#161d30); color:var(--text,#e5e7eb); border:1px solid #3b4a6b; border-radius:10px; padding:5px 10px; font-size:10px; font-weight:700; cursor:pointer; transition:.2s; }
-.media-btn:hover { border-color:var(--accent,#00f0ff); color:var(--accent,#00f0ff); }
-.media-modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.75); display:flex; align-items:center; justify-content:center; z-index:999; }
-.media-modal { background:var(--bg-card,#111827); border:1px solid #3b4a6b; border-radius:18px; max-width:560px; width:92%; padding:24px; max-height:85vh; overflow:auto; box-shadow:0 12px 40px rgba(0,0,0,.5); }
-.media-modal h3 { margin:0 0 12px; font-size:20px; }
-.media-modal-symbol { font-size:92px; text-align:center; margin:10px 0; }
-.media-modal p { font-size:14px; color:var(--text-muted,#9ca3af); line-height:1.5; }
-.media-modal .mflag { display:flex; height:120px; border-radius:12px; overflow:hidden; border:1px solid #3b4a6b; margin:12px 0; }
-.media-modal .mflag div { flex:1; }
-.media-close { position:fixed; top:16px; right:16px; background:var(--bg-input,#161d30); border:1px solid #3b4a6b; color:#fff; border-radius:999px; width:38px; height:38px; font-size:18px; cursor:pointer; z-index:1000; }
 </style>
 </head>
 <body>
@@ -934,10 +924,6 @@ color:transparent; }
                     <div style="font-size:10px;color:#fbbf24;margin-top:2px;">💰 <span id="topCoinBalance">0</span></div>
                     <div style="font-size:10px;color:#a78bfa;margin-top:2px;">💎 <span id="topLechBalance">0</span> Лешинксы</div>
                     <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
-                        <button class="media-btn" onclick="openMedia('anthem')">🎵 Гимн</button>
-                        <button class="media-btn" onclick="openMedia('flag')">🚩 Флаг</button>
-                        <button class="media-btn" onclick="openMedia('herb')">🛡️ Герб</button>
-                        <button class="media-btn" onclick="openMedia('promo')">📢 Приколюхи</button>
                     </div>
                 </div>
             </div>
@@ -2238,87 +2224,7 @@ color:transparent; }
             '</div>';
         }
 
-                var _mediaAudio = null;
-        function closeMedia() {
-            var b = document.getElementById('mediaBackdrop');
-            if (b) b.remove();
-            if (_mediaAudio) { _mediaAudio.pause(); _mediaAudio = null; }
-        }
-        function openMedia(type) {
-            var title='', body='', footer='';
-            if (type==='anthem') {
-                title='🎵 Гимн мессенджера Брум-Брум Алёши';
-                body='<div class="media-modal-symbol">🎵</div><p>Слушай гимн нашего мессенджера — про Брум-Брум, машины, монеты, Лешинксы и бота Алёшу. Голос и мелодия играют автоматически.</p>';
-                footer='<div style="margin-top:14px;display:flex;gap:8px"><button class="media-btn" onclick="playAnthem()">▶ Слушать</button><button class="media-btn" onclick="stopAnthem()">⏹ Стоп</button></div>'+
-                    '<p style="font-size:11px;color:var(--text-muted);margin-top:10px;">'+
-                    'Брум-Брум, Брум-Брум — мессенджер для машин.<br>По номеру авто мы свяжемся в один миг.<br>Монеты и Лешинксы в кармане у тебя.<br>И бот Алёша рядом — поможет он всегда.'+
-                    '</p>';
-            } else if (type==='flag') {
-                title='🚩 Флаг мессенджера Брум-Брум Алёши';
-                body='<div class="media-modal-symbol">🚩</div>'+
-                    '<div class="mflag">'+
-                      '<div style="background:#005ac8"></div>'+
-                      '<div style="background:#0a0c18"></div>'+
-                      '<div style="background:#7828c8"></div>'+
-                    '</div>'+
-                    '<p>Три неоновые полосы: синий — свобода дороги, чёрный — ночь на трассе, фиолетовый — магия будущего. В центре — знак Брум-Брум с машиной.</p>';
-            } else if (type==='herb') {
-                title='🛡️ Герб мессенджера Брум-Брум Алёши';
-                body='<div class="media-modal-symbol">🛡️</div>'+
-                    '<p>Щит с короной Владельца, машиной в центре и знаками валют мессенджера — монетой 💰 и Лешинксом 💎. Внизу лента с названием «Брум-Брум».</p>'+
-                    '<div style="display:flex;gap:10px;align-items:center;margin-top:10px">'+
-                      '<span style="font-size:44px">👑</span><span style="color:#fbbf24;font-weight:700">ВЛАДЕЛЕЦ</span>'+
-                      '<span style="margin-left:auto;font-size:30px">🚗 💰 💎</span>'+
-                    '</div>';
-            } else if (type==='promo') {
-                title='📢 Рекламные приколюхи Брум-Брум';
-                var items=[
-                    ['promo/logo.png','Логотип'],['promo/qr_poster.png','QR-постер'],
-                    ['promo/banner_square.png','Пост 1080×1080'],['promo/banner_wide.png','Баннер 1200×630'],
-                    ['promo/banner_horo.png','Баннер 1500×500'],['promo/story.png','Сторис'],
-                    ['promo/quote1.png','Цитата 1'],['promo/quote2.png','Цитата 2'],
-                    ['promo/brand_post.png','Бренд-пост'],['promo/cta_button.png','Кнопка Скачать']
-                ];
-                var g='<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">';
-                for (var i=0;i<items.length;i++){
-                    g+='<div style="text-align:center;width:110px;cursor:pointer" onclick="viewPromo('+i+')">'+
-                       '<img src="'+items[i][0]+'" style="width:110px;height:110px;object-fit:cover;border-radius:12px;border:2px solid #3b4a6b" onerror="this.style.display=\'none\'">'+
-                       '<div style="font-size:10px;color:var(--text-muted,#9ca3af);margin-top:4px">'+items[i][1]+'</div>'+
-                    '</div>';
-                }
-                g+='</div><p style="font-size:11px;color:var(--text-muted);margin-top:12px;text-align:center">Нажми на картинку, чтобы открыть на весь экран. Папка promo/ — в папке с приложением.</p>';
-                body=g;
-            }
-            var backdrop=document.createElement('div');
-            backdrop.className='media-modal-backdrop';
-            backdrop.id='mediaBackdrop';
-            backdrop.onclick=function(e){ if(e.target===backdrop) closeMedia(); };
-            backdrop.innerHTML='<div class="media-modal"><h3>'+title+'</h3>'+body+footer+'</div>'+
-                '<button class="media-close" onclick="closeMedia()">✕</button>';
-            document.body.appendChild(backdrop);
-        }
-        function playAnthem() {
-            if (!_mediaAudio) { _mediaAudio = new Audio('gimn.mp3'); _mediaAudio.loop=false; }
-            _mediaAudio.currentTime=0;
-            _mediaAudio.play().catch(function(){});
-        }
-        function stopAnthem() { if (_mediaAudio) { _mediaAudio.pause(); } }
-
-        var _promoItems=[['promo/logo.png','Логотип'],['promo/qr_poster.png','QR-постер'],['promo/banner_square.png','Пост 1080×1080'],['promo/banner_wide.png','Баннер 1200×630'],['promo/banner_horo.png','Баннер 1500×500'],['promo/story.png','Сторис'],['promo/quote1.png','Цитата 1'],['promo/quote2.png','Цитата 2'],['promo/brand_post.png','Бренд-пост'],['promo/cta_button.png','Кнопка Скачать']];
-        function viewPromo(i) {
-            var src=_promoItems[i][0], label=_promoItems[i][1];
-            var backdrop=document.createElement('div');
-            backdrop.className='media-modal-backdrop';
-            backdrop.id='promoBackdrop';
-            backdrop.onclick=function(e){ if(e.target===backdrop) backdrop.remove(); };
-            backdrop.innerHTML='<div style="max-width:92vw;max-height:90vh;display:flex;flex-direction:column;align-items:center">'+
-                '<h3 style="color:#fff;margin:0 0 10px;font-size:18px">'+label+'</h3>'+
-                '<img src="'+src+'" style="max-width:92vw;max-height:80vh;border-radius:14px;border:2px solid #3b4a6b;background:#000">'+
-            '</div><button class="media-close" onclick="document.getElementById(\'promoBackdrop\').remove()">✕</button>';
-            document.body.appendChild(backdrop);
-        }
-
-function setTheme(mode) {
+                function setTheme(mode) {
             var root = document.documentElement;
             root.classList.remove('theme-light');
             if (mode === 'light') root.classList.add('theme-light');
